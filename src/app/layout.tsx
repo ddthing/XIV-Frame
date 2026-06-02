@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://xiv-frame.com"),
   title: "XIV Frame - Final Fantasy XIV Screenshot Framer",
-  description: "파이널판타지14(FF14) 스크린샷 프레임 제작 도구. 나만의 시그니처와 레이아웃으로 멋진 스크린샷을 꾸며보세요.",
-  keywords: ["FF14", "파판14", "스크린샷", "프레임", "XIV Frame", "파이널판타지14", "스샷", "보정"],
+  description: "파이널판타지14(FF14) 스크린샷 2장 합치기 및 사진 배열, 나만의 시그니처 생성이 가능한 프레임 제작 도구입니다. 1장 이미지에도 간편하게 시그니처와 레이아웃을 설정해 멋진 스크린샷을 꾸며보세요.",
+  keywords: ["FF14", "파판14", "스크린샷", "프레임", "XIV Frame", "파이널판타지14", "스샷", "보정", "시그니처", "사진 합치기"],
   authors: [{ name: "XIV Frame" }],
   openGraph: {
     title: "XIV Frame - FF14 스크린샷 프레임",
