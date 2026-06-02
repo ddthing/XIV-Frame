@@ -1,36 +1,17 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# XIV Frame
 
-## Getting Started
+XIV Frame은 파이널판타지14(FF14) 유저들을 위한 간편한 웹 기반 스크린샷 꾸미기 도구입니다. 
 
-First, run the development server:
+## 주요 기능
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+* **간단한 사진 배열 및 합치기**: 최대 2장의 스크린샷을 업로드하여 나란히 합치거나, 자연스러운 그라데이션 블렌드(Soft Blend) 효과로 이어붙일 수 있습니다.
+* **나만의 시그니처 생성**: 캐릭터 이름, 서버명 등 원하는 텍스트를 입력하고 폰트와 레이아웃을 조절하여 스크린샷에 어울리는 시그니처를 만들 수 있습니다. 1장 이미지만 업로드해도 시그니처 설정이 가능합니다.
+* **커스텀 디자인 요소 지원**: 자체 엠블럼이나 부대 로고 이미지(PNG)를 불러와 원하는 위치에 배치할 수 있습니다.
+* **웹 기반 실시간 편집**: 별도의 프로그램 설치 없이 브라우저에서 바로 조작하며 결과물을 미리 보고 고화질(PNG, JPG)로 내보낼 수 있습니다.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 스택
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* **Core**: Next.js (App Router), React, TypeScript
+* **Styling**: TailwindCSS, Shadcn UI
+* **Canvas**: Konva (react-konva)
+* **State**: Zustand
