@@ -11,6 +11,8 @@ export const FONT_MAP: Record<string, string> = {
   'x12y12pxMaruMinyaHangul': '마루미냐 한글',
   'LotteriaChwapttaenggyeo': '롯데리아 촵땡겨체',
   'HsBombaram30': '봄바람체 3.0',
+  'GoodNeighbor': '좋은이웃체',
+  'SlowGothic': '느림보고딕',
 }
 
 export const POSITION_OPTIONS: { value: SignaturePosition; label: string; icon: React.ReactNode }[] = [
