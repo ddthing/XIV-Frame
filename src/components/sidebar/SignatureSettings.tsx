@@ -143,6 +143,8 @@ export function SignatureSettings() {
               <SelectItem value="x12y12pxMaruMinyaHangul" className="text-xs font-medium" style={{ fontFamily: 'x12y12pxMaruMinyaHangul' }}>마루미냐 한글</SelectItem>
               <SelectItem value="LotteriaChwapttaenggyeo" className="text-xs font-medium" style={{ fontFamily: 'LotteriaChwapttaenggyeo' }}>롯데리아 촵땡겨체</SelectItem>
               <SelectItem value="HsBombaram30" className="text-xs font-medium" style={{ fontFamily: 'HsBombaram30' }}>봄바람체 3.0</SelectItem>
+              <SelectItem value="GoodNeighbor" className="text-xs font-medium" style={{ fontFamily: 'GoodNeighbor' }}>좋은이웃체</SelectItem>
+              <SelectItem value="SlowGothic" className="text-xs font-medium" style={{ fontFamily: 'SlowGothic' }}>느림보고딕</SelectItem>
             </SelectContent>
           </Select>
         </div>
