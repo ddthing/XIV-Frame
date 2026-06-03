@@ -97,32 +97,54 @@
     "ratio": "비율",
     "zoomIn": "확대",
     "zoomOut": "축소",
-    "reset": "초기화",
     "export": "저장",
-    "exporting": "저장중...",
-    "copyrightToggle": "저작권 문구 표시"
+    "exporting": "저장 중...",
+    "copyrightToggle": "저작권 워터마크 표시",
+    "reset": "초기화"
   },
   "MobileLayout": {
-    "sheetTitle": "저장 및 비율 설정",
-    "exportTitle": "내보내기",
+    "sheetTitle": "내보내기 및 비율 설정",
+    "exportTitle": "저장 (내보내기)",
     "ratio": "비율",
     "navImage": "사진",
-    "navSignature": "시그니처",
-    "navLayout": "레이아웃",
+    "navSignature": "서명",
+    "navLayout": "비율",
     "navExport": "저장",
     "ratioSettings": "비율 설정",
-    "zoomSettings": "화면 배율",
+    "zoomSettings": "확대/축소 설정",
     "resetDefault": "기본값으로 초기화",
-    "savePhoto": "사진 저장"
+    "savePhoto": "사진 저장하기",
+    "zoomOut": "축소",
+    "zoomIn": "확대"
   },
   "LanguageSwitcher": {
     "language": "언어 (Language)"
   },
   "SettingsPanel": {
     "title": "설정",
+    "tabImage": "사진",
+    "tabLayout": "레이아웃",
+    "tabSignature": "시그니처",
+    "blog": "블로그 (가이드)",
     "privacy": "개인정보처리방침",
     "terms": "이용약관",
     "donate": "☕ 후원하기"
+  },
+  "Blog": {
+    "title": "가이드 & 팁",
+    "description": "파이널판타지14 스크린샷 보정, 단체자세 팁, XIV Frame 사용법을 소개합니다.",
+    "readMore": "자세히 보기",
+    "backToList": "목록으로 돌아가기",
+    "ctaTitle": "당신의 스크린샷을 더 아름답게",
+    "ctaDescription": "복잡한 프로그램 없이 지금 바로 웹 브라우저에서 스크린샷을 보정하고 멋진 시그니처를 남겨보세요.",
+    "ctaButton": "XIV Frame 시작하기",
+    "faqTitle": "자주 묻는 질문",
+    "faqQ1": "XIV Frame은 완전 무료인가요?",
+    "faqA1": "네, XIV Frame은 모든 기능을 회원가입 없이 무료로 사용할 수 있는 웹 기반 도구입니다.",
+    "faqQ2": "모바일에서도 사용할 수 있나요?",
+    "faqA2": "물론입니다. 스마트폰이나 태블릿에서도 최적화된 UI로 스크린샷을 병합하고 보정할 수 있습니다.",
+    "faqQ3": "저장된 스크린샷 화질이 떨어지지 않나요?",
+    "faqA3": "업로드한 원본 화질을 최대한 유지하며 고해상도 PNG 파일로 렌더링하여 압축 손실을 최소화합니다."
   },
   "CopyrightLayer": {
     "text": "© SQUARE ENIX Published in Korea by Actoz Soft CO., LTD."

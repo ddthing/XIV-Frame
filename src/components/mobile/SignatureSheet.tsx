@@ -1,8 +1,10 @@
 import React from 'react'
 import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer'
 import { SignatureSettings } from '@/components/sidebar/SignatureSettings'
+import { useTranslations } from 'next-intl'
 
 export function SignatureSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+  const t = useTranslations('SignatureSettings')
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="max-h-[85vh] bg-slate-50">

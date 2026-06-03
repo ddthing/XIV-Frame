@@ -97,32 +97,54 @@
     "ratio": "比率",
     "zoomIn": "拡大",
     "zoomOut": "縮小",
-    "reset": "リセット",
     "export": "保存",
     "exporting": "保存中...",
-    "copyrightToggle": "著作権表記を表示"
+    "copyrightToggle": "著作権表示",
+    "reset": "リセット"
   },
   "MobileLayout": {
-    "sheetTitle": "保存と比率設定",
+    "sheetTitle": "エクスポート・比率設定",
     "exportTitle": "保存",
     "ratio": "比率",
     "navImage": "写真",
     "navSignature": "署名",
-    "navLayout": "レイアウト",
+    "navLayout": "比率",
     "navExport": "保存",
     "ratioSettings": "比率設定",
     "zoomSettings": "ズーム設定",
-    "resetDefault": "デフォルトにリセット",
-    "savePhoto": "写真を保存"
+    "resetDefault": "初期化",
+    "savePhoto": "保存する",
+    "zoomOut": "縮小",
+    "zoomIn": "拡大"
   },
   "LanguageSwitcher": {
     "language": "言語 (Language)"
   },
   "SettingsPanel": {
     "title": "設定",
+    "tabImage": "写真",
+    "tabLayout": "レイアウト",
+    "tabSignature": "署名",
+    "blog": "ブログ（ガイド）",
     "privacy": "プライバシーポリシー",
     "terms": "利用規約",
     "donate": "☕ 寄付する"
+  },
+  "Blog": {
+    "title": "ガイド & ヒント",
+    "description": "FF14スクリーンショットの加工、グルポのヒント、XIV Frameの使い方を紹介します。",
+    "readMore": "続きを読む",
+    "backToList": "一覧に戻る",
+    "ctaTitle": "あなたのスクリーンショットをもっと美しく",
+    "ctaDescription": "面倒なソフトは不要です。ブラウザ上で今すぐスクリーンショットを加工し、オリジナルの署名を追加しましょう。",
+    "ctaButton": "XIV Frame を試す",
+    "faqTitle": "よくあるご質問",
+    "faqQ1": "XIV Frameは完全無料ですか？",
+    "faqA1": "はい、XIV Frameはすべての機能を登録なしで無料で利用できるウェブツールです。",
+    "faqQ2": "スマートフォンでも利用できますか？",
+    "faqA2": "もちろんです。スマホやタブレットでも快適にコラージュや編集ができるよう最適化されています。",
+    "faqQ3": "保存した画像の画質は落ちませんか？",
+    "faqA3": "元の画質を最大限に保持し、高解像度のPNG形式で出力するため圧縮による劣化を最小限に抑えています。"
   },
   "CopyrightLayer": {
     "text": "© SQUARE ENIX"
