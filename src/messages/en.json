@@ -130,10 +130,20 @@
     "terms": "Terms of Service",
     "donate": "☕ Donate"
   },
+  "Navigation": {
+    "app": "App",
+    "blog": "Guide",
+    "about": "About",
+    "contact": "Contact",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "donate": "Donate"
+  },
   "Blog": {
-    "title": "Guides & Tips",
-    "description": "Discover FFXIV screenshot tips, GPose tricks, and learn how to use XIV Frame.",
-    "readMore": "Read More",
+    "title": "Blog & Guides",
+    "description": "Learn how to make the most out of XIV Frame with our guides and tips.",
+    "readMore": "Read full article",
+    "back": "Back to list",
     "backToList": "Back to Articles",
     "ctaTitle": "Make Your Screenshots Beautiful",
     "ctaDescription": "Enhance your FFXIV screenshots, create collages, and add custom signatures right from your browser.",

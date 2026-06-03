@@ -129,20 +129,22 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
           blendWidth={state.blendWidth}
         />
 
-        <Layer x={state.borderWidth} y={state.borderWidth}>
-          <SignatureLayer 
-            contentWidth={logicalWidth}
-            contentHeight={logicalHeight}
-          />
-          <LogoLayer 
-            contentWidth={logicalWidth}
-            contentHeight={logicalHeight}
-          />
-          <CopyrightLayer 
-            contentWidth={logicalWidth}
-            contentHeight={logicalHeight}
-          />
-        </Layer>
+        {imagesData.length > 0 && (
+          <Layer x={state.borderWidth} y={state.borderWidth}>
+            <SignatureLayer 
+              contentWidth={logicalWidth}
+              contentHeight={logicalHeight}
+            />
+            <LogoLayer 
+              contentWidth={logicalWidth}
+              contentHeight={logicalHeight}
+            />
+            <CopyrightLayer 
+              contentWidth={logicalWidth}
+              contentHeight={logicalHeight}
+            />
+          </Layer>
+        )}
       </Stage>
     </div>
   )

@@ -35,7 +35,7 @@ export function TextOptionControl({
   return (
     <div className="space-y-1.5">
       <div className="grid grid-cols-[80px_1fr] items-center gap-2">
-        <Label className="text-xs text-slate-500 font-medium">{label}</Label>
+        <Label className="text-xs text-muted-foreground font-medium">{label}</Label>
         <Input 
           value={value} 
           onChange={(e) => onChangeValue(e.target.value)}
@@ -47,20 +47,20 @@ export function TextOptionControl({
       <div className="pl-[88px] flex items-center gap-2">
         <button 
           type="button" 
-          className={`p-1.5 rounded-full transition-colors ${bold ? 'bg-primary text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`} 
+          className={`p-1.5 rounded-full transition-colors ${bold ? 'bg-primary text-white' : 'bg-muted text-muted-foreground hover:bg-muted'}`} 
           onClick={() => onChangeBold(!bold)}
         >
           <Bold className="w-3.5 h-3.5" />
         </button>
         <button 
           type="button" 
-          className={`p-1.5 rounded-full transition-colors ${italic ? 'bg-primary text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`} 
+          className={`p-1.5 rounded-full transition-colors ${italic ? 'bg-primary text-white' : 'bg-muted text-muted-foreground hover:bg-muted'}`} 
           onClick={() => onChangeItalic(!italic)}
         >
           <Italic className="w-3.5 h-3.5" />
         </button>
-        <div className="flex-1 pl-2 flex items-center gap-2 border-l border-slate-200">
-          <span className="text-[10px] text-slate-400 font-medium whitespace-nowrap">{t('letterSpacing')}</span>
+        <div className="flex-1 pl-2 flex items-center gap-2 border-l border-border">
+          <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap">{t('letterSpacing')}</span>
           <Slider 
             value={[letterSpacing]} 
             onValueChange={v => onChangeLetterSpacing(Array.isArray(v) ? v[0] : v)} 

@@ -25,21 +25,21 @@ import { useTranslations } from 'next-intl'
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85vh] bg-slate-50">
+      <DrawerContent className="max-h-[85vh] bg-background">
         <DrawerTitle className="sr-only">{t('sheetTitle')}</DrawerTitle>
         <div className="p-6 pb-[calc(env(safe-area-inset-bottom,1rem)+1.5rem)] flex flex-col gap-8">
           
           {/* Canvas Ratio */}
           <div className="space-y-3">
-            <span className="text-sm font-semibold text-slate-800">{t('ratioSettings')}</span>
-            <div className="flex bg-slate-200/50 p-1.5 rounded-full">
+            <span className="text-sm font-semibold text-foreground">{t('ratioSettings')}</span>
+            <div className="flex bg-muted/50 p-1.5 rounded-full">
               {['auto', '16:9', '2:1'].map((ratio) => (
                 <button
                   key={ratio}
                   className={`flex-1 py-2.5 text-sm rounded-full transition-colors ${
                     canvasRatio === ratio 
-                      ? 'bg-white shadow-sm font-bold text-primary' 
-                      : 'text-slate-600 hover:text-slate-900 font-medium'
+                      ? 'bg-card shadow-sm font-bold text-primary' 
+                      : 'text-muted-foreground hover:text-foreground font-medium'
                   }`}
                   onClick={() => setCanvasRatio(ratio as CanvasRatio)}
                 >
@@ -51,9 +51,9 @@ import { useTranslations } from 'next-intl'
 
           {/* Zoom */}
           <div className="space-y-3">
-            <span className="text-sm font-semibold text-slate-800">{t('zoomSettings')}</span>
-            <div className="flex items-center gap-4 bg-white border border-slate-200 p-2 rounded-full">
-              <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0 rounded-full text-slate-600" aria-label={t('zoomOut')} onClick={() => setZoom(Math.max(10, zoom - 10))}>
+            <span className="text-sm font-semibold text-foreground">{t('zoomSettings')}</span>
+            <div className="flex items-center gap-4 bg-card border border-border p-2 rounded-full">
+              <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0 rounded-full text-muted-foreground" aria-label={t('zoomOut')} onClick={() => setZoom(Math.max(10, zoom - 10))}>
                 <ZoomOut className="w-5 h-5" />
               </Button>
               <div className="flex-1 px-2">
@@ -63,7 +63,7 @@ import { useTranslations } from 'next-intl'
                   min={10} max={200} step={1} 
                 />
               </div>
-              <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0 rounded-full text-slate-600" aria-label={t('zoomIn')} onClick={() => setZoom(Math.min(200, zoom + 10))}>
+              <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0 rounded-full text-muted-foreground" aria-label={t('zoomIn')} onClick={() => setZoom(Math.min(200, zoom + 10))}>
                 <ZoomIn className="w-5 h-5" />
               </Button>
             </div>
@@ -77,7 +77,7 @@ import { useTranslations } from 'next-intl'
                 resetAll()
                 onOpenChange(false)
               }} 
-              className="h-14 flex-1 rounded-3xl border-slate-200 bg-white font-semibold text-slate-700"
+              className="h-14 flex-1 rounded-3xl border-border bg-card font-semibold text-foreground"
             >
               <RefreshCw className="w-5 h-5 mr-2" /> {t('resetDefault')}
             </Button>

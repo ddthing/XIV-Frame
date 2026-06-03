@@ -1,11 +1,12 @@
 import { ClientApp } from '@/components/ClientApp'
-import { NextIntlClientProvider } from 'next-intl'
 import { notFound } from 'next/navigation'
 import { setRequestLocale } from 'next-intl/server'
 import type { Metadata } from 'next'
+import { locales } from '@/i18n/request'
+import { PageShell } from '@/components/layout/PageShell'
 
 export function generateStaticParams() {
-  return [{ locale: 'en' }, { locale: 'ja' }]
+  return locales.map((locale) => ({ locale }))
 }
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
@@ -52,15 +53,13 @@ export default async function LocalePage({ params }: { params: { locale: string 
   const { locale } = await params;
   setRequestLocale(locale);
   
-  if (!['en', 'ja'].includes(locale)) {
-    return null;
+  if (!locales.includes(locale as any)) {
+    notFound();
   }
 
-  const messages = (await import(`@/messages/${locale}.json`)).default;
-
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
+    <PageShell locale={locale} hideFooter={true} hideHeader={true}>
       <ClientApp currentLocale={locale} />
-    </NextIntlClientProvider>
+    </PageShell>
   )
 }

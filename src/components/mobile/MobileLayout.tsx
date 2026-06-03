@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { Logo } from '@/components/ui/Logo'
 import { PreviewCanvas } from '@/components/canvas/PreviewCanvas'
 import { MobileBottomNav } from './MobileBottomNav'
 import { ImageSheet } from './ImageSheet'
@@ -17,15 +18,8 @@ export function MobileLayout({ stageRef }: { stageRef: React.MutableRefObject<Ko
   const [activeSheet, setActiveSheet] = useState<BottomSheetType>(null)
 
   return (
-    <div className="flex flex-col w-full h-full relative bg-slate-50">
-      {/* Header */}
-      <header className="flex items-center justify-between h-12 px-4 bg-white border-b border-slate-200 shrink-0 z-10">
-        <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="XIV Frame Logo" className="w-5 h-5 rounded-md object-cover" />
-          <h1 className="text-sm font-bold text-slate-800 tracking-tight">XIV Frame</h1>
-        </div>
-        <LanguageSwitcher />
-      </header>
+    <div className="flex flex-col w-full h-full relative bg-background">
+      {/* Header removed: using global SiteHeader from PageShell */}
 
       {/* Canvas Area */}
       <main className="flex-1 relative overflow-hidden">
@@ -33,7 +27,7 @@ export function MobileLayout({ stageRef }: { stageRef: React.MutableRefObject<Ko
       </main>
 
       {/* Bottom Navigation */}
-      <div className="shrink-0 z-20 pb-[env(safe-area-inset-bottom,0px)] bg-white border-t border-slate-200">
+      <div className="shrink-0 z-20 pb-[env(safe-area-inset-bottom,0px)] bg-card border-t border-border">
         <MobileBottomNav activeSheet={activeSheet} onSelect={setActiveSheet} />
       </div>
 

@@ -26,12 +26,12 @@ export function ClientApp({ currentLocale }: { currentLocale: string }) {
   }, [currentLocale, router])
 
   return (
-    <div className="flex h-[100dvh] w-full bg-slate-50 font-sans text-slate-900 overflow-hidden flex-col md:flex-row">
+    <div className="flex h-full w-full bg-background font-sans text-foreground overflow-hidden flex-col md:flex-row">
       
       {/* Desktop Layout (Hidden on Mobile) */}
       <div className="hidden md:flex w-full h-full">
         {/* Desktop Sidebar */}
-        <aside className="w-[280px] xl:w-[360px] flex-shrink-0 bg-white border-r border-slate-200 h-full z-10">
+        <aside className="w-[280px] xl:w-[360px] flex-shrink-0 bg-card border-r border-border h-full z-10">
           <SettingsPanel />
         </aside>
 
