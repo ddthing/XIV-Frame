@@ -57,8 +57,8 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
   return (
     <Container size="md" className="py-12 lg:py-24">
       <div className="mb-16 text-center space-y-4">
-        <h1 className="text-5xl lg:text-6xl font-normal tracking-tight text-foreground">{t('title')}</h1>
-        <p className="text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto leading-[1.75] tracking-[-0.01em] break-keep">
+        <h1 className="text-3xl lg:text-4xl font-semibold tracking-tight text-foreground">{t('title')}</h1>
+        <p className="text-base text-muted-foreground max-w-2xl mx-auto leading-[1.75] tracking-[-0.01em] break-keep">
           {t('description')}
         </p>
       </div>
@@ -68,7 +68,7 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
           <Link key={post.slug} href={`/${locale}/blog/${post.slug}`} className="block group">
             <article className="p-6 sm:p-8 bg-card border border-border rounded-[24px] shadow-none hover:bg-muted/50 transition-all">
               <div className="flex flex-col sm:flex-row sm:items-baseline gap-4 mb-3">
-                <h2 className="text-2xl font-normal tracking-tight text-foreground group-hover:text-primary transition-colors">
+                <h2 className="text-xl font-semibold tracking-tight text-foreground group-hover:text-primary transition-colors">
                   {post.metadata.title}
                 </h2>
                 <time className="text-sm text-muted-foreground whitespace-nowrap">

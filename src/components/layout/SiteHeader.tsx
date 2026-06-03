@@ -8,7 +8,7 @@ import { Logo } from '@/components/ui/Logo'
 import { Menu, X } from 'lucide-react'
 import { Container } from './Container'
 
-export function SiteHeader({ locale, hideBorder = false }: { locale: string, hideBorder?: boolean }) {
+export function SiteHeader({ locale, hideBorder = false, className = '' }: { locale: string, hideBorder?: boolean, className?: string }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const t = useTranslations('Navigation')
 
@@ -19,7 +19,7 @@ export function SiteHeader({ locale, hideBorder = false }: { locale: string, hid
   ]
 
   return (
-    <header className={`sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md ${hideBorder ? '' : 'border-b border-border'}`}>
+    <header className={`sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md ${hideBorder ? '' : 'border-b border-border'} ${className}`}>
       <Container size="lg" className="h-16 flex items-center justify-between">
         <div className="flex items-center gap-8">
           <Link href={`/${locale}`} className="flex items-center">
