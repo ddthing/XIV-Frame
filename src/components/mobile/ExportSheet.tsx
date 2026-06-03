@@ -8,6 +8,8 @@ import { Slider } from '@/components/ui/slider'
 
   import type Konva from 'konva'
 
+import { useTranslations } from 'next-intl'
+
   export function ExportSheet({ 
     open, 
     onOpenChange, 
@@ -18,6 +20,8 @@ import { Slider } from '@/components/ui/slider'
     stageRef: React.MutableRefObject<Konva.Stage | null>;
   }) {
   const { canvasRatio, setCanvasRatio, zoom, setZoom, resetAll } = useStore()
+  const t = useTranslations('MobileLayout')
+  const layoutT = useTranslations('LayoutSettings')
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -27,7 +31,7 @@ import { Slider } from '@/components/ui/slider'
           
           {/* Canvas Ratio */}
           <div className="space-y-3">
-            <span className="text-sm font-semibold text-slate-800">비율 설정</span>
+            <span className="text-sm font-semibold text-slate-800">{t('ratioSettings')}</span>
             <div className="flex bg-slate-200/50 p-1.5 rounded-full">
               {['auto', '16:9', '2:1'].map((ratio) => (
                 <button
@@ -39,7 +43,7 @@ import { Slider } from '@/components/ui/slider'
                   }`}
                   onClick={() => setCanvasRatio(ratio as CanvasRatio)}
                 >
-                  {ratio.toUpperCase()}
+                  {ratio === 'auto' ? layoutT('ratioAuto') : ratio.toUpperCase()}
                 </button>
               ))}
             </div>
@@ -47,7 +51,7 @@ import { Slider } from '@/components/ui/slider'
 
           {/* Zoom */}
           <div className="space-y-3">
-            <span className="text-sm font-semibold text-slate-800">화면 배율</span>
+            <span className="text-sm font-semibold text-slate-800">{t('zoomSettings')}</span>
             <div className="flex items-center gap-4 bg-white border border-slate-200 p-2 rounded-full">
               <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0 rounded-full text-slate-600" aria-label="축소" onClick={() => setZoom(Math.max(10, zoom - 10))}>
                 <ZoomOut className="w-5 h-5" />
@@ -75,7 +79,7 @@ import { Slider } from '@/components/ui/slider'
               }} 
               className="h-14 flex-1 rounded-3xl border-slate-200 bg-white font-semibold text-slate-700"
             >
-              <RefreshCw className="w-5 h-5 mr-2" /> 기본값으로 초기화
+              <RefreshCw className="w-5 h-5 mr-2" /> {t('resetDefault')}
             </Button>
             <Button 
               className="h-14 flex-[2] rounded-3xl font-bold text-base shadow-lg shadow-primary/20" 
@@ -84,7 +88,7 @@ import { Slider } from '@/components/ui/slider'
                 onOpenChange(false)
               }}
             >
-              <Download className="w-5 h-5 mr-2" /> 사진 저장
+              <Download className="w-5 h-5 mr-2" /> {t('savePhoto')}
             </Button>
           </div>
           

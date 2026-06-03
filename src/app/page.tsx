@@ -1,38 +1,36 @@
-'use client'
+import { ClientApp } from '@/components/ClientApp'
+import { NextIntlClientProvider } from 'next-intl'
+import { setRequestLocale } from 'next-intl/server'
+import koMessages from '@/messages/ko.json'
+import type { Metadata } from 'next'
 
-import { useRef } from 'react'
-import { SettingsPanel } from '@/components/sidebar/SettingsPanel'
-import { PreviewCanvas } from '@/components/canvas/PreviewCanvas'
-import { DesktopToolbar } from '@/components/canvas/DesktopToolbar'
-import { MobileLayout } from '@/components/mobile/MobileLayout'
-
-import type Konva from 'konva'
+export const metadata: Metadata = {
+  alternates: {
+    canonical: 'https://xiv-frame.com',
+    languages: {
+      'ko': 'https://xiv-frame.com',
+      'en': 'https://xiv-frame.com/en',
+      'ja': 'https://xiv-frame.com/ja',
+      'x-default': 'https://xiv-frame.com'
+    }
+  },
+  openGraph: {
+    title: "XIV Frame - FF14 스크린샷 프레임",
+    description: "파이널판타지14 스크린샷을 나만의 스타일로 꾸미고 저장하세요.",
+    url: "https://xiv-frame.com",
+    locale: "ko_KR",
+  },
+  twitter: {
+    title: "XIV Frame - FF14 스크린샷 프레임",
+    description: "파이널판타지14 스크린샷을 나만의 스타일로 꾸미고 저장하세요.",
+  }
+}
 
 export default function Home() {
-  const stageRef = useRef<Konva.Stage | null>(null)
-
+  setRequestLocale('ko');
   return (
-    <div className="flex h-[100dvh] w-full bg-slate-50 font-sans text-slate-900 overflow-hidden flex-col md:flex-row">
-      
-      {/* Desktop Layout (Hidden on Mobile) */}
-      <div className="hidden md:flex w-full h-full">
-        {/* Desktop Sidebar */}
-        <aside className="w-[280px] xl:w-[360px] flex-shrink-0 bg-white border-r border-slate-200 h-full z-10">
-          <SettingsPanel />
-        </aside>
-
-        {/* Desktop Main Area */}
-        <main className="flex-1 flex flex-col h-full overflow-hidden relative">
-          <DesktopToolbar stageRef={stageRef} />
-          <PreviewCanvas stageRef={stageRef} />
-        </main>
-      </div>
-
-      {/* Mobile Layout (Hidden on Desktop) */}
-      <div className="md:hidden flex w-full h-full">
-        <MobileLayout stageRef={stageRef} />
-      </div>
-
-    </div>
+    <NextIntlClientProvider locale="ko" messages={koMessages}>
+      <ClientApp currentLocale="ko" />
+    </NextIntlClientProvider>
   )
 }

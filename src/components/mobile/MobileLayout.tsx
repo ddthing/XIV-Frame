@@ -7,6 +7,7 @@ import { ImageSheet } from './ImageSheet'
 import { SignatureSheet } from './SignatureSheet'
 import { LayoutSheet } from './LayoutSheet'
 import { ExportSheet } from './ExportSheet'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 
 export type BottomSheetType = 'image' | 'signature' | 'layout' | 'export' | null
 
@@ -18,9 +19,12 @@ export function MobileLayout({ stageRef }: { stageRef: React.MutableRefObject<Ko
   return (
     <div className="flex flex-col w-full h-full relative bg-slate-50">
       {/* Header */}
-      <header className="flex items-center justify-center gap-2 h-12 bg-white border-b border-slate-200 shrink-0 z-10">
-        <img src="/logo.png" alt="XIV Frame Logo" className="w-5 h-5 rounded-md object-cover" />
-        <h1 className="text-sm font-bold text-slate-800 tracking-tight">XIV Frame</h1>
+      <header className="flex items-center justify-between h-12 px-4 bg-white border-b border-slate-200 shrink-0 z-10">
+        <div className="flex items-center gap-2">
+          <img src="/logo.png" alt="XIV Frame Logo" className="w-5 h-5 rounded-md object-cover" />
+          <h1 className="text-sm font-bold text-slate-800 tracking-tight">XIV Frame</h1>
+        </div>
+        <LanguageSwitcher />
       </header>
 
       {/* Canvas Area */}
