@@ -89,6 +89,8 @@
     "posTopLeft": "좌상단",
     "posTopCenter": "중앙상단",
     "posTopRight": "우상단",
+    "posMiddleLeft": "좌중단",
+    "posMiddleRight": "우중단",
     "posBottomLeft": "좌하단",
     "posBottomCenter": "중앙하단",
     "posBottomRight": "우하단",

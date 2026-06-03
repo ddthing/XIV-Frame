@@ -51,7 +51,7 @@ export function ImageUploader() {
           return (
             <div 
               key={idx} 
-              className="relative flex-1 aspect-[4/3] rounded-3xl border-2 border-dashed border-border overflow-hidden bg-background flex flex-col items-center justify-center cursor-pointer hover:bg-muted transition-colors group"
+              className="relative flex-1 aspect-[4/3] rounded-sm border-2 border-dashed border-border overflow-hidden bg-background flex flex-col items-center justify-center cursor-pointer hover:bg-muted transition-colors group"
               onClick={() => !image && handleFileUpload(idx)}
             >
               {image ? (
@@ -60,18 +60,18 @@ export function ImageUploader() {
                   <img src={image} alt={`Upload ${idx + 1}`} className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                     {idx > 0 && (
-                      <button onClick={(e) => handleMove(e, idx, 'prev')} className="bg-black/50 text-white p-1.5 rounded-full hover:bg-black/70">
+                      <button onClick={(e) => handleMove(e, idx, 'prev')} className="bg-black/50 text-white p-1.5 rounded-sm hover:bg-black/70">
                         <ChevronLeft className="w-4 h-4" />
                       </button>
                     )}
                     <button 
                       onClick={(e) => { e.stopPropagation(); handleFileUpload(idx); }}
-                      className="text-white text-xs font-medium border border-white/50 px-3 py-1.5 rounded-full bg-black/20 hover:bg-black/50"
+                      className="text-white text-xs font-medium border border-white/50 px-3 py-1.5 rounded-sm bg-black/20 hover:bg-black/50"
                     >
                       {t('change')}
                     </button>
                     {idx < images.length - 1 && (
-                      <button onClick={(e) => handleMove(e, idx, 'next')} className="bg-black/50 text-white p-1.5 rounded-full hover:bg-black/70">
+                      <button onClick={(e) => handleMove(e, idx, 'next')} className="bg-black/50 text-white p-1.5 rounded-sm hover:bg-black/70">
                         <ChevronRight className="w-4 h-4" />
                       </button>
                     )}
@@ -80,12 +80,12 @@ export function ImageUploader() {
                     <button 
                       aria-label={t('deleteImage')}
                       onClick={(e) => { e.stopPropagation(); removeImageAt(idx); }}
-                      className="bg-black/50 text-white p-1 rounded-full hover:bg-black/70"
+                      className="bg-black/50 text-white p-1 rounded-sm hover:bg-black/70"
                     >
                       <X className="w-4 h-4" />
                     </button>
                   </div>
-                  <div className="absolute top-2 left-2 bg-black/50 text-white w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold z-10 pointer-events-none">
+                  <div className="absolute top-2 left-2 bg-black/50 text-white w-6 h-6 flex items-center justify-center rounded-sm text-xs font-bold z-10 pointer-events-none">
                     {idx + 1}
                   </div>
                 </>
@@ -101,10 +101,10 @@ export function ImageUploader() {
       </div>
 
       <div className="flex gap-2">
-        <Button variant="outline" size="sm" className="flex-1 text-xs h-10 rounded-full" onClick={() => swapImages(0, 1)} disabled={images.length < 2 || !images[0] || !images[1]}>
+        <Button variant="outline" size="sm" className="flex-1 text-xs h-10 rounded-sm" onClick={() => swapImages(0, 1)} disabled={images.length < 2 || !images[0] || !images[1]}>
           <ArrowLeftRight className="w-3.5 h-3.5 mr-1.5" /> {t('swapOrder')}
         </Button>
-        <Button variant="outline" size="sm" className="flex-1 text-xs h-10 rounded-full" onClick={() => setImages([])} disabled={images.filter(Boolean).length === 0}>
+        <Button variant="outline" size="sm" className="flex-1 text-xs h-10 rounded-sm" onClick={() => setImages([])} disabled={images.filter(Boolean).length === 0}>
           <RefreshCw className="w-3.5 h-3.5 mr-1.5" /> {t('clearAll')}
         </Button>
       </div>
@@ -121,7 +121,7 @@ export function ImageUploader() {
 
           <div className="space-y-3">
             {images.map((img, idx) => img && (
-              <div key={`controls-${idx}`} className="space-y-2 bg-background p-3 rounded-3xl border border-border">
+              <div key={`controls-${idx}`} className="space-y-2 bg-background p-3 rounded-sm border border-border">
                 <div className="flex items-center justify-between">
                   <Label className="text-xs font-medium text-muted-foreground">{t('imageSize', { index: idx + 1 })}</Label>
                   <button 

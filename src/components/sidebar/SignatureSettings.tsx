@@ -24,7 +24,7 @@ function PositionGrid({ value, options, onChange }: {
           aria-label={t(label as any)}
           title={t(label as any)}
           onClick={() => onChange(optVal)}
-          className={`flex items-center justify-center h-9 rounded-full border transition-all
+          className={`flex items-center justify-center h-9 rounded-sm border transition-all
             ${value === optVal
               ? 'bg-primary text-white border-primary shadow-sm'
               : 'bg-card text-muted-foreground border-border hover:border-primary/50 hover:text-primary'
@@ -48,7 +48,7 @@ function AlignGroup({ value, onChange }: { value: SignatureAlign; onChange: (v: 
           aria-label={t(label as any)}
           title={t(label as any)}
           onClick={() => onChange(optVal)}
-          className={`flex-1 flex items-center justify-center h-9 rounded-full border transition-all
+          className={`flex-1 flex items-center justify-center h-9 rounded-sm border transition-all
             ${value === optVal
               ? 'bg-primary text-white border-primary shadow-sm'
               : 'bg-card text-muted-foreground border-border hover:border-primary/50 hover:text-primary'
@@ -83,13 +83,12 @@ export function SignatureSettings() {
 
   return (
     <Tabs defaultValue="text" className="w-full mt-2">
-      <TabsList className="grid w-full grid-cols-3 mb-4 rounded-full h-10 bg-muted p-1">
-        <TabsTrigger value="text" className="text-xs rounded-full">{t('tabText')}</TabsTrigger>
-        <TabsTrigger value="style" className="text-xs rounded-full">{t('tabStyle')}</TabsTrigger>
-        <TabsTrigger value="logo" className="text-xs rounded-full">{t('tabLogo')}</TabsTrigger>
+      <TabsList className="grid w-full grid-cols-2 mb-4 h-10 bg-muted p-1 rounded-sm">
+        <TabsTrigger value="text" className="text-xs rounded-sm">{t('tabText')}</TabsTrigger>
+        <TabsTrigger value="logo" className="text-xs rounded-sm">{t('tabLogo')}</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="text" className="space-y-4">
+      <TabsContent value="text" className="space-y-3">
         <TextOptionControl
           label={t('upperText')}
           placeholder="Name"
@@ -115,17 +114,16 @@ export function SignatureSettings() {
           letterSpacing={state.lowerLetterSpacing}
           onChangeLetterSpacing={state.setLowerLetterSpacing}
         />
-      </TabsContent>
 
-      <TabsContent value="style" className="space-y-4">
-        <div className="grid grid-cols-[80px_1fr] items-start gap-2">
-          <Label className="text-xs text-muted-foreground font-medium mt-2.5">{t('position')}</Label>
-          <PositionGrid
-            value={state.signaturePosition}
-            options={POSITION_OPTIONS}
-            onChange={state.setSignaturePosition}
-          />
-        </div>
+        <div className="pt-3 border-t border-border space-y-3">
+          <div className="grid grid-cols-[80px_1fr] items-start gap-2">
+            <Label className="text-xs text-muted-foreground font-medium mt-2.5">{t('position')}</Label>
+            <PositionGrid
+              value={state.signaturePosition}
+              options={POSITION_OPTIONS}
+              onChange={state.setSignaturePosition}
+            />
+          </div>
 
         <div className="grid grid-cols-[80px_1fr] items-center gap-2">
           <Label className="text-xs text-muted-foreground font-medium">{t('align')}</Label>
@@ -135,7 +133,7 @@ export function SignatureSettings() {
         <div className="grid grid-cols-[80px_1fr] items-center gap-2">
           <Label className="text-xs text-muted-foreground font-medium">{t('font')}</Label>
           <Select value={state.fontFamily} onValueChange={(val) => val && state.setFontFamily(val)}>
-            <SelectTrigger className="text-xs h-10 w-full rounded-full">
+            <SelectTrigger className="text-xs h-10 w-full rounded-sm">
               <span className="flex flex-1 text-left truncate">{FONT_MAP[state.fontFamily]}</span>
             </SelectTrigger>
             <SelectContent>
@@ -156,20 +154,18 @@ export function SignatureSettings() {
 
         <div className="grid grid-cols-[80px_1fr_40px] items-center gap-2">
           <Label className="text-xs text-muted-foreground font-medium">{t('size')}</Label>
-          <div className="px-2">
-            <Slider 
-              value={[state.signatureSize]} 
-              onValueChange={(vals) => state.setSignatureSize(Array.isArray(vals) ? vals[0] : vals)} 
-              min={50} max={200} step={1} 
-            />
-          </div>
+          <Slider 
+            value={[state.signatureSize]} 
+            onValueChange={(vals) => state.setSignatureSize(Array.isArray(vals) ? vals[0] : vals)} 
+            min={50} max={200} step={1} 
+          />
           <span className="text-xs text-right text-muted-foreground font-medium">{state.signatureSize}%</span>
         </div>
 
         <div className="grid grid-cols-[80px_1fr] items-center gap-2">
           <Label className="text-xs text-muted-foreground font-medium">{t('color')}</Label>
           <div className="flex items-center gap-2">
-            <div className="relative w-8 h-8 rounded-full overflow-hidden border border-border shadow-sm cursor-pointer shrink-0">
+            <div className="relative w-8 h-8 rounded-sm overflow-hidden border border-border shadow-sm cursor-pointer shrink-0">
               <input 
                 type="color" 
                 value={state.signatureColor} 
@@ -182,35 +178,34 @@ export function SignatureSettings() {
 
         <div className="grid grid-cols-[80px_1fr_40px] items-center gap-2">
           <Label className="text-xs text-muted-foreground font-medium">{t('opacity')}</Label>
-          <div className="px-2">
-            <Slider 
-              value={[state.signatureOpacity]} 
-              onValueChange={(vals) => state.setSignatureOpacity(Array.isArray(vals) ? vals[0] : vals)} 
-              min={0} max={100} step={1} 
-            />
-          </div>
+          <Slider 
+            value={[state.signatureOpacity]} 
+            onValueChange={(vals) => state.setSignatureOpacity(Array.isArray(vals) ? vals[0] : vals)} 
+            min={0} max={100} step={1} 
+          />
           <span className="text-xs text-right text-muted-foreground font-medium">{state.signatureOpacity}%</span>
+        </div>
         </div>
       </TabsContent>
 
-      <TabsContent value="logo" className="space-y-4">
+      <TabsContent value="logo" className="space-y-3">
         {!state.logoUrl ? (
           <div 
             onClick={handleLogoUpload}
-            className="w-full aspect-[2/1] rounded-3xl border-2 border-dashed border-border bg-background flex flex-col items-center justify-center cursor-pointer hover:bg-muted transition-colors"
+            className="w-full aspect-[2/1] rounded-sm border-2 border-dashed border-border bg-background flex flex-col items-center justify-center cursor-pointer hover:bg-muted transition-colors"
           >
             <Upload className="w-5 h-5 text-muted-foreground mb-2" />
             <span className="text-xs text-muted-foreground font-medium">{t('logoUploadLabel')}</span>
           </div>
         ) : (
-          <div className="space-y-4">
-            <div className="relative w-full aspect-[2/1] bg-muted rounded-3xl border border-border overflow-hidden flex items-center justify-center group">
+          <div className="space-y-3">
+            <div className="relative w-full aspect-[2/1] bg-muted rounded-sm border border-border overflow-hidden flex items-center justify-center group">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={state.logoUrl} alt="Logo" className="max-w-[80%] max-h-[80%] object-contain" />
               <button 
                 aria-label={t('logoDelete')}
                 onClick={() => state.setLogoUrl(null)}
-                className="absolute top-2 right-2 bg-black/50 text-white p-1.5 rounded-full hover:bg-black/70 transition-colors opacity-0 group-hover:opacity-100"
+                className="absolute top-2 right-2 bg-black/50 text-white p-1.5 rounded-sm hover:bg-black/70 transition-colors opacity-0 group-hover:opacity-100"
               >
                 <X className="w-3 h-3" />
               </button>
@@ -227,25 +222,21 @@ export function SignatureSettings() {
             
             <div className="grid grid-cols-[80px_1fr_40px] items-center gap-2">
               <Label className="text-xs text-muted-foreground font-medium">{t('size')}</Label>
-              <div className="px-2">
-                <Slider 
-                  value={[state.logoScale]} 
-                  onValueChange={(vals) => state.setLogoScale(Array.isArray(vals) ? vals[0] : vals)} 
-                  min={10} max={200} step={1} 
-                />
-              </div>
+              <Slider 
+                value={[state.logoScale]} 
+                onValueChange={(vals) => state.setLogoScale(Array.isArray(vals) ? vals[0] : vals)} 
+                min={10} max={200} step={1} 
+              />
               <span className="text-xs text-right text-muted-foreground font-medium">{state.logoScale}%</span>
             </div>
 
             <div className="grid grid-cols-[80px_1fr_40px] items-center gap-2">
               <Label className="text-xs text-muted-foreground font-medium">{t('opacity')}</Label>
-              <div className="px-2">
-                <Slider 
-                  value={[state.logoOpacity]} 
-                  onValueChange={(vals) => state.setLogoOpacity(Array.isArray(vals) ? vals[0] : vals)} 
-                  min={0} max={100} step={1} 
-                />
-              </div>
+              <Slider 
+                value={[state.logoOpacity]} 
+                onValueChange={(vals) => state.setLogoOpacity(Array.isArray(vals) ? vals[0] : vals)} 
+                min={0} max={100} step={1} 
+              />
               <span className="text-xs text-right text-muted-foreground font-medium">{state.logoOpacity}%</span>
             </div>
           </div>

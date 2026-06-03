@@ -89,6 +89,8 @@
     "posTopLeft": "左上",
     "posTopCenter": "上部中央",
     "posTopRight": "右上",
+    "posMiddleLeft": "左中央",
+    "posMiddleRight": "右中央",
     "posBottomLeft": "左下",
     "posBottomCenter": "下部中央",
     "posBottomRight": "右下",

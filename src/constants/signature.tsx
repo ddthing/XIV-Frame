@@ -34,6 +34,24 @@ export const POSITION_OPTIONS: { value: SignaturePosition; label: string; icon: 
       <rect x="11" y="4" width="5" height="5" rx="1" fill="currentColor" opacity="0.15"/>
     </svg>
   )},
+  { value: 'middle-left', label: 'posMiddleLeft', icon: (
+    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4">
+      <path d="M4 10h5M4 7.5v5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+      <rect x="4" y="7.5" width="5" height="5" rx="1" fill="currentColor" opacity="0.15"/>
+    </svg>
+  )},
+  { value: 'center', label: 'posCenter', icon: (
+    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4">
+      <path d="M7.5 10h5M10 7.5v5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+      <rect x="7.5" y="7.5" width="5" height="5" rx="1" fill="currentColor" opacity="0.15"/>
+    </svg>
+  )},
+  { value: 'middle-right', label: 'posMiddleRight', icon: (
+    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4">
+      <path d="M16 10h-5M16 7.5v5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+      <rect x="11" y="7.5" width="5" height="5" rx="1" fill="currentColor" opacity="0.15"/>
+    </svg>
+  )},
   { value: 'bottom-left', label: 'posBottomLeft', icon: (
     <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4">
       <path d="M4 16h5M4 16v-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
@@ -54,15 +72,7 @@ export const POSITION_OPTIONS: { value: SignaturePosition; label: string; icon: 
   )},
 ]
 
-export const LOGO_POSITION_OPTIONS: { value: SignaturePosition; label: string; icon: React.ReactNode }[] = [
-  ...POSITION_OPTIONS,
-  { value: 'center', label: 'posCenter', icon: (
-    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4">
-      <path d="M7.5 10h5M10 7.5v5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-      <rect x="7.5" y="7.5" width="5" height="5" rx="1" fill="currentColor" opacity="0.15"/>
-    </svg>
-  )},
-]
+export const LOGO_POSITION_OPTIONS = POSITION_OPTIONS
 
 export const ALIGN_OPTIONS: { value: SignatureAlign; label: string; icon: React.ReactNode }[] = [
   { value: 'left', label: 'alignLeft', icon: (

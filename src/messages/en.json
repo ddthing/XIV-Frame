@@ -89,6 +89,8 @@
     "posTopLeft": "Top Left",
     "posTopCenter": "Top Center",
     "posTopRight": "Top Right",
+    "posMiddleLeft": "Middle Left",
+    "posMiddleRight": "Middle Right",
     "posBottomLeft": "Bottom Left",
     "posBottomCenter": "Bottom Center",
     "posBottomRight": "Bottom Right",
