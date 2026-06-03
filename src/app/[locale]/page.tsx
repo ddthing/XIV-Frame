@@ -53,7 +53,7 @@ export default async function LocalePage({ params }: { params: { locale: string 
   setRequestLocale(locale);
   
   if (!['en', 'ja'].includes(locale)) {
-    notFound();
+    return null;
   }
 
   const messages = (await import(`@/messages/${locale}.json`)).default;

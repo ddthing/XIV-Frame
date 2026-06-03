@@ -6,7 +6,7 @@ import { ImageUploader } from './ImageUploader'
 import Link from 'next/link'
 import { SignatureSettings } from './SignatureSettings'
 import { LayoutSettings } from './LayoutSettings'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 
 function CollapsibleCard({ 
   step, title, isOpen, onToggle, children 
@@ -42,6 +42,7 @@ function CollapsibleCard({
 export function SettingsPanel() {
   const [activeSection, setActiveSection] = useState<'image' | 'signature' | 'layout'>('image')
   const t = useTranslations('SettingsPanel')
+  const locale = useLocale()
 
   return (
     <div className="flex flex-col h-full bg-slate-50 overflow-hidden">
@@ -80,8 +81,9 @@ export function SettingsPanel() {
 
         <div className="pt-4 flex flex-col items-center justify-center gap-2 text-xs text-slate-400">
           <div className="flex items-center gap-4">
-            <Link href="/legal/privacy" className="hover:text-slate-600 transition-colors">{t('privacy')}</Link>
-            <Link href="/legal/terms" className="hover:text-slate-600 transition-colors">{t('terms')}</Link>
+            <Link href={`/${locale}/blog`} className="hover:text-slate-600 transition-colors font-semibold text-primary">{t('blog')}</Link>
+            <Link href={`/${locale}/legal/privacy`} className="hover:text-slate-600 transition-colors">{t('privacy')}</Link>
+            <Link href={`/${locale}/legal/terms`} className="hover:text-slate-600 transition-colors">{t('terms')}</Link>
             <a href="https://toss.me/ddthing" target="_blank" rel="noopener noreferrer" className="hover:text-slate-600 transition-colors">
               {t('donate')}
             </a>

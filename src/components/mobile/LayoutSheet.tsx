@@ -1,8 +1,10 @@
 import React from 'react'
 import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer'
 import { LayoutSettings } from '@/components/sidebar/LayoutSettings'
+import { useTranslations } from 'next-intl'
 
 export function LayoutSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+  const t = useTranslations('MobileLayout')
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="max-h-[85vh] bg-slate-50">

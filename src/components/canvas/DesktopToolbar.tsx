@@ -4,7 +4,8 @@ import { Download, RefreshCw, ZoomIn, ZoomOut } from 'lucide-react'
 import { exportCanvas } from '@/lib/export'
 import { Slider } from '@/components/ui/slider'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
+import Link from 'next/link'
 
 import { CanvasRatio } from '@/store/useStore'
 import type Konva from 'konva'
@@ -13,6 +14,7 @@ export function DesktopToolbar({ stageRef, className = '' }: { stageRef: React.M
   const { canvasRatio, setCanvasRatio, zoom, setZoom, resetAll } = useStore()
   const t = useTranslations('DesktopToolbar')
   const layoutT = useTranslations('LayoutSettings')
+  const locale = useLocale()
 
   return (
     <div className={`flex items-center justify-between h-[60px] px-4 bg-white border-b border-slate-200 z-10 shrink-0 ${className}`}>
@@ -51,6 +53,9 @@ export function DesktopToolbar({ stageRef, className = '' }: { stageRef: React.M
       </div>
 
       <div className="flex items-center gap-4">
+        <Link href={`/${locale}/blog`} className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">
+          Blog
+        </Link>
         <LanguageSwitcher />
         <div className="flex items-center gap-2 border-l pl-4 border-slate-200">
           <Button variant="outline" size="sm" onClick={resetAll} className="h-8 rounded-full">

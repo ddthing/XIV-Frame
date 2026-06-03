@@ -99,7 +99,8 @@
     "zoomOut": "Zoom Out",
     "export": "Export",
     "exporting": "Exporting...",
-    "copyrightToggle": "Show Copyright"
+    "copyrightToggle": "Show Copyright",
+    "reset": "Reset"
   },
   "MobileLayout": {
     "sheetTitle": "Export & Ratio Settings",
@@ -112,16 +113,38 @@
     "ratioSettings": "Ratio Settings",
     "zoomSettings": "Zoom Settings",
     "resetDefault": "Reset to Default",
-    "savePhoto": "Save Photo"
+    "savePhoto": "Save Photo",
+    "zoomOut": "Zoom Out",
+    "zoomIn": "Zoom In"
   },
   "LanguageSwitcher": {
     "language": "Language"
   },
   "SettingsPanel": {
     "title": "Settings",
+    "tabImage": "Image",
+    "tabLayout": "Layout",
+    "tabSignature": "Signature",
+    "blog": "Blog & Guides",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
     "donate": "☕ Donate"
+  },
+  "Blog": {
+    "title": "Guides & Tips",
+    "description": "Discover FFXIV screenshot tips, GPose tricks, and learn how to use XIV Frame.",
+    "readMore": "Read More",
+    "backToList": "Back to Articles",
+    "ctaTitle": "Make Your Screenshots Beautiful",
+    "ctaDescription": "Enhance your FFXIV screenshots, create collages, and add custom signatures right from your browser.",
+    "ctaButton": "Try XIV Frame",
+    "faqTitle": "Frequently Asked Questions",
+    "faqQ1": "Is XIV Frame completely free?",
+    "faqA1": "Yes! XIV Frame is a free, web-based tool with no registration required.",
+    "faqQ2": "Can I use it on my mobile phone?",
+    "faqA2": "Absolutely. The UI is fully responsive, allowing you to edit screenshots perfectly on mobile devices.",
+    "faqQ3": "Does it reduce image quality?",
+    "faqA3": "No, we render everything in high resolution and export as high-quality PNG to prevent compression artifacts."
   },
   "CopyrightLayer": {
     "text": "© SQUARE ENIX"
