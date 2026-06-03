@@ -71,7 +71,7 @@ export function SettingsPanel() {
 
         <CollapsibleCard 
           step={3} 
-          title="레이아웃 설정" 
+          title={t('title')}
           isOpen={activeSection === 'layout'} 
           onToggle={() => setActiveSection(activeSection === 'layout' ? 'image' : 'layout')}
         >
@@ -80,10 +80,10 @@ export function SettingsPanel() {
 
         <div className="pt-4 flex flex-col items-center justify-center gap-2 text-xs text-slate-400">
           <div className="flex items-center gap-4">
-            <Link href="/legal/privacy" className="hover:text-slate-600 transition-colors">개인정보처리방침</Link>
-            <Link href="/legal/terms" className="hover:text-slate-600 transition-colors">이용약관</Link>
-            <a href="https://ko-fi.com/reconeur" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 font-medium transition-colors">
-              ☕ 후원하기
+            <Link href="/legal/privacy" className="hover:text-slate-600 transition-colors">{t('privacy')}</Link>
+            <Link href="/legal/terms" className="hover:text-slate-600 transition-colors">{t('terms')}</Link>
+            <a href="https://toss.me/ddthing" target="_blank" rel="noopener noreferrer" className="hover:text-slate-600 transition-colors">
+              {t('donate')}
             </a>
           </div>
           <p className="flex items-center gap-1">

@@ -34,7 +34,7 @@ export function DesktopToolbar({ stageRef, className = '' }: { stageRef: React.M
       </div>
 
       <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-full">
-        <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" aria-label="축소" onClick={() => setZoom(Math.max(10, zoom - 10))}>
+        <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" aria-label={t('zoomOut')} onClick={() => setZoom(Math.max(10, zoom - 10))}>
           <ZoomOut className="w-3.5 h-3.5" />
         </Button>
         <div className="w-24 px-2">
@@ -44,7 +44,7 @@ export function DesktopToolbar({ stageRef, className = '' }: { stageRef: React.M
             min={10} max={200} step={1} 
           />
         </div>
-        <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" aria-label="확대" onClick={() => setZoom(Math.min(200, zoom + 10))}>
+        <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" aria-label={t('zoomIn')} onClick={() => setZoom(Math.min(200, zoom + 10))}>
           <ZoomIn className="w-3.5 h-3.5" />
         </Button>
         <span className="text-xs font-medium w-12 text-center text-slate-500">{zoom}%</span>
