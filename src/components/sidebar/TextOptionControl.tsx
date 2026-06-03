@@ -40,21 +40,23 @@ export function TextOptionControl({
           value={value} 
           onChange={(e) => onChangeValue(e.target.value)}
           placeholder={placeholder}
-          className="text-sm h-10 rounded-full"
+          className="text-sm h-10 rounded-sm"
           maxLength={30}
         />
       </div>
       <div className="pl-[88px] flex items-center gap-2">
         <button 
           type="button" 
-          className={`p-1.5 rounded-full transition-colors ${bold ? 'bg-primary text-white' : 'bg-muted text-muted-foreground hover:bg-muted'}`} 
+          aria-label={bold ? 'Remove bold' : 'Make text bold'}
+          className={`flex items-center justify-center w-9 h-9 rounded-sm border transition-colors ${bold ? 'bg-primary text-white border-primary shadow-sm' : 'bg-card text-muted-foreground border-border hover:bg-muted/50'}`} 
           onClick={() => onChangeBold(!bold)}
         >
           <Bold className="w-3.5 h-3.5" />
         </button>
         <button 
           type="button" 
-          className={`p-1.5 rounded-full transition-colors ${italic ? 'bg-primary text-white' : 'bg-muted text-muted-foreground hover:bg-muted'}`} 
+          aria-label={italic ? 'Remove italic' : 'Make text italic'}
+          className={`flex items-center justify-center w-9 h-9 rounded-sm border transition-colors ${italic ? 'bg-primary text-white border-primary shadow-sm' : 'bg-card text-muted-foreground border-border hover:bg-muted/50'}`} 
           onClick={() => onChangeItalic(!italic)}
         >
           <Italic className="w-3.5 h-3.5" />

@@ -10,7 +10,7 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
   const images = useStore(state => state.images)
 
   return (
-    <div className="flex-1 w-full h-full relative bg-slate-50 dark:bg-zinc-950 overflow-hidden flex items-center justify-center">
+    <div className="flex-1 w-full h-full relative bg-background overflow-hidden flex items-center justify-center">
       <KonvaStage stageRef={stageRef} />
       
       {images.length === 0 && (

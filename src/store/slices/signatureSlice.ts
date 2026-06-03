@@ -1,6 +1,6 @@
 import { StateCreator } from 'zustand'
 
-export type SignaturePosition = 'top-left' | 'top-center' | 'top-right' | 'center' | 'bottom-left' | 'bottom-center' | 'bottom-right'
+export type SignaturePosition = 'top-left' | 'top-center' | 'top-right' | 'middle-left' | 'center' | 'middle-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'
 export type SignatureAlign = 'left' | 'center' | 'right'
 
 export interface SignatureSlice {

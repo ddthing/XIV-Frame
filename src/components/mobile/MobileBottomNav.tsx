@@ -19,12 +19,13 @@ export function MobileBottomNav({ activeSheet, onSelect }: MobileBottomNavProps)
   ] as const
 
   return (
-    <nav className="flex items-center justify-around w-full h-[60px] px-2 bg-card">
+    <nav className="flex items-center justify-around w-full h-[60px] px-2 bg-card border-t border-border">
       {items.map(({ id, label, icon: Icon }) => {
         const isActive = activeSheet === id
         return (
           <button
             key={id}
+            aria-label={label}
             onClick={() => onSelect(isActive ? null : id)}
             className={`flex flex-col items-center justify-center flex-1 h-full min-h-[44px] gap-1 transition-colors ${
               isActive ? 'text-primary' : 'text-muted-foreground'

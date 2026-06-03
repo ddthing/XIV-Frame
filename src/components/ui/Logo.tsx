@@ -26,11 +26,11 @@ export function Logo({ size = 'md', className = '' }: LogoProps) {
         alt="XIV Frame Logo" 
         width={iconSizes[size]} 
         height={iconSizes[size]} 
-        className="rounded-xl object-contain shadow-sm"
+        className="object-contain"
         priority
         unoptimized
       />
-      <span className={`font-normal tracking-tight text-foreground ${sizeClasses[size]}`}>
+      <span className={`font-bold tracking-tight text-foreground ${sizeClasses[size]}`}>
         XIV Frame
       </span>
     </div>
