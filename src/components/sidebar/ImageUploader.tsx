@@ -4,6 +4,7 @@ import { Slider } from '@/components/ui/slider'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Upload, X, ArrowLeftRight, RefreshCw, Lock, Unlock } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 export function ImageUploader() {
   const { 
@@ -11,6 +12,7 @@ export function ImageUploader() {
     imageScales, setImageScale, setImagePosition,
     isImageLocked, setIsImageLocked
   } = useStore()
+  const t = useTranslations('ImageUploader')
   
   const handleFileUpload = (index: number) => {
     const input = document.createElement('input')
@@ -20,7 +22,7 @@ export function ImageUploader() {
       const file = (e.target as HTMLInputElement).files?.[0]
       if (file) {
         if (file.size > 10 * 1024 * 1024) {
-          alert('이미지 파일은 10MB 이하만 가능합니다.')
+          alert(t('uploadLimit'))
           return
         }
         const url = URL.createObjectURL(file)
@@ -52,12 +54,12 @@ export function ImageUploader() {
                       onClick={(e) => { e.stopPropagation(); handleFileUpload(idx); }}
                       className="text-white text-xs font-medium border border-white/50 px-3 py-1.5 rounded-full bg-black/20 hover:bg-black/50"
                     >
-                      변경
+                      {t('change')}
                     </button>
                   </div>
                   <div className="absolute top-2 right-2 z-10">
                     <button 
-                      aria-label="이미지 삭제"
+                      aria-label={t('deleteImage')}
                       onClick={(e) => { e.stopPropagation(); removeImageAt(idx); }}
                       className="bg-black/50 text-white p-1 rounded-full hover:bg-black/70"
                     >
@@ -81,10 +83,10 @@ export function ImageUploader() {
 
       <div className="flex gap-2">
         <Button variant="outline" size="sm" className="flex-1 text-xs h-10 rounded-full" onClick={() => swapImages(0, 1)} disabled={images.length < 2 || !images[0] || !images[1]}>
-          <ArrowLeftRight className="w-3.5 h-3.5 mr-1.5" /> 순서 바꾸기
+          <ArrowLeftRight className="w-3.5 h-3.5 mr-1.5" /> {t('swapOrder')}
         </Button>
         <Button variant="outline" size="sm" className="flex-1 text-xs h-10 rounded-full" onClick={() => setImages([])} disabled={images.filter(Boolean).length === 0}>
-          <RefreshCw className="w-3.5 h-3.5 mr-1.5" /> 모두 지우기
+          <RefreshCw className="w-3.5 h-3.5 mr-1.5" /> {t('clearAll')}
         </Button>
       </div>
 
@@ -93,7 +95,7 @@ export function ImageUploader() {
           <div className="flex items-center justify-between">
             <Label className="text-xs font-medium text-slate-500 flex items-center gap-1.5 cursor-pointer" onClick={() => setIsImageLocked(!isImageLocked)}>
               {isImageLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
-              캔버스 이미지 위치 잠금
+              {t('lockPosition')}
             </Label>
             <Switch checked={isImageLocked} onCheckedChange={setIsImageLocked} />
           </div>
@@ -102,12 +104,12 @@ export function ImageUploader() {
             {images.map((img, idx) => img && (
               <div key={`controls-${idx}`} className="space-y-2 bg-slate-50 p-3 rounded-3xl border border-slate-100">
                 <div className="flex items-center justify-between">
-                  <Label className="text-xs font-medium text-slate-600">이미지 {idx + 1} 크기</Label>
+                  <Label className="text-xs font-medium text-slate-600">{t('imageSize', { index: idx + 1 })}</Label>
                   <button 
                     onClick={() => { setImageScale(idx, 1); setImagePosition(idx, {x:0, y:0}) }}
                     className="text-[10px] text-slate-400 hover:text-primary flex items-center gap-1 transition-colors"
                   >
-                    <RefreshCw className="w-3 h-3" /> 초기화
+                    <RefreshCw className="w-3 h-3" /> {t('reset')}
                   </button>
                 </div>
                 <div className="flex items-center gap-2">

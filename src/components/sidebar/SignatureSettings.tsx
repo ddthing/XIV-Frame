@@ -59,8 +59,11 @@ function AlignGroup({ value, onChange }: { value: SignatureAlign; onChange: (v: 
   )
 }
 
+import { useTranslations } from 'next-intl'
+
 export function SignatureSettings() {
   const state = useStore()
+  const t = useTranslations('SignatureSettings')
 
   const handleLogoUpload = () => {
     const input = document.createElement('input')
@@ -79,14 +82,14 @@ export function SignatureSettings() {
   return (
     <Tabs defaultValue="text" className="w-full mt-2">
       <TabsList className="grid w-full grid-cols-3 mb-4 rounded-full h-10 bg-slate-100 p-1">
-        <TabsTrigger value="text" className="text-xs rounded-full">텍스트</TabsTrigger>
-        <TabsTrigger value="style" className="text-xs rounded-full">스타일</TabsTrigger>
-        <TabsTrigger value="logo" className="text-xs rounded-full">로고 업로드</TabsTrigger>
+        <TabsTrigger value="text" className="text-xs rounded-full">{t('tabText')}</TabsTrigger>
+        <TabsTrigger value="style" className="text-xs rounded-full">{t('tabStyle')}</TabsTrigger>
+        <TabsTrigger value="logo" className="text-xs rounded-full">{t('tabLogo')}</TabsTrigger>
       </TabsList>
 
       <TabsContent value="text" className="space-y-4">
         <TextOptionControl
-          label="상단 텍스트"
+          label={t('upperText')}
           placeholder="Name"
           value={state.characterName}
           onChangeValue={state.setCharacterName}
@@ -99,7 +102,7 @@ export function SignatureSettings() {
         />
 
         <TextOptionControl
-          label="하단 텍스트"
+          label={t('lowerText')}
           placeholder="FINAL FANTASY XIV"
           value={state.serverName}
           onChangeValue={state.setServerName}
@@ -114,7 +117,7 @@ export function SignatureSettings() {
 
       <TabsContent value="style" className="space-y-4">
         <div className="grid grid-cols-[80px_1fr] items-start gap-2">
-          <Label className="text-xs text-slate-500 font-medium mt-2.5">위치</Label>
+          <Label className="text-xs text-slate-500 font-medium mt-2.5">{t('position')}</Label>
           <PositionGrid
             value={state.signaturePosition}
             options={POSITION_OPTIONS}
@@ -123,12 +126,12 @@ export function SignatureSettings() {
         </div>
 
         <div className="grid grid-cols-[80px_1fr] items-center gap-2">
-          <Label className="text-xs text-slate-500 font-medium">정렬</Label>
+          <Label className="text-xs text-slate-500 font-medium">{t('align')}</Label>
           <AlignGroup value={state.signatureAlign} onChange={state.setSignatureAlign} />
         </div>
 
         <div className="grid grid-cols-[80px_1fr] items-center gap-2">
-          <Label className="text-xs text-slate-500 font-medium">글꼴</Label>
+          <Label className="text-xs text-slate-500 font-medium">{t('font')}</Label>
           <Select value={state.fontFamily} onValueChange={(val) => val && state.setFontFamily(val)}>
             <SelectTrigger className="text-xs h-10 w-full rounded-full">
               <span className="flex flex-1 text-left truncate">{FONT_MAP[state.fontFamily]}</span>
@@ -150,7 +153,7 @@ export function SignatureSettings() {
         </div>
 
         <div className="grid grid-cols-[80px_1fr_40px] items-center gap-2">
-          <Label className="text-xs text-slate-500 font-medium">크기</Label>
+          <Label className="text-xs text-slate-500 font-medium">{t('size')}</Label>
           <div className="px-2">
             <Slider 
               value={[state.signatureSize]} 
@@ -162,7 +165,7 @@ export function SignatureSettings() {
         </div>
 
         <div className="grid grid-cols-[80px_1fr] items-center gap-2">
-          <Label className="text-xs text-slate-500 font-medium">색상</Label>
+          <Label className="text-xs text-slate-500 font-medium">{t('color')}</Label>
           <div className="flex items-center gap-2">
             <div className="relative w-8 h-8 rounded-full overflow-hidden border border-slate-200 shadow-sm cursor-pointer shrink-0">
               <input 
@@ -176,7 +179,7 @@ export function SignatureSettings() {
         </div>
 
         <div className="grid grid-cols-[80px_1fr_40px] items-center gap-2">
-          <Label className="text-xs text-slate-500 font-medium">불투명도</Label>
+          <Label className="text-xs text-slate-500 font-medium">{t('opacity')}</Label>
           <div className="px-2">
             <Slider 
               value={[state.signatureOpacity]} 
@@ -195,7 +198,7 @@ export function SignatureSettings() {
             className="w-full aspect-[2/1] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 transition-colors"
           >
             <Upload className="w-5 h-5 text-slate-400 mb-2" />
-            <span className="text-xs text-slate-500 font-medium">로고 이미지 업로드 (PNG 권장)</span>
+            <span className="text-xs text-slate-500 font-medium">{t('logoUploadLabel')}</span>
           </div>
         ) : (
           <div className="space-y-4">
@@ -203,7 +206,7 @@ export function SignatureSettings() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={state.logoUrl} alt="Logo" className="max-w-[80%] max-h-[80%] object-contain" />
               <button 
-                aria-label="로고 삭제"
+                aria-label={t('logoDelete')}
                 onClick={() => state.setLogoUrl(null)}
                 className="absolute top-2 right-2 bg-black/50 text-white p-1.5 rounded-full hover:bg-black/70 transition-colors opacity-0 group-hover:opacity-100"
               >
@@ -212,7 +215,7 @@ export function SignatureSettings() {
             </div>
             
             <div className="grid grid-cols-[80px_1fr] items-start gap-2">
-              <Label className="text-xs text-slate-500 font-medium mt-2.5">위치</Label>
+              <Label className="text-xs text-slate-500 font-medium mt-2.5">{t('position')}</Label>
               <PositionGrid
                 value={state.logoPosition}
                 options={LOGO_POSITION_OPTIONS}
@@ -221,7 +224,7 @@ export function SignatureSettings() {
             </div>
             
             <div className="grid grid-cols-[80px_1fr_40px] items-center gap-2">
-              <Label className="text-xs text-slate-500 font-medium">크기</Label>
+              <Label className="text-xs text-slate-500 font-medium">{t('size')}</Label>
               <div className="px-2">
                 <Slider 
                   value={[state.logoScale]} 
@@ -233,7 +236,7 @@ export function SignatureSettings() {
             </div>
 
             <div className="grid grid-cols-[80px_1fr_40px] items-center gap-2">
-              <Label className="text-xs text-slate-500 font-medium">불투명도</Label>
+              <Label className="text-xs text-slate-500 font-medium">{t('opacity')}</Label>
               <div className="px-2">
                 <Slider 
                   value={[state.logoOpacity]} 

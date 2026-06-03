@@ -7,12 +7,15 @@ interface MobileBottomNavProps {
   onSelect: (sheet: BottomSheetType) => void
 }
 
+import { useTranslations } from 'next-intl'
+
 export function MobileBottomNav({ activeSheet, onSelect }: MobileBottomNavProps) {
+  const t = useTranslations('MobileLayout')
   const items = [
-    { id: 'image', label: '사진', icon: ImageIcon },
-    { id: 'signature', label: '시그니처', icon: Type },
-    { id: 'layout', label: '레이아웃', icon: LayoutTemplate },
-    { id: 'export', label: '저장', icon: Download },
+    { id: 'image', label: t('navImage'), icon: ImageIcon },
+    { id: 'signature', label: t('navSignature'), icon: Type },
+    { id: 'layout', label: t('navLayout'), icon: LayoutTemplate },
+    { id: 'export', label: t('navExport'), icon: Download },
   ] as const
 
   return (

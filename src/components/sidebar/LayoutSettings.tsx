@@ -2,34 +2,36 @@ import { useStore, BackgroundColor } from '@/store/useStore'
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
+import { useTranslations } from 'next-intl'
 
 export function LayoutSettings() {
   const state = useStore()
+  const t = useTranslations('LayoutSettings')
   const colors: BackgroundColor[] = ['white', 'light-gray', 'transparent']
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-[80px_1fr] items-center gap-2">
-        <Label className="text-xs text-slate-500 font-medium">연결 효과</Label>
+        <Label className="text-xs text-slate-500 font-medium">{t('transition')}</Label>
         <div className="flex gap-2">
           <button
             onClick={() => state.setImageTransition('none')}
             className={`flex-1 h-9 text-[11px] rounded-full border transition-colors ${state.imageTransition === 'none' ? 'bg-primary/10 border-primary text-primary font-semibold' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}
           >
-            기본 (None)
+            {t('transitionNone')}
           </button>
           <button
             onClick={() => state.setImageTransition('soft-blend')}
             className={`flex-1 h-9 text-[11px] rounded-full border transition-colors ${state.imageTransition === 'soft-blend' ? 'bg-primary/10 border-primary text-primary font-semibold' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}
           >
-            Soft Blend
+            {t('transitionSoftBlend')}
           </button>
         </div>
       </div>
 
       {state.imageTransition === 'none' ? (
         <div className="grid grid-cols-[80px_1fr_40px] items-center gap-2">
-          <Label className="text-xs text-slate-500 font-medium">이미지 간격</Label>
+          <Label className="text-xs text-slate-500 font-medium">{t('imageGap')}</Label>
           <div className="px-2">
             <Slider 
               value={[state.imageGap]} 
@@ -41,7 +43,7 @@ export function LayoutSettings() {
         </div>
       ) : (
         <div className="grid grid-cols-[80px_1fr_40px] items-center gap-2">
-          <Label className="text-xs text-slate-500 font-medium">Blend 범위</Label>
+          <Label className="text-xs text-slate-500 font-medium">{t('blendWidth')}</Label>
           <div className="px-2">
             <Slider 
               value={[state.blendWidth]} 
@@ -54,7 +56,7 @@ export function LayoutSettings() {
       )}
 
       <div className="grid grid-cols-[80px_1fr_40px] items-center gap-2">
-        <Label className="text-xs text-slate-500 font-medium">테두리 두께</Label>
+        <Label className="text-xs text-slate-500 font-medium">{t('borderWidth')}</Label>
         <div className="px-2">
           <Slider 
             value={[state.borderWidth]} 
@@ -66,7 +68,7 @@ export function LayoutSettings() {
       </div>
 
       <div className="grid grid-cols-[80px_1fr] items-center gap-2">
-        <Label className="text-xs text-slate-500 font-medium">배경</Label>
+        <Label className="text-xs text-slate-500 font-medium">{t('background')}</Label>
         <div className="flex gap-2">
           {colors.map(color => (
             <button
@@ -74,13 +76,13 @@ export function LayoutSettings() {
               onClick={() => state.setBackgroundColor(color)}
               className={`flex-1 h-10 text-[11px] rounded-full border transition-colors ${state.backgroundColor === color ? 'bg-primary/10 border-primary text-primary font-semibold' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}
             >
-              {color === 'white' ? '화이트' : color === 'light-gray' ? '연한 회색' : '투명'}
+              {color === 'white' ? t('bgWhite') : color === 'light-gray' ? t('bgLightGray') : t('bgTransparent')}
             </button>
           ))}
         </div>
       </div>
       <div className="grid grid-cols-[80px_1fr] items-center gap-2 pt-4 border-t border-slate-100">
-        <Label className="text-xs text-slate-500 font-medium">저작권 표시</Label>
+        <Label className="text-xs text-slate-500 font-medium">{t('copyrightToggle')}</Label>
         <div className="flex items-center">
           <Switch 
             checked={state.showCopyright} 
@@ -92,13 +94,13 @@ export function LayoutSettings() {
       {state.showCopyright && (
         <>
           <div className="grid grid-cols-[80px_1fr] items-center gap-2">
-            <Label className="text-xs text-slate-500 font-medium">저작권 위치</Label>
+            <Label className="text-xs text-slate-500 font-medium">{t('copyrightPosition')}</Label>
             <div className="grid grid-cols-3 gap-1 w-full">
               {(
                 [
-                  { value: 'bottom-left', label: '좌측' },
-                  { value: 'bottom-center', label: '중앙' },
-                  { value: 'bottom-right', label: '우측' },
+                  { value: 'bottom-left', label: t('posLeft') },
+                  { value: 'bottom-center', label: t('posCenter') },
+                  { value: 'bottom-right', label: t('posRight') },
                 ] as const
               ).map(({ value, label }) => (
                 <button
@@ -118,13 +120,13 @@ export function LayoutSettings() {
           </div>
 
           <div className="grid grid-cols-[80px_1fr] items-center gap-2">
-            <Label className="text-xs text-slate-500 font-medium">저작권 색상</Label>
+            <Label className="text-xs text-slate-500 font-medium">{t('copyrightColor')}</Label>
             <div className="grid grid-cols-3 gap-1 w-full">
               {(
                 [
-                  { value: 'black', label: '검정색' },
-                  { value: 'white', label: '흰색' },
-                  { value: 'gray', label: '회색' },
+                  { value: 'black', label: t('colorBlack') },
+                  { value: 'white', label: t('colorWhite') },
+                  { value: 'gray', label: t('colorGray') },
                 ] as const
               ).map(({ value, label }) => (
                 <button

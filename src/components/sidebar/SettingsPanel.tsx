@@ -6,6 +6,7 @@ import { ImageUploader } from './ImageUploader'
 import Link from 'next/link'
 import { SignatureSettings } from './SignatureSettings'
 import { LayoutSettings } from './LayoutSettings'
+import { useTranslations } from 'next-intl'
 
 function CollapsibleCard({ 
   step, title, isOpen, onToggle, children 
@@ -40,6 +41,7 @@ function CollapsibleCard({
 
 export function SettingsPanel() {
   const [activeSection, setActiveSection] = useState<'image' | 'signature' | 'layout'>('image')
+  const t = useTranslations('SettingsPanel')
 
   return (
     <div className="flex flex-col h-full bg-slate-50 overflow-hidden">
@@ -51,7 +53,7 @@ export function SettingsPanel() {
         
         <CollapsibleCard 
           step={1} 
-          title="이미지 업로드" 
+          title={t('tabImage')} 
           isOpen={activeSection === 'image'} 
           onToggle={() => setActiveSection(activeSection === 'image' ? 'image' : 'image')}
         >
@@ -60,9 +62,9 @@ export function SettingsPanel() {
 
         <CollapsibleCard 
           step={2} 
-          title="시그니처 설정" 
+          title={t('tabSignature')} 
           isOpen={activeSection === 'signature'} 
-          onToggle={() => setActiveSection(activeSection === 'signature' ? 'image' : 'signature')}
+          onToggle={() => setActiveSection(activeSection === 'signature' ? 'signature' : 'signature')}
         >
           <SignatureSettings />
         </CollapsibleCard>

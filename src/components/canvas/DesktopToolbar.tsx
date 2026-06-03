@@ -3,17 +3,21 @@ import { Button } from '@/components/ui/button'
 import { Download, RefreshCw, ZoomIn, ZoomOut } from 'lucide-react'
 import { exportCanvas } from '@/lib/export'
 import { Slider } from '@/components/ui/slider'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { useTranslations } from 'next-intl'
 
 import { CanvasRatio } from '@/store/useStore'
 import type Konva from 'konva'
 
 export function DesktopToolbar({ stageRef, className = '' }: { stageRef: React.MutableRefObject<Konva.Stage | null>, className?: string }) {
   const { canvasRatio, setCanvasRatio, zoom, setZoom, resetAll } = useStore()
+  const t = useTranslations('DesktopToolbar')
+  const layoutT = useTranslations('LayoutSettings')
 
   return (
     <div className={`flex items-center justify-between h-[60px] px-4 bg-white border-b border-slate-200 z-10 shrink-0 ${className}`}>
       <div className="flex items-center gap-4">
-        <span className="text-sm font-medium">비율</span>
+        <span className="text-sm font-medium">{t('ratio')}</span>
         <div className="flex bg-slate-100 p-1 rounded-full">
           {['auto', '16:9', '2:1'].map((ratio) => (
             <button
@@ -23,7 +27,7 @@ export function DesktopToolbar({ stageRef, className = '' }: { stageRef: React.M
               }`}
               onClick={() => setCanvasRatio(ratio as CanvasRatio)}
             >
-              {ratio.toUpperCase()}
+              {ratio === 'auto' ? layoutT('ratioAuto') : ratio.toUpperCase()}
             </button>
           ))}
         </div>
@@ -46,13 +50,16 @@ export function DesktopToolbar({ stageRef, className = '' }: { stageRef: React.M
         <span className="text-xs font-medium w-12 text-center text-slate-500">{zoom}%</span>
       </div>
 
-      <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm" onClick={resetAll} className="h-8 rounded-full">
-          <RefreshCw className="w-4 h-4 mr-2" /> 기본값으로 초기화
-        </Button>
-        <Button size="sm" className="h-8 rounded-full px-4" onClick={() => exportCanvas(stageRef, 'png')}>
-          <Download className="w-4 h-4 mr-2" /> 저장 (PNG)
-        </Button>
+      <div className="flex items-center gap-4">
+        <LanguageSwitcher />
+        <div className="flex items-center gap-2 border-l pl-4 border-slate-200">
+          <Button variant="outline" size="sm" onClick={resetAll} className="h-8 rounded-full">
+            <RefreshCw className="w-4 h-4 mr-2" /> {t('reset')}
+          </Button>
+          <Button size="sm" className="h-8 rounded-full px-4" onClick={() => exportCanvas(stageRef, 'png')}>
+            <Download className="w-4 h-4 mr-2" /> {t('export')} (PNG)
+          </Button>
+        </div>
       </div>
     </div>
   )
