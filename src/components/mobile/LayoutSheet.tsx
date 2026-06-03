@@ -7,7 +7,7 @@ export function LayoutSheet({ open, onOpenChange }: { open: boolean; onOpenChang
   const t = useTranslations('MobileLayout')
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85vh] bg-slate-50">
+      <DrawerContent className="max-h-[85vh] bg-background">
         <DrawerTitle className="sr-only">{t('sheetTitle')}</DrawerTitle>
         <div className="p-4 pb-[calc(env(safe-area-inset-bottom,1rem)+1rem)] custom-scrollbar overflow-y-auto">
           <div className="space-y-6">

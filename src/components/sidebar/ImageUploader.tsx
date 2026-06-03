@@ -42,7 +42,7 @@ export function ImageUploader() {
           return (
             <div 
               key={idx} 
-              className="relative flex-1 aspect-[4/3] rounded-3xl border-2 border-dashed border-slate-200 overflow-hidden bg-slate-50 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 transition-colors group"
+              className="relative flex-1 aspect-[4/3] rounded-3xl border-2 border-dashed border-border overflow-hidden bg-background flex flex-col items-center justify-center cursor-pointer hover:bg-muted transition-colors group"
               onClick={() => !image && handleFileUpload(idx)}
             >
               {image ? (
@@ -71,7 +71,7 @@ export function ImageUploader() {
                   </div>
                 </>
               ) : (
-                <div className="flex flex-col items-center gap-1 text-slate-400">
+                <div className="flex flex-col items-center gap-1 text-muted-foreground">
                   <Upload className="w-5 h-5" />
                   <span className="text-xs font-medium">Image {idx + 1}</span>
                 </div>
@@ -91,9 +91,9 @@ export function ImageUploader() {
       </div>
 
       {images.some(Boolean) && (
-        <div className="space-y-4 pt-2 border-t border-slate-100">
+        <div className="space-y-4 pt-2 border-t border-border">
           <div className="flex items-center justify-between">
-            <Label className="text-xs font-medium text-slate-500 flex items-center gap-1.5 cursor-pointer" onClick={() => setIsImageLocked(!isImageLocked)}>
+            <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5 cursor-pointer" onClick={() => setIsImageLocked(!isImageLocked)}>
               {isImageLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
               {t('lockPosition')}
             </Label>
@@ -102,12 +102,12 @@ export function ImageUploader() {
 
           <div className="space-y-3">
             {images.map((img, idx) => img && (
-              <div key={`controls-${idx}`} className="space-y-2 bg-slate-50 p-3 rounded-3xl border border-slate-100">
+              <div key={`controls-${idx}`} className="space-y-2 bg-background p-3 rounded-3xl border border-border">
                 <div className="flex items-center justify-between">
-                  <Label className="text-xs font-medium text-slate-600">{t('imageSize', { index: idx + 1 })}</Label>
+                  <Label className="text-xs font-medium text-muted-foreground">{t('imageSize', { index: idx + 1 })}</Label>
                   <button 
                     onClick={() => { setImageScale(idx, 1); setImagePosition(idx, {x:0, y:0}) }}
-                    className="text-[10px] text-slate-400 hover:text-primary flex items-center gap-1 transition-colors"
+                    className="text-[10px] text-muted-foreground hover:text-primary flex items-center gap-1 transition-colors"
                   >
                     <RefreshCw className="w-3 h-3" /> {t('reset')}
                   </button>
@@ -118,7 +118,7 @@ export function ImageUploader() {
                     onValueChange={(vals) => setImageScale(idx, Array.isArray(vals) ? vals[0] : vals as any)} 
                     min={0.5} max={3} step={0.01} 
                   />
-                  <span className="text-xs text-slate-500 w-8 text-right font-medium">
+                  <span className="text-xs text-muted-foreground w-8 text-right font-medium">
                     {Math.round((imageScales[idx] || 1) * 100)}%
                   </span>
                 </div>

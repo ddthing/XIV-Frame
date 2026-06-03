@@ -1,7 +1,6 @@
 import { ClientApp } from '@/components/ClientApp'
-import { NextIntlClientProvider } from 'next-intl'
 import { setRequestLocale } from 'next-intl/server'
-import koMessages from '@/messages/ko.json'
+import { PageShell } from '@/components/layout/PageShell'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -29,8 +28,8 @@ export const metadata: Metadata = {
 export default function Home() {
   setRequestLocale('ko');
   return (
-    <NextIntlClientProvider locale="ko" messages={koMessages}>
+    <PageShell locale="ko" hideFooter={true} hideHeader={true}>
       <ClientApp currentLocale="ko" />
-    </NextIntlClientProvider>
+    </PageShell>
   )
 }

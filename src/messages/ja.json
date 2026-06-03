@@ -27,7 +27,7 @@
     "blurIntensity": "ぼかしの強さ",
     "blurNotice": "アップロードした画像を背景として使用します。",
     "ratio": "比率",
-    "ratioAuto": "自動 (AUTO)",
+    "ratioAuto": "自動",
     "ratio16_9": "16:9",
     "ratio2_1": "2:1",
     "imageGap": "画像の間隔",
@@ -55,7 +55,7 @@
   "SignatureSettings": {
     "sheetTitle": "署名設定",
     "charNamePlaceholder": "キャラクター名",
-    "serverNamePlaceholder": "サーバー名 (例: Chocobo)",
+    "serverNamePlaceholder": "サーバー名 (例: チョコボ)",
     "toggleSignature": "署名を有効にする",
     "position": "位置",
     "align": "整列",
@@ -118,7 +118,7 @@
     "zoomIn": "拡大"
   },
   "LanguageSwitcher": {
-    "language": "言語 (Language)"
+    "language": "言語"
   },
   "SettingsPanel": {
     "title": "設定",
@@ -130,10 +130,20 @@
     "terms": "利用規約",
     "donate": "☕ 寄付する"
   },
+  "Navigation": {
+    "app": "アプリ",
+    "blog": "ガイド",
+    "about": "概要",
+    "contact": "お問い合わせ",
+    "privacy": "プライバシーポリシー",
+    "terms": "利用規約",
+    "donate": "寄付する"
+  },
   "Blog": {
-    "title": "ガイド & ヒント",
-    "description": "FF14スクリーンショットの加工、グルポのヒント、XIV Frameの使い方を紹介します。",
-    "readMore": "続きを読む",
+    "title": "ブログとガイド",
+    "description": "XIV Frameを最大限に活用するためのガイドとヒントをご覧ください。",
+    "readMore": "記事全体を読む",
+    "back": "リストに戻る",
     "backToList": "一覧に戻る",
     "ctaTitle": "あなたのスクリーンショットをもっと美しく",
     "ctaDescription": "面倒なソフトは不要です。ブラウザ上で今すぐスクリーンショットを加工し、オリジナルの署名を追加しましょう。",
