@@ -14,14 +14,15 @@ function PositionGrid({ value, options, onChange }: {
   options: { value: SignaturePosition; label: string; icon: React.ReactNode }[],
   onChange: (v: SignaturePosition) => void
 }) {
+  const t = useTranslations('SignatureSettings')
   return (
     <div className="grid grid-cols-3 gap-1 w-full">
       {options.map(({ value: optVal, label, icon }) => (
         <button
           key={optVal}
           type="button"
-          aria-label={label}
-          title={label}
+          aria-label={t(label as any)}
+          title={t(label as any)}
           onClick={() => onChange(optVal)}
           className={`flex items-center justify-center h-9 rounded-full border transition-all
             ${value === optVal
@@ -37,14 +38,15 @@ function PositionGrid({ value, options, onChange }: {
 }
 
 function AlignGroup({ value, onChange }: { value: SignatureAlign; onChange: (v: SignatureAlign) => void }) {
+  const t = useTranslations('SignatureSettings')
   return (
     <div className="flex gap-1">
       {ALIGN_OPTIONS.map(({ value: optVal, label, icon }) => (
         <button
           key={optVal}
           type="button"
-          aria-label={label}
-          title={label}
+          aria-label={t(label as any)}
+          title={t(label as any)}
           onClick={() => onChange(optVal)}
           className={`flex-1 flex items-center justify-center h-9 rounded-full border transition-all
             ${value === optVal
@@ -137,17 +139,17 @@ export function SignatureSettings() {
               <span className="flex flex-1 text-left truncate">{FONT_MAP[state.fontFamily]}</span>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Pretendard" className="text-xs font-sans font-medium">기본 (Pretendard)</SelectItem>
-              <SelectItem value="NexonMaplestory" className="text-xs font-medium" style={{ fontFamily: 'NexonMaplestory' }}>넥슨 메이플스토리</SelectItem>
-              <SelectItem value="TMoneyDungunbaram" className="text-xs font-medium" style={{ fontFamily: 'TMoneyDungunbaram' }}>티머니 둥근바람</SelectItem>
-              <SelectItem value="OgRenaissanceSecret" className="text-xs font-medium" style={{ fontFamily: 'OgRenaissanceSecret' }}>OG 르네상스 비밀</SelectItem>
-              <SelectItem value="Shouting" className="text-xs font-medium" style={{ fontFamily: 'Shouting' }}>샤우팅체</SelectItem>
-              <SelectItem value="BookkMyungjo" className="text-xs font-medium" style={{ fontFamily: 'BookkMyungjo' }}>부크크 명조</SelectItem>
-              <SelectItem value="x12y12pxMaruMinyaHangul" className="text-xs font-medium" style={{ fontFamily: 'x12y12pxMaruMinyaHangul' }}>마루미냐 한글</SelectItem>
-              <SelectItem value="LotteriaChwapttaenggyeo" className="text-xs font-medium" style={{ fontFamily: 'LotteriaChwapttaenggyeo' }}>롯데리아 촵땡겨체</SelectItem>
-              <SelectItem value="HsBombaram30" className="text-xs font-medium" style={{ fontFamily: 'HsBombaram30' }}>봄바람체 3.0</SelectItem>
-              <SelectItem value="GoodNeighbor" className="text-xs font-medium" style={{ fontFamily: 'GoodNeighbor' }}>좋은이웃체</SelectItem>
-              <SelectItem value="SlowGothic" className="text-xs font-medium" style={{ fontFamily: 'SlowGothic' }}>느림보고딕</SelectItem>
+              <SelectItem value="Pretendard" className="text-xs font-sans font-medium">{t('fontDefault')}</SelectItem>
+              <SelectItem value="NexonMaplestory" className="text-xs font-medium" style={{ fontFamily: 'NexonMaplestory' }}>{t('fontMaplestory')}</SelectItem>
+              <SelectItem value="TMoneyDungunbaram" className="text-xs font-medium" style={{ fontFamily: 'TMoneyDungunbaram' }}>{t('fontTmoney')}</SelectItem>
+              <SelectItem value="OgRenaissanceSecret" className="text-xs font-medium" style={{ fontFamily: 'OgRenaissanceSecret' }}>{t('fontOg')}</SelectItem>
+              <SelectItem value="Shouting" className="text-xs font-medium" style={{ fontFamily: 'Shouting' }}>{t('fontShouting')}</SelectItem>
+              <SelectItem value="BookkMyungjo" className="text-xs font-medium" style={{ fontFamily: 'BookkMyungjo' }}>{t('fontBookk')}</SelectItem>
+              <SelectItem value="x12y12pxMaruMinyaHangul" className="text-xs font-medium" style={{ fontFamily: 'x12y12pxMaruMinyaHangul' }}>{t('fontMaru')}</SelectItem>
+              <SelectItem value="LotteriaChwapttaenggyeo" className="text-xs font-medium" style={{ fontFamily: 'LotteriaChwapttaenggyeo' }}>{t('fontLotteria')}</SelectItem>
+              <SelectItem value="HsBombaram30" className="text-xs font-medium" style={{ fontFamily: 'HsBombaram30' }}>{t('fontBombaram')}</SelectItem>
+              <SelectItem value="GoodNeighbor" className="text-xs font-medium" style={{ fontFamily: 'GoodNeighbor' }}>{t('fontGoodNeighbor')}</SelectItem>
+              <SelectItem value="SlowGothic" className="text-xs font-medium" style={{ fontFamily: 'SlowGothic' }}>{t('fontSlowGothic')}</SelectItem>
             </SelectContent>
           </Select>
         </div>

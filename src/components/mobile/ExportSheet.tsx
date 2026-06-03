@@ -26,7 +26,7 @@ import { useTranslations } from 'next-intl'
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="max-h-[85vh] bg-slate-50">
-        <DrawerTitle className="sr-only">저장 및 비율 설정</DrawerTitle>
+        <DrawerTitle className="sr-only">{t('sheetTitle')}</DrawerTitle>
         <div className="p-6 pb-[calc(env(safe-area-inset-bottom,1rem)+1.5rem)] flex flex-col gap-8">
           
           {/* Canvas Ratio */}
@@ -53,7 +53,7 @@ import { useTranslations } from 'next-intl'
           <div className="space-y-3">
             <span className="text-sm font-semibold text-slate-800">{t('zoomSettings')}</span>
             <div className="flex items-center gap-4 bg-white border border-slate-200 p-2 rounded-full">
-              <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0 rounded-full text-slate-600" aria-label="축소" onClick={() => setZoom(Math.max(10, zoom - 10))}>
+              <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0 rounded-full text-slate-600" aria-label={t('zoomOut')} onClick={() => setZoom(Math.max(10, zoom - 10))}>
                 <ZoomOut className="w-5 h-5" />
               </Button>
               <div className="flex-1 px-2">
@@ -63,7 +63,7 @@ import { useTranslations } from 'next-intl'
                   min={10} max={200} step={1} 
                 />
               </div>
-              <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0 rounded-full text-slate-600" aria-label="확대" onClick={() => setZoom(Math.min(200, zoom + 10))}>
+              <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0 rounded-full text-slate-600" aria-label={t('zoomIn')} onClick={() => setZoom(Math.min(200, zoom + 10))}>
                 <ZoomIn className="w-5 h-5" />
               </Button>
             </div>

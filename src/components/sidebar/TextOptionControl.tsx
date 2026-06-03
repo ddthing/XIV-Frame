@@ -17,6 +17,8 @@ interface TextOptionControlProps {
   onChangeLetterSpacing: (val: number) => void
 }
 
+import { useTranslations } from 'next-intl'
+
 export function TextOptionControl({
   label,
   placeholder,
@@ -29,6 +31,7 @@ export function TextOptionControl({
   letterSpacing,
   onChangeLetterSpacing,
 }: TextOptionControlProps) {
+  const t = useTranslations('SignatureSettings')
   return (
     <div className="space-y-1.5">
       <div className="grid grid-cols-[80px_1fr] items-center gap-2">
@@ -57,7 +60,7 @@ export function TextOptionControl({
           <Italic className="w-3.5 h-3.5" />
         </button>
         <div className="flex-1 pl-2 flex items-center gap-2 border-l border-slate-200">
-          <span className="text-[10px] text-slate-400 font-medium whitespace-nowrap">자간</span>
+          <span className="text-[10px] text-slate-400 font-medium whitespace-nowrap">{t('letterSpacing')}</span>
           <Slider 
             value={[letterSpacing]} 
             onValueChange={v => onChangeLetterSpacing(Array.isArray(v) ? v[0] : v)} 

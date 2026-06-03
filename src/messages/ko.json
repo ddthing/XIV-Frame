@@ -14,6 +14,7 @@
     "lockPosition": "캔버스 이미지 위치 잠금",
     "imageSize": "이미지 {index} 크기",
     "reset": "초기화",
+    "sheetTitle": "사진 업로드 설정",
     "guideTitle": "이미지 조작 가이드",
     "guideMove": "드래그: 이미지 이동",
     "guideZoom": "스크롤: 확대/축소",
@@ -52,6 +53,7 @@
     "logoDelete": "로고 삭제"
   },
   "SignatureSettings": {
+    "sheetTitle": "시그니처 설정",
     "charNamePlaceholder": "캐릭터 이름",
     "serverNamePlaceholder": "서버 이름 (ex. Chocobo)",
     "toggleSignature": "시그니처 사용",
@@ -66,17 +68,42 @@
     "tabLogo": "로고 업로드",
     "upperText": "상단 텍스트",
     "lowerText": "하단 텍스트",
+    "letterSpacing": "자간",
     "logoUploadLabel": "로고 이미지 업로드 (PNG 권장)",
-    "logoDelete": "로고 삭제"
+    "logoDelete": "로고 삭제",
+    "fontDefault": "기본 (Pretendard)",
+    "fontMaplestory": "넥슨 메이플스토리",
+    "fontTmoney": "티머니 둥근바람",
+    "fontOg": "OG 르네상스 비밀",
+    "fontShouting": "샤우팅체",
+    "fontBookk": "부크크 명조",
+    "fontMaru": "마루미냐 한글",
+    "fontLotteria": "롯데리아 촵땡겨체",
+    "fontBombaram": "봄바람체 3.0",
+    "fontGoodNeighbor": "좋은이웃체",
+    "fontSlowGothic": "느림보고딕",
+    "posTopLeft": "좌상단",
+    "posTopCenter": "중앙상단",
+    "posTopRight": "우상단",
+    "posBottomLeft": "좌하단",
+    "posBottomCenter": "중앙하단",
+    "posBottomRight": "우하단",
+    "posCenter": "정중앙",
+    "alignLeft": "왼쪽 정렬",
+    "alignCenter": "가운데 정렬",
+    "alignRight": "오른쪽 정렬"
   },
   "DesktopToolbar": {
     "ratio": "비율",
+    "zoomIn": "확대",
+    "zoomOut": "축소",
     "reset": "초기화",
     "export": "저장",
     "exporting": "저장중...",
     "copyrightToggle": "저작권 문구 표시"
   },
   "MobileLayout": {
+    "sheetTitle": "저장 및 비율 설정",
     "exportTitle": "내보내기",
     "ratio": "비율",
     "navImage": "사진",
@@ -90,5 +117,14 @@
   },
   "LanguageSwitcher": {
     "language": "언어 (Language)"
+  },
+  "SettingsPanel": {
+    "title": "설정",
+    "privacy": "개인정보처리방침",
+    "terms": "이용약관",
+    "donate": "☕ 후원하기"
+  },
+  "CopyrightLayer": {
+    "text": "© SQUARE ENIX Published in Korea by Actoz Soft CO., LTD."
   }
 }

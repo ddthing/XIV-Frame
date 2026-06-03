@@ -14,6 +14,7 @@
     "lockPosition": "画像位置をロック",
     "imageSize": "画像 {index} サイズ",
     "reset": "リセット",
+    "sheetTitle": "写真アップロード設定",
     "guideTitle": "画像操作ガイド",
     "guideMove": "ドラッグ: 画像を移動",
     "guideZoom": "スクロール: 拡大/縮小",
@@ -52,6 +53,7 @@
     "logoDelete": "ロゴを削除"
   },
   "SignatureSettings": {
+    "sheetTitle": "署名設定",
     "charNamePlaceholder": "キャラクター名",
     "serverNamePlaceholder": "サーバー名 (例: Chocobo)",
     "toggleSignature": "署名を有効にする",
@@ -66,17 +68,42 @@
     "tabLogo": "ロゴアップロード",
     "upperText": "上部テキスト",
     "lowerText": "下部テキスト",
+    "letterSpacing": "文字間隔",
     "logoUploadLabel": "ロゴ画像をアップロード (PNG推奨)",
-    "logoDelete": "ロゴを削除"
+    "logoDelete": "ロゴを削除",
+    "fontDefault": "基本 (Pretendard)",
+    "fontMaplestory": "ネクソン メイプルストーリー",
+    "fontTmoney": "T-money 丸ゴシック",
+    "fontOg": "OG ルネッサンス シークレット",
+    "fontShouting": "シャウティング",
+    "fontBookk": "Bookk 明朝",
+    "fontMaru": "マルミニャ",
+    "fontLotteria": "ロッテリア チョップ",
+    "fontBombaram": "春風体 3.0",
+    "fontGoodNeighbor": "グッドネイバー",
+    "fontSlowGothic": "スローゴシック",
+    "posTopLeft": "左上",
+    "posTopCenter": "上部中央",
+    "posTopRight": "右上",
+    "posBottomLeft": "左下",
+    "posBottomCenter": "下部中央",
+    "posBottomRight": "右下",
+    "posCenter": "中央",
+    "alignLeft": "左揃え",
+    "alignCenter": "中央揃え",
+    "alignRight": "右揃え"
   },
   "DesktopToolbar": {
     "ratio": "比率",
+    "zoomIn": "拡大",
+    "zoomOut": "縮小",
     "reset": "リセット",
     "export": "保存",
     "exporting": "保存中...",
     "copyrightToggle": "著作権表記を表示"
   },
   "MobileLayout": {
+    "sheetTitle": "保存と比率設定",
     "exportTitle": "保存",
     "ratio": "比率",
     "navImage": "写真",
@@ -90,5 +117,14 @@
   },
   "LanguageSwitcher": {
     "language": "言語 (Language)"
+  },
+  "SettingsPanel": {
+    "title": "設定",
+    "privacy": "プライバシーポリシー",
+    "terms": "利用規約",
+    "donate": "☕ 寄付する"
+  },
+  "CopyrightLayer": {
+    "text": "© SQUARE ENIX"
   }
 }

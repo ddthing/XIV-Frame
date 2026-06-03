@@ -14,6 +14,7 @@
     "lockPosition": "Lock Image Position",
     "imageSize": "Image {index} Size",
     "reset": "Reset",
+    "sheetTitle": "Photo Upload Settings",
     "guideTitle": "Image Control Guide",
     "guideMove": "Drag: Move Image",
     "guideZoom": "Scroll: Zoom In/Out",
@@ -52,6 +53,7 @@
     "logoDelete": "Delete Logo"
   },
   "SignatureSettings": {
+    "sheetTitle": "Signature Settings",
     "charNamePlaceholder": "Character Name",
     "serverNamePlaceholder": "Server Name (ex. Chocobo)",
     "toggleSignature": "Enable Signature",
@@ -66,17 +68,41 @@
     "tabLogo": "Logo Upload",
     "upperText": "Upper Text",
     "lowerText": "Lower Text",
+    "letterSpacing": "Spacing",
     "logoUploadLabel": "Upload Logo Image (PNG Rec.)",
-    "logoDelete": "Delete Logo"
+    "logoDelete": "Delete Logo",
+    "fontDefault": "Default (Pretendard)",
+    "fontMaplestory": "Nexon Maplestory",
+    "fontTmoney": "Tmoney RoundWind",
+    "fontOg": "OG Renaissance Secret",
+    "fontShouting": "Shouting",
+    "fontBookk": "Bookk Myungjo",
+    "fontMaru": "Maruminya",
+    "fontLotteria": "Lotteria Chwap",
+    "fontBombaram": "Bombaram 3.0",
+    "fontGoodNeighbor": "Good Neighbor",
+    "fontSlowGothic": "Slow Gothic",
+    "posTopLeft": "Top Left",
+    "posTopCenter": "Top Center",
+    "posTopRight": "Top Right",
+    "posBottomLeft": "Bottom Left",
+    "posBottomCenter": "Bottom Center",
+    "posBottomRight": "Bottom Right",
+    "posCenter": "Center",
+    "alignLeft": "Align Left",
+    "alignCenter": "Align Center",
+    "alignRight": "Align Right"
   },
   "DesktopToolbar": {
     "ratio": "Ratio",
-    "reset": "Reset",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
     "export": "Export",
     "exporting": "Exporting...",
     "copyrightToggle": "Show Copyright"
   },
   "MobileLayout": {
+    "sheetTitle": "Export & Ratio Settings",
     "exportTitle": "Export",
     "ratio": "Ratio",
     "navImage": "Photo",
@@ -90,5 +116,14 @@
   },
   "LanguageSwitcher": {
     "language": "Language"
+  },
+  "SettingsPanel": {
+    "title": "Settings",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "donate": "☕ Donate"
+  },
+  "CopyrightLayer": {
+    "text": "© SQUARE ENIX"
   }
 }
