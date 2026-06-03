@@ -5,8 +5,11 @@ export type BackgroundColor = 'white' | 'light-gray' | 'transparent'
 export type CopyrightPosition = 'bottom-left' | 'bottom-center' | 'bottom-right'
 export type CopyrightColor = 'black' | 'white' | 'gray'
 export type ImageTransition = 'none' | 'soft-blend'
+export type LayoutPreset = 'split' | 'blend' | 'grid'
 
 export interface LayoutSlice {
+  layoutPreset: LayoutPreset
+  setLayoutPreset: (preset: LayoutPreset) => void
   canvasRatio: CanvasRatio
   setCanvasRatio: (ratio: CanvasRatio) => void
   backgroundColor: BackgroundColor
@@ -34,6 +37,7 @@ export interface LayoutSlice {
 }
 
 export const initialLayoutState = {
+  layoutPreset: 'split' as LayoutPreset,
   canvasRatio: 'auto' as CanvasRatio,
   backgroundColor: 'white' as BackgroundColor,
   imageGap: 24,
@@ -49,6 +53,7 @@ export const initialLayoutState = {
 export const createLayoutSlice: StateCreator<LayoutSlice, [], [], LayoutSlice> = (set) => ({
   ...initialLayoutState,
   
+  setLayoutPreset: (preset) => set({ layoutPreset: preset }),
   setCanvasRatio: (ratio) => set({ canvasRatio: ratio }),
   setImageGap: (gap) => set({ imageGap: gap }),
   setImageTransition: (t) => set({ imageTransition: t }),

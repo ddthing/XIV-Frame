@@ -21,6 +21,10 @@
     "guideNotice": "결과물에는 영향을 주지 않습니다."
   },
   "LayoutSettings": {
+    "layoutPreset": "레이아웃",
+    "presetSplit": "스플릿",
+    "presetBlend": "블렌드",
+    "presetGrid": "그리드",
     "background": "배경",
     "backgroundBlur": "블러",
     "backgroundColor": "단색",

@@ -69,25 +69,35 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
   if (imagesData.length > 0) {
     const baseHeight = imagesData[0].height
     let totalWidth = 0
-    imagesData.forEach(img => {
-      totalWidth += img.width * (baseHeight / img.height)
-    })
+    let gridHeight = baseHeight
     
-    if (state.imageTransition === 'soft-blend') {
-      totalWidth -= Math.max(0, imagesData.length - 1) * state.blendWidth
+    if (state.layoutPreset === 'grid' && imagesData.length >= 3) {
+      // 2x2 grid calculation
+      const cellWidth = imagesData[0].width
+      totalWidth = (cellWidth * 2) + state.imageGap
+      gridHeight = (baseHeight * 2) + state.imageGap
     } else {
-      totalWidth += Math.max(0, imagesData.length - 1) * state.imageGap
+      // Horizontal layout calculation
+      imagesData.forEach(img => {
+        totalWidth += img.width * (baseHeight / img.height)
+      })
+      
+      if (state.imageTransition === 'soft-blend') {
+        totalWidth -= Math.max(0, imagesData.length - 1) * state.blendWidth
+      } else {
+        totalWidth += Math.max(0, imagesData.length - 1) * state.imageGap
+      }
     }
 
     if (state.canvasRatio === '16:9') {
-      logicalWidth = Math.max(totalWidth, baseHeight * (16 / 9))
+      logicalWidth = Math.max(totalWidth, gridHeight * (16 / 9))
       logicalHeight = logicalWidth * (9 / 16)
     } else if (state.canvasRatio === '2:1') {
-      logicalWidth = Math.max(totalWidth, baseHeight * 2)
+      logicalWidth = Math.max(totalWidth, gridHeight * 2)
       logicalHeight = logicalWidth / 2
     } else {
       logicalWidth = totalWidth
-      logicalHeight = baseHeight
+      logicalHeight = gridHeight
     }
   }
 
@@ -127,6 +137,7 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
           borderWidth={state.borderWidth}
           isSoftBlend={state.imageTransition === 'soft-blend'}
           blendWidth={state.blendWidth}
+          layoutPreset={state.layoutPreset}
         />
 
         {imagesData.length > 0 && (
