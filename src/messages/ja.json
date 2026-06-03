@@ -21,6 +21,10 @@
     "guideNotice": "最終的な書き出しには影響しません。"
   },
   "LayoutSettings": {
+    "layoutPreset": "レイアウト",
+    "presetSplit": "スプリット",
+    "presetBlend": "ブレンド",
+    "presetGrid": "グリッド",
     "background": "背景",
     "backgroundBlur": "ぼかし",
     "backgroundColor": "単色",

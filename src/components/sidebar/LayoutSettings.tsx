@@ -12,19 +12,35 @@ export function LayoutSettings() {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-[80px_1fr] items-center gap-2">
-        <Label className="text-xs text-muted-foreground font-medium">{t('transition')}</Label>
+        <Label className="text-xs text-muted-foreground font-medium">{t('layoutPreset')}</Label>
         <div className="flex gap-2">
           <button
-            onClick={() => state.setImageTransition('none')}
-            className={`flex-1 h-9 text-[11px] rounded-full border transition-colors ${state.imageTransition === 'none' ? 'bg-primary/10 border-primary text-primary font-semibold' : 'border-border text-muted-foreground hover:bg-background'}`}
+            onClick={() => {
+              state.setLayoutPreset('split')
+              state.setImageTransition('none')
+            }}
+            className={`flex-1 h-9 text-[11px] rounded-full border transition-colors ${state.layoutPreset === 'split' ? 'bg-primary/10 border-primary text-primary font-semibold' : 'border-border text-muted-foreground hover:bg-background'}`}
           >
-            {t('transitionNone')}
+            {t('presetSplit')}
           </button>
           <button
-            onClick={() => state.setImageTransition('soft-blend')}
-            className={`flex-1 h-9 text-[11px] rounded-full border transition-colors ${state.imageTransition === 'soft-blend' ? 'bg-primary/10 border-primary text-primary font-semibold' : 'border-border text-muted-foreground hover:bg-background'}`}
+            onClick={() => {
+              state.setLayoutPreset('blend')
+              state.setImageTransition('soft-blend')
+            }}
+            className={`flex-1 h-9 text-[11px] rounded-full border transition-colors ${state.layoutPreset === 'blend' ? 'bg-primary/10 border-primary text-primary font-semibold' : 'border-border text-muted-foreground hover:bg-background'}`}
           >
-            {t('transitionSoftBlend')}
+            {t('presetBlend')}
+          </button>
+          <button
+            onClick={() => {
+              state.setLayoutPreset('grid')
+              state.setImageTransition('none')
+            }}
+            className={`flex-1 h-9 text-[11px] rounded-full border transition-colors ${state.layoutPreset === 'grid' ? 'bg-primary/10 border-primary text-primary font-semibold' : 'border-border text-muted-foreground hover:bg-background'}`}
+            disabled={state.images.filter(Boolean).length < 3}
+          >
+            {t('presetGrid')}
           </button>
         </div>
       </div>

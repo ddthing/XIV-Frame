@@ -10,7 +10,8 @@ function ImageGridLayerComponent({
   gap,
   borderWidth = 0,
   isSoftBlend = false,
-  blendWidth = 50
+  blendWidth = 50,
+  layoutPreset
 }: { 
   images: HTMLImageElement[], 
   contentWidth: number, 
@@ -18,7 +19,8 @@ function ImageGridLayerComponent({
   gap: number,
   borderWidth?: number,
   isSoftBlend?: boolean,
-  blendWidth?: number
+  blendWidth?: number,
+  layoutPreset?: string
 }) {
   const imagePositions = useStore(state => state.imagePositions)
   const imageScales = useStore(state => state.imageScales)
@@ -27,13 +29,31 @@ function ImageGridLayerComponent({
 
   if (images.length === 0) return null
 
-  const itemWidth = (contentWidth - (gap * (images.length - 1))) / images.length
+  const isGrid = layoutPreset === 'grid' && images.length >= 3
+  const itemWidth = isGrid ? (contentWidth - gap) / 2 : (contentWidth - (gap * (images.length - 1))) / images.length
+  const itemHeight = isGrid ? (contentHeight - gap) / 2 : contentHeight
 
   return (
     <>
       {images.map((img, index) => {
-        const xPos = index * (itemWidth + gap)
-        const baseScale = Math.max(itemWidth / img.width, contentHeight / img.height)
+        let xPos = 0
+        let yPos = 0
+        
+        if (isGrid) {
+          if (index === 0) {
+            xPos = 0; yPos = 0
+          } else if (index === 1) {
+            xPos = itemWidth + gap; yPos = 0
+          } else if (index === 2) {
+            xPos = 0; yPos = itemHeight + gap
+          } else if (index === 3) {
+            xPos = itemWidth + gap; yPos = itemHeight + gap
+          }
+        } else {
+          xPos = index * (itemWidth + gap)
+        }
+
+        const baseScale = Math.max(itemWidth / img.width, itemHeight / img.height)
         const userScale = imageScales[index] || 1
         const scale = baseScale * userScale
         
@@ -44,13 +64,13 @@ function ImageGridLayerComponent({
           <Layer
             key={index}
             x={borderWidth + xPos}
-            y={borderWidth}
+            y={borderWidth + yPos}
           >
             <Group
               clipX={0}
               clipY={0}
               clipWidth={itemWidth}
-              clipHeight={contentHeight}
+              clipHeight={itemHeight}
             >
               <KonvaImage
                 image={img}
@@ -79,7 +99,7 @@ function ImageGridLayerComponent({
                   const minX = -scaledWidth + 100;
                   const maxX = itemWidth - 100;
                   const minY = -scaledHeight + 100;
-                  const maxY = contentHeight - 100;
+                  const maxY = itemHeight - 100;
                   
                   const newX = Math.max(minX, Math.min(maxX, relativePos.x));
                   const newY = Math.max(minY, Math.min(maxY, relativePos.y));
@@ -88,12 +108,12 @@ function ImageGridLayerComponent({
                 }}
               />
             </Group>
-            {isSoftBlend && index > 0 && blendWidth > 0 && (
+            {isSoftBlend && !isGrid && index > 0 && blendWidth > 0 && (
               <Rect
                 x={0}
                 y={0}
                 width={itemWidth}
-                height={contentHeight}
+                height={itemHeight}
                 globalCompositeOperation="destination-in"
                 fillLinearGradientStartPoint={{ x: 0, y: 0 }}
                 fillLinearGradientEndPoint={{ x: itemWidth, y: 0 }}

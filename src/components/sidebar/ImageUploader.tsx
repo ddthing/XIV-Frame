@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { Upload, X, ArrowLeftRight, RefreshCw, Lock, Unlock } from 'lucide-react'
+import { Upload, X, ArrowLeftRight, RefreshCw, Lock, Unlock, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 export function ImageUploader() {
@@ -34,11 +34,20 @@ export function ImageUploader() {
     input.click()
   }
 
+  const handleMove = (e: React.MouseEvent, idx: number, direction: 'prev' | 'next') => {
+    e.stopPropagation()
+    if (direction === 'prev' && idx > 0) swapImages(idx, idx - 1)
+    if (direction === 'next' && idx < images.length - 1) swapImages(idx, idx + 1)
+  }
+
   return (
     <div className="space-y-4">
-      <div className="flex gap-2">
-        {[0, 1].map((idx) => {
+      <div className="grid grid-cols-2 gap-2">
+        {[0, 1, 2, 3].map((idx) => {
           const image = images[idx]
+          // Don't show slot 3 or 4 if the previous slots are empty
+          if (idx > 1 && !images[idx - 1] && !image) return null;
+
           return (
             <div 
               key={idx} 
@@ -49,13 +58,23 @@ export function ImageUploader() {
                 <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={image} alt={`Upload ${idx + 1}`} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    {idx > 0 && (
+                      <button onClick={(e) => handleMove(e, idx, 'prev')} className="bg-black/50 text-white p-1.5 rounded-full hover:bg-black/70">
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+                    )}
                     <button 
                       onClick={(e) => { e.stopPropagation(); handleFileUpload(idx); }}
                       className="text-white text-xs font-medium border border-white/50 px-3 py-1.5 rounded-full bg-black/20 hover:bg-black/50"
                     >
                       {t('change')}
                     </button>
+                    {idx < images.length - 1 && (
+                      <button onClick={(e) => handleMove(e, idx, 'next')} className="bg-black/50 text-white p-1.5 rounded-full hover:bg-black/70">
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                   <div className="absolute top-2 right-2 z-10">
                     <button 
