@@ -74,6 +74,7 @@
     font-display: swap;
 }
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 

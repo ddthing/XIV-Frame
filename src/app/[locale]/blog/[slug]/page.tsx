@@ -84,7 +84,7 @@ export default async function BlogPostPage({ params }: PostPageProps) {
       
       <article>
         <header className="mb-12 text-center">
-          <h1 className="text-4xl lg:text-5xl font-normal tracking-tight text-foreground mb-6">
+          <h1 className="text-3xl lg:text-4xl font-semibold tracking-tight text-foreground mb-6">
             {post.metadata.title}
           </h1>
           <time dateTime={post.metadata.date} className="text-sm text-muted-foreground font-normal">
@@ -92,7 +92,7 @@ export default async function BlogPostPage({ params }: PostPageProps) {
           </time>
         </header>
 
-        <div className="prose dark:prose-invert prose-lg max-w-none prose-headings:font-normal prose-headings:tracking-tight prose-p:leading-[1.75] prose-p:tracking-[-0.01em] prose-li:leading-[1.75] prose-li:tracking-[-0.01em] prose-a:text-primary hover:prose-a:text-primary/80 prose-img:rounded-xl break-keep">
+        <div className="prose dark:prose-invert  max-w-none prose-headings:font-normal prose-headings:tracking-tight prose-p:leading-[1.75] prose-p:tracking-[-0.01em] prose-li:leading-[1.75] prose-li:tracking-[-0.01em] prose-a:text-primary hover:prose-a:text-primary/80 prose-img:rounded-xl break-keep">
           <MarkdownRenderer content={post.content} />
         </div>
       </article>
