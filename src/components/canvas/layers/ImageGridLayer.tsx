@@ -34,7 +34,7 @@ function ImageGridLayerComponent({
   const itemHeight = isGrid ? (contentHeight - gap) / 2 : contentHeight
 
   return (
-    <>
+    <Layer>
       {images.map((img, index) => {
         let xPos = 0
         let yPos = 0
@@ -61,7 +61,7 @@ function ImageGridLayerComponent({
         const savedPos = imagePositions[index] || { x: 0, y: 0 }
         
         return (
-          <Layer
+          <Group
             key={index}
             x={borderWidth + xPos}
             y={borderWidth + yPos}
@@ -124,10 +124,10 @@ function ImageGridLayerComponent({
                 ]}
               />
             )}
-          </Layer>
+          </Group>
         )
       })}
-    </>
+    </Layer>
   )
 }
 
