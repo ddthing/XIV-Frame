@@ -110,6 +110,7 @@ function ImageGridLayerComponent({
             </Group>
             {isSoftBlend && !isGrid && index > 0 && blendWidth > 0 && (
               <Rect
+                listening={false}
                 x={0}
                 y={0}
                 width={itemWidth}
