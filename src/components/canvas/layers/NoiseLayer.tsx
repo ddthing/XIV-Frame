@@ -24,6 +24,7 @@ export function NoiseLayer({ width, height, intensity }: NoiseLayerProps) {
         fillPatternImage={noiseImage}
         fillPatternRepeat="repeat"
         opacity={intensity / 100}
+        globalCompositeOperation="overlay"
         listening={false}
       />
     </Layer>
