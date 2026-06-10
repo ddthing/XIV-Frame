@@ -26,6 +26,39 @@ function ImageGridLayerComponent({
   const imageScales = useStore(state => state.imageScales)
   const isImageLocked = useStore(state => state.isImageLocked)
   const setImagePosition = useStore(state => state.setImagePosition)
+  const setImageAt = useStore(state => state.setImageAt)
+  const setImageScale = useStore(state => state.setImageScale)
+
+  const isShiftPressed = React.useRef(false)
+  const dragContexts = React.useRef<{ [key: number]: { startX: number, startY: number, axis: 'x' | 'y' | null } }>({})
+
+  React.useEffect(() => {
+    const down = (e: KeyboardEvent) => { if (e.key === 'Shift') isShiftPressed.current = true }
+    const up = (e: KeyboardEvent) => { if (e.key === 'Shift') isShiftPressed.current = false }
+    window.addEventListener('keydown', down)
+    window.addEventListener('keyup', up)
+    return () => { window.removeEventListener('keydown', down); window.removeEventListener('keyup', up) }
+  }, [])
+
+  const handleFileUpload = (index: number) => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (file) {
+        if (file.size > 10 * 1024 * 1024) {
+          alert('File size exceeds 10MB limit.')
+          return
+        }
+        const url = URL.createObjectURL(file)
+        setImageAt(index, url)
+        setImageScale(index, 1)
+        setImagePosition(index, { x: 0, y: 0 })
+      }
+    }
+    input.click()
+  }
 
   if (images.length === 0) return null
 
@@ -79,9 +112,22 @@ function ImageGridLayerComponent({
                 scaleY={scale}
                 x={savedPos.x}
                 y={savedPos.y}
+                onDragStart={(e) => {
+                  dragContexts.current[index] = { startX: e.target.x(), startY: e.target.y(), axis: null }
+                }}
                 onDragEnd={(e) => {
                   setImagePosition(index, { x: e.target.x(), y: e.target.y() })
+                  delete dragContexts.current[index]
                 }}
+                onWheel={(e) => {
+                  e.evt.preventDefault()
+                  const scaleBy = 1.05
+                  const oldScale = imageScales[index] || 1
+                  const newScale = e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy
+                  setImageScale(index, Math.max(0.5, Math.min(3, newScale)))
+                }}
+                onDblClick={() => handleFileUpload(index)}
+                onDblTap={() => handleFileUpload(index)}
                 dragBoundFunc={function(this: Konva.Node, pos) {
                   // eslint-disable-next-line @typescript-eslint/no-this-alias
                   const node = this;
@@ -101,8 +147,26 @@ function ImageGridLayerComponent({
                   const minY = -scaledHeight + 100;
                   const maxY = itemHeight - 100;
                   
-                  const newX = Math.max(minX, Math.min(maxX, relativePos.x));
-                  const newY = Math.max(minY, Math.min(maxY, relativePos.y));
+                  let newX = Math.max(minX, Math.min(maxX, relativePos.x));
+                  let newY = Math.max(minY, Math.min(maxY, relativePos.y));
+                  
+                  if (isShiftPressed.current) {
+                    const ctx = dragContexts.current[index]
+                    if (ctx) {
+                      if (!ctx.axis) {
+                        const dx = Math.abs(newX - ctx.startX)
+                        const dy = Math.abs(newY - ctx.startY)
+                        if (dx > 5 || dy > 5) {
+                          ctx.axis = dx > dy ? 'x' : 'y'
+                        }
+                      }
+                      if (ctx.axis === 'x') {
+                        newY = ctx.startY
+                      } else if (ctx.axis === 'y') {
+                        newX = ctx.startX
+                      }
+                    }
+                  }
                   
                   return parent.getAbsoluteTransform().point({ x: newX, y: newY });
                 }}

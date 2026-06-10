@@ -137,9 +137,64 @@ export function ImageUploader() {
                     onValueChange={(vals) => setImageScale(idx, Array.isArray(vals) ? vals[0] : vals as any)} 
                     min={0.5} max={3} step={0.01} 
                   />
-                  <span className="text-xs text-muted-foreground w-8 text-right font-medium">
-                    {Math.round((imageScales[idx] || 1) * 100)}%
-                  </span>
+                  <div className="relative w-12 shrink-0">
+                    <input 
+                      type="number"
+                      className="w-full text-xs text-right font-medium bg-transparent border border-border rounded-sm px-1 py-0.5 pr-3 appearance-none hover:border-primary focus:border-primary focus:outline-none"
+                      value={Math.round((imageScales[idx] || 1) * 100)}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value)
+                        if (!isNaN(val)) setImageScale(idx, Math.max(0.5, Math.min(3, val / 100)))
+                      }}
+                      min="50" max="300"
+                    />
+                    <span className="absolute right-1 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground pointer-events-none">%</span>
+                  </div>
+                </div>
+                
+                {/* Fine-tune position controls */}
+                <div className="flex items-center justify-between pt-1">
+                  <span className="text-[11px] text-muted-foreground">{t('positionNudge') || 'Position Nudge'}</span>
+                  <div className="flex items-center gap-1">
+                    <button 
+                      onClick={() => setImagePosition(idx, { 
+                        x: (useStore.getState().imagePositions[idx]?.x || 0) - 10, 
+                        y: useStore.getState().imagePositions[idx]?.y || 0 
+                      })}
+                      className="p-1 rounded-sm border border-border bg-card hover:bg-muted text-muted-foreground transition-colors"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                    </button>
+                    <div className="flex flex-col gap-1">
+                      <button 
+                        onClick={() => setImagePosition(idx, { 
+                          x: useStore.getState().imagePositions[idx]?.x || 0, 
+                          y: (useStore.getState().imagePositions[idx]?.y || 0) - 10 
+                        })}
+                        className="p-1 rounded-sm border border-border bg-card hover:bg-muted text-muted-foreground transition-colors"
+                      >
+                        <ChevronLeft className="w-3.5 h-3.5 rotate-90" />
+                      </button>
+                      <button 
+                        onClick={() => setImagePosition(idx, { 
+                          x: useStore.getState().imagePositions[idx]?.x || 0, 
+                          y: (useStore.getState().imagePositions[idx]?.y || 0) + 10 
+                        })}
+                        className="p-1 rounded-sm border border-border bg-card hover:bg-muted text-muted-foreground transition-colors"
+                      >
+                        <ChevronLeft className="w-3.5 h-3.5 -rotate-90" />
+                      </button>
+                    </div>
+                    <button 
+                      onClick={() => setImagePosition(idx, { 
+                        x: (useStore.getState().imagePositions[idx]?.x || 0) + 10, 
+                        y: useStore.getState().imagePositions[idx]?.y || 0 
+                      })}
+                      className="p-1 rounded-sm border border-border bg-card hover:bg-muted text-muted-foreground transition-colors"
+                    >
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

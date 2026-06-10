@@ -6,6 +6,7 @@ import { ImageGridLayer } from './layers/ImageGridLayer'
 import { SignatureLayer } from './layers/SignatureLayer'
 import { LogoLayer } from './layers/LogoLayer'
 import { CopyrightLayer } from './layers/CopyrightLayer'
+import { NoiseLayer } from './layers/NoiseLayer'
 
 import type Konva from 'konva'
 
@@ -156,6 +157,12 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
             />
           </Layer>
         )}
+
+        <NoiseLayer 
+          width={outerWidth} 
+          height={outerHeight} 
+          intensity={state.grainIntensity} 
+        />
       </Stage>
     </div>
   )
