@@ -10,9 +10,11 @@ export const FONT_MAP: Record<string, string> = {
   'BookkMyungjo': 'fontBookk',
   'x12y12pxMaruMinyaHangul': 'fontMaru',
   'LotteriaChwapttaenggyeo': 'fontLotteria',
-  'HsBombaram30': 'fontBombaram',
+  'Bombaram': 'fontBombaram',
   'GoodNeighbor': 'fontGoodNeighbor',
   'SlowGothic': 'fontSlowGothic',
+  'Ridibatang': 'fontRidibatang',
+  'Mulmaru': 'fontMulmaru'
 }
 
 export const POSITION_OPTIONS: { value: SignaturePosition; label: string; icon: React.ReactNode }[] = [
