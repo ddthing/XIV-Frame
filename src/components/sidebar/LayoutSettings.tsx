@@ -25,6 +25,15 @@ export function LayoutSettings() {
           </button>
           <button
             onClick={() => {
+              state.setLayoutPreset('vertical-split')
+              state.setImageTransition('none')
+            }}
+            className={`flex-1 h-9 text-[11px] rounded-sm border transition-colors ${state.layoutPreset === 'vertical-split' ? 'bg-primary/10 border-primary text-primary font-semibold' : 'bg-card border-border text-muted-foreground hover:bg-muted/50'}`}
+          >
+            {t('presetVertical')}
+          </button>
+          <button
+            onClick={() => {
               state.setLayoutPreset('blend')
               state.setImageTransition('soft-blend')
             }}

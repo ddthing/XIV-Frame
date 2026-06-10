@@ -63,8 +63,21 @@ function ImageGridLayerComponent({
   if (images.length === 0) return null
 
   const isGrid = layoutPreset === 'grid' && images.length >= 3
-  const itemWidth = isGrid ? (contentWidth - gap) / 2 : (contentWidth - (gap * (images.length - 1))) / images.length
-  const itemHeight = isGrid ? (contentHeight - gap) / 2 : contentHeight
+  const isVertical = layoutPreset === 'vertical-split'
+
+  let itemWidth = 0
+  let itemHeight = 0
+  
+  if (isGrid) {
+    itemWidth = (contentWidth - gap) / 2
+    itemHeight = (contentHeight - gap) / 2
+  } else if (isVertical) {
+    itemWidth = contentWidth
+    itemHeight = (contentHeight - (gap * (images.length - 1))) / images.length
+  } else {
+    itemWidth = (contentWidth - (gap * (images.length - 1))) / images.length
+    itemHeight = contentHeight
+  }
 
   return (
     <>
@@ -82,6 +95,8 @@ function ImageGridLayerComponent({
           } else if (index === 3) {
             xPos = itemWidth + gap; yPos = itemHeight + gap
           }
+        } else if (isVertical) {
+          yPos = index * (itemHeight + gap)
         } else {
           xPos = index * (itemWidth + gap)
         }
