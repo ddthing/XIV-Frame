@@ -1,52 +1,66 @@
+# XIV Frame - Design System & Guidelines
+
 ## Overview
 
-Futuristic and cosmic with a premium, space-age aesthetic. The design feels expansive and mysterious, using dramatic gradients and lighting effects to create depth. The overall tone is sophisticated and cutting-edge, befitting an AI company with cosmic ambitions.
+XIV Frame is a premium, minimalist web-based screenshot layout and editing tool designed specifically for Final Fantasy XIV players. The primary goal is to make the user's screenshots the absolute focal point. 
 
-Centered layout with generous whitespace. The design uses a single-column approach with elements centered both horizontally and vertically. Navigation is horizontally distributed across the top, with the main content area featuring a large search input as the focal point.
-
-Uses a 4px base grid with scale: 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 32, 64.
+The aesthetic is clean, functional, and unobtrusive, drawing inspiration from professional design tools like Figma or Lightroom, while incorporating subtle thematic nods to the FFXIV UI through brand-aligned accent colors.
 
 ## Colors
 
-### Dark Theme
-- **Background Primary** (#1f2228): Main background color for dark theme
-- **Text Primary** (#ffffff): Primary text color, navigation, headings
-- **Text Secondary** (#7d8187): Secondary text, muted content
-- **Deep Black** (#0a0a0a): Deep background elements, overlays
-- **Accent Blue** (#2563eb): Interactive elements, links, highlights
-- **Border Gray** (#0c0c0b): Subtle borders and dividers
+### Theme Variables
+- **Background Primary**: Light `#f8fafc` / Dark `#1f2228` (Clean workspace background)
+- **Panel Background**: Light `#ffffff` / Dark `#2a2d35` (For sidebars and settings panels)
+- **Text Primary**: Light `#0f172a` / Dark `#f8fafc` (High readability for settings and labels)
+- **Text Secondary**: Light `#64748b` / Dark `#94a3b8` (Muted hints, secondary labels)
+- **Border/Divider**: Light `#e2e8f0` / Dark `#334155` (Subtle separation of tool sections)
 
-### Light Theme
-- **Background Light** (#ffffff): Light theme background
-- **Text Dark** (#1f2228): Primary text in light theme
-- **Text Muted** (#7d8187): Secondary text in light theme
-- **Accent Blue** (#2563eb): Interactive elements, consistent across themes
+### Brand & Accent
+- **XIV Accent (Orange/Red)**: `#ea580c` (Used for primary buttons, active tabs, and highlights to reflect the game's iconic branding)
 
 ## Typography
-- **Headline Font**: universalSans
-- **Body Font**: universalSans
-- **Label Font**: universalSans
-- **Code Font**: GeistMono
 
-The typography system uses universalSans as the primary typeface across all contexts, with negative letter-spacing on larger sizes (-2px on 80px, -1.2px on 48px) to maintain optical balance. GeistMono serves as the monospace option with increased letter-spacing (1.2-1.4px) for better code readability. The weight remains consistently at 400 across all sizes, relying on size and spacing for hierarchy rather than weight variation.
+The typography system is split into two functional categories: **UI Typeface** and **Signature Typefaces**.
 
-## Elevation
+### UI Typeface
+- **Font**: Pretendard (or standard system sans-serif like Inter/Roboto)
+- **Usage**: Used for all editor interfaces, sidebar labels, buttons, and settings.
+- **Hierarchy**: 
+  - Section Headers: `Weight 600`, `14px`
+  - Labels: `Weight 500`, `12px`
+  - Hints/Secondary: `Weight 400`, `11px`
 
-Depth is created primarily through gradient backgrounds, transparency effects, and layered text rather than traditional shadows. The design uses a single subtle shadow for form elements but relies heavily on opacity and gradient overlays to create visual hierarchy and spatial relationships.
+### Signature Typefaces
+- **Fonts**: Nexon Maplestory, Ridibatang, Mulmaru, Bombaram 3.0, Slow Gothic, Good Neighbor, etc.
+- **Usage**: Exclusively available for the user to customize their watermark/signature on the canvas. 
 
-## Components
-- **Cosmic Hero Section**: Large gradient background with semi-transparent text overlay and dramatic lighting effects
-- **Pill Navigation**: Horizontal navigation with rounded pill-shaped buttons using 9999px border radius
-- **Search Input**: Large rounded input field with dark background and subtle borders
-- **Announcement Banner**: Bottom-positioned banner with call-to-action button and descriptive text
-- **Gradient Text Effect**: Large text with transparency and layered effects creating depth
+## Layout & Components
+
+The interface follows a classic Editor/Workspace layout.
+
+### 1. Workspace (Canvas)
+- The expansive central area where the image preview is rendered.
+- **Background**: Neutral checkerboard or contrasting solid color to differentiate from the photo edges.
+- **Interaction**: Direct manipulation (Shift+Drag to lock axis, Mouse Wheel to zoom).
+
+### 2. Control Sidebar (Settings Panel)
+- Pinned to the side or overlaid cleanly on mobile.
+- Features tight, dense, and organized controls to minimize scrolling.
+- **Inputs**: Number inputs, range sliders, toggle switches, and distinct active/inactive states for buttons.
+
+### 3. Modals & Sheets
+- Used for file uploads, export previews, or advanced settings.
+
+## Elevation & Depth
+
+Shadows and borders are strictly functional, used to separate control panels from the canvas workspace.
+- **Panels**: Distinct 1px borders and slight drop-shadows to float above the canvas.
+- **Canvas Elements**: The images themselves rely on user-defined settings (borders, gaps, blending) rather than UI-forced drop shadows.
 
 ## Do's and Don'ts
-- Do use negative letter-spacing on large text sizes to maintain optical balance
-- Don't use font weights other than 400 - rely on size and spacing for hierarchy
-- Do maintain high contrast between text and background for accessibility
-- Don't overuse the accent blue - reserve it for truly interactive elements
-- Do use pill-shaped buttons (9999px radius) for primary actions
-- Don't mix border radius styles - stick to either pill or 24px radius
-- Do leverage transparency and gradients to create depth rather than shadows
-- Don't use more than 3 text sizes in a single interface section
+
+- **Do** maximize the canvas size. The user's screenshot is the hero.
+- **Don't** use distracting, dramatic gradients or heavy backgrounds in the UI panels.
+- **Do** use multiple font weights (400, 500, 600) in the sidebar to establish clear visual hierarchy for dense settings.
+- **Don't** use rounded "pill" buttons (9999px) for dense control panels. Stick to subtle `4px` or `6px` border radii (`rounded-sm`, `rounded-md`) to save space and maintain a professional tool aesthetic.
+- **Do** group related controls tightly (e.g., Image Scale slider + Number Input + Position Nudge buttons).

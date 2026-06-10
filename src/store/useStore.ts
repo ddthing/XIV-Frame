@@ -26,7 +26,7 @@ export const useStore = create<AppState>()(
       }),
     }),
     {
-      name: 'xiv-frame-settings',
+      name: 'xiv-frame-settings-v2',
       partialize: (state) => {
         // Exclude ephemeral and non-serializable state from persistence
         const { images, imagePositions, imageScales, isImageLocked, logoUrl, ...rest } = state
