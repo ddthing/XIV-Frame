@@ -11,7 +11,7 @@ export function LayoutSettings() {
 
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-[80px_1fr] items-center gap-2">
+      <div className="grid grid-cols-[100px_1fr] items-center gap-2">
         <Label className="text-xs text-muted-foreground font-medium">{t('layoutPreset')}</Label>
         <div className="flex gap-2">
           <button
@@ -46,7 +46,7 @@ export function LayoutSettings() {
       </div>
 
       {state.imageTransition === 'none' ? (
-        <div className="grid grid-cols-[80px_1fr_40px] items-center gap-2">
+        <div className="grid grid-cols-[100px_1fr_40px] items-center gap-2">
           <Label className="text-xs text-muted-foreground font-medium">{t('imageGap')}</Label>
           <Slider 
             value={[state.imageGap]} 
@@ -56,7 +56,7 @@ export function LayoutSettings() {
           <span className="text-xs text-right text-muted-foreground">{state.imageGap} px</span>
         </div>
       ) : (
-        <div className="grid grid-cols-[80px_1fr_40px] items-center gap-2">
+        <div className="grid grid-cols-[100px_1fr_40px] items-center gap-2">
           <Label className="text-xs text-muted-foreground font-medium">{t('blendWidth')}</Label>
           <Slider 
             value={[state.blendWidth]} 
@@ -67,7 +67,7 @@ export function LayoutSettings() {
         </div>
       )}
 
-      <div className="grid grid-cols-[80px_1fr_40px] items-center gap-2">
+      <div className="grid grid-cols-[100px_1fr_40px] items-center gap-2">
         <Label className="text-xs text-muted-foreground font-medium">{t('borderWidth')}</Label>
         <Slider 
           value={[state.borderWidth]} 
@@ -77,7 +77,17 @@ export function LayoutSettings() {
         <span className="text-xs text-right text-muted-foreground">{state.borderWidth} px</span>
       </div>
 
-      <div className="grid grid-cols-[80px_1fr] items-center gap-2">
+      <div className="grid grid-cols-[100px_1fr_40px] items-center gap-2">
+        <Label className="text-xs text-muted-foreground font-medium">{t('grainIntensity') || 'Grain'}</Label>
+        <Slider 
+          value={[state.grainIntensity]} 
+          onValueChange={(vals) => state.setGrainIntensity(Array.isArray(vals) ? vals[0] : vals as any)}
+          min={0} max={100} step={1} 
+        />
+        <span className="text-xs text-right text-muted-foreground">{state.grainIntensity}%</span>
+      </div>
+
+      <div className="grid grid-cols-[100px_1fr] items-center gap-2">
         <Label className="text-xs text-muted-foreground font-medium">{t('background')}</Label>
         <div className="flex gap-2">
           {colors.map(color => (
@@ -91,7 +101,7 @@ export function LayoutSettings() {
           ))}
         </div>
       </div>
-      <div className="grid grid-cols-[80px_1fr] items-center gap-2 pt-4 border-t border-border">
+      <div className="grid grid-cols-[100px_1fr] items-center gap-2 pt-4 border-t border-border">
         <Label className="text-xs text-muted-foreground font-medium">{t('copyrightToggle')}</Label>
         <div className="flex items-center">
           <Switch 
@@ -103,7 +113,7 @@ export function LayoutSettings() {
 
       {state.showCopyright && (
         <>
-          <div className="grid grid-cols-[80px_1fr] items-center gap-2">
+          <div className="grid grid-cols-[100px_1fr] items-center gap-2">
             <Label className="text-xs text-muted-foreground font-medium">{t('copyrightPosition')}</Label>
             <div className="grid grid-cols-3 gap-1 w-full">
               {(
@@ -129,7 +139,7 @@ export function LayoutSettings() {
             </div>
           </div>
 
-          <div className="grid grid-cols-[80px_1fr] items-center gap-2">
+          <div className="grid grid-cols-[100px_1fr] items-center gap-2">
             <Label className="text-xs text-muted-foreground font-medium">{t('copyrightColor')}</Label>
             <div className="grid grid-cols-3 gap-1 w-full">
               {(

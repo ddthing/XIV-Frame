@@ -18,7 +18,8 @@
     "guideTitle": "이미지 조작 가이드",
     "guideMove": "드래그: 이미지 이동",
     "guideZoom": "스크롤: 확대/축소",
-    "guideNotice": "결과물에는 영향을 주지 않습니다."
+    "guideNotice": "결과물에는 영향을 주지 않습니다.",
+    "positionNudge": "위치 미세조정"
   },
   "LayoutSettings": {
     "layoutPreset": "레이아웃",
@@ -40,6 +41,7 @@
     "transitionSoftBlend": "자연스럽게",
     "blendWidth": "자연스러운 영역 너비",
     "borderWidth": "테두리 두께",
+    "grainIntensity": "필름 노이즈",
     "bgWhite": "화이트",
     "bgLightGray": "연한 회색",
     "bgTransparent": "투명",

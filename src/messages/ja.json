@@ -18,7 +18,8 @@
     "guideTitle": "画像操作ガイド",
     "guideMove": "ドラッグ: 画像を移動",
     "guideZoom": "スクロール: 拡大/縮小",
-    "guideNotice": "最終的な書き出しには影響しません。"
+    "guideNotice": "最終的な画像には影響しません。",
+    "positionNudge": "位置の微調整"
   },
   "LayoutSettings": {
     "layoutPreset": "レイアウト",
@@ -38,8 +39,9 @@
     "transition": "トランジション",
     "transitionNone": "なし",
     "transitionSoftBlend": "ソフトブレンド",
-    "blendWidth": "ブレンド幅",
-    "borderWidth": "境界線の太さ",
+    "blendWidth": "自然な境界の幅",
+    "borderWidth": "枠線の太さ",
+    "grainIntensity": "フィルムノイズ",
     "bgWhite": "ホワイト",
     "bgLightGray": "ライトグレー",
     "bgTransparent": "透明",

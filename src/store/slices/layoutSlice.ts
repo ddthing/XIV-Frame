@@ -34,6 +34,9 @@ export interface LayoutSlice {
 
   zoom: number
   setZoom: (zoom: number) => void
+
+  grainIntensity: number
+  setGrainIntensity: (intensity: number) => void
 }
 
 export const initialLayoutState = {
@@ -48,6 +51,7 @@ export const initialLayoutState = {
   copyrightColor: 'black' as CopyrightColor,
   copyrightPosition: 'bottom-center' as CopyrightPosition,
   zoom: 100,
+  grainIntensity: 0,
 }
 
 export const createLayoutSlice: StateCreator<LayoutSlice, [], [], LayoutSlice> = (set) => ({
@@ -64,4 +68,5 @@ export const createLayoutSlice: StateCreator<LayoutSlice, [], [], LayoutSlice> =
   setBorderWidth: (width) => set({ borderWidth: width }),
   setShowCopyright: (show) => set({ showCopyright: show }),
   setZoom: (z) => set({ zoom: z }),
+  setGrainIntensity: (intensity) => set({ grainIntensity: intensity }),
 })
