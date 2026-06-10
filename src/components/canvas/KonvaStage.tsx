@@ -77,6 +77,15 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
       const cellWidth = imagesData[0].width
       totalWidth = (cellWidth * 2) + state.imageGap
       gridHeight = (baseHeight * 2) + state.imageGap
+    } else if (state.layoutPreset === 'vertical-split') {
+      // Vertical layout calculation
+      const baseWidth = imagesData[0].width
+      totalWidth = baseWidth
+      gridHeight = 0
+      imagesData.forEach(img => {
+        gridHeight += img.height * (baseWidth / img.width)
+      })
+      gridHeight += Math.max(0, imagesData.length - 1) * state.imageGap
     } else {
       // Horizontal layout calculation
       imagesData.forEach(img => {

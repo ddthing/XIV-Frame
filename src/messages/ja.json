@@ -24,6 +24,7 @@
   "LayoutSettings": {
     "layoutPreset": "レイアウト",
     "presetSplit": "スプリット",
+    "presetVertical": "縦",
     "presetBlend": "ブレンド",
     "presetGrid": "グリッド",
     "background": "背景",

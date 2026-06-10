@@ -5,7 +5,7 @@ export type BackgroundColor = 'white' | 'light-gray' | 'transparent'
 export type CopyrightPosition = 'bottom-left' | 'bottom-center' | 'bottom-right'
 export type CopyrightColor = 'black' | 'white' | 'gray'
 export type ImageTransition = 'none' | 'soft-blend'
-export type LayoutPreset = 'split' | 'blend' | 'grid'
+export type LayoutPreset = 'split' | 'vertical-split' | 'blend' | 'grid'
 
 export interface LayoutSlice {
   layoutPreset: LayoutPreset
