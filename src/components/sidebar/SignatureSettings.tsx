@@ -145,9 +145,11 @@ export function SignatureSettings() {
               <SelectItem value="BookkMyungjo" className="text-xs font-medium" style={{ fontFamily: 'BookkMyungjo' }}>{t('fontBookk')}</SelectItem>
               <SelectItem value="x12y12pxMaruMinyaHangul" className="text-xs font-medium" style={{ fontFamily: 'x12y12pxMaruMinyaHangul' }}>{t('fontMaru')}</SelectItem>
               <SelectItem value="LotteriaChwapttaenggyeo" className="text-xs font-medium" style={{ fontFamily: 'LotteriaChwapttaenggyeo' }}>{t('fontLotteria')}</SelectItem>
-              <SelectItem value="HsBombaram30" className="text-xs font-medium" style={{ fontFamily: 'HsBombaram30' }}>{t('fontBombaram')}</SelectItem>
+              <SelectItem value="Bombaram" className="text-xs font-medium" style={{ fontFamily: 'Bombaram' }}>{t('fontBombaram')}</SelectItem>
               <SelectItem value="GoodNeighbor" className="text-xs font-medium" style={{ fontFamily: 'GoodNeighbor' }}>{t('fontGoodNeighbor')}</SelectItem>
               <SelectItem value="SlowGothic" className="text-xs font-medium" style={{ fontFamily: 'SlowGothic' }}>{t('fontSlowGothic')}</SelectItem>
+              <SelectItem value="Ridibatang" className="text-xs font-medium" style={{ fontFamily: 'Ridibatang' }}>{t('fontRidibatang')}</SelectItem>
+              <SelectItem value="Mulmaru" className="text-xs font-medium" style={{ fontFamily: 'Mulmaru' }}>{t('fontMulmaru')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
