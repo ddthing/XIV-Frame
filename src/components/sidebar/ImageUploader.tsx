@@ -137,10 +137,10 @@ export function ImageUploader() {
                     onValueChange={(vals) => setImageScale(idx, Array.isArray(vals) ? vals[0] : vals as any)} 
                     min={0.5} max={3} step={0.01} 
                   />
-                  <div className="relative w-12 shrink-0">
+                  <div className="relative w-16 shrink-0">
                     <input 
                       type="number"
-                      className="w-full text-xs text-right font-medium bg-transparent border border-border rounded-sm px-1 py-0.5 pr-3 appearance-none hover:border-primary focus:border-primary focus:outline-none"
+                      className="w-full text-xs text-right font-medium bg-transparent border border-border rounded-sm px-1 py-0.5 pr-4 appearance-none hover:border-primary focus:border-primary focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                       value={Math.round((imageScales[idx] || 1) * 100)}
                       onChange={(e) => {
                         const val = parseInt(e.target.value)
