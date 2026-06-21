@@ -5,7 +5,7 @@ export type BackgroundColor = 'white' | 'light-gray' | 'transparent'
 export type CopyrightPosition = 'bottom-left' | 'bottom-center' | 'bottom-right'
 export type CopyrightColor = 'black' | 'white' | 'gray'
 export type ImageTransition = 'none' | 'soft-blend'
-export type LayoutPreset = 'split' | 'vertical-split' | 'blend' | 'grid'
+export type LayoutPreset = 'split' | 'vertical-split' | 'grid'
 
 export interface LayoutSlice {
   layoutPreset: LayoutPreset
@@ -37,6 +37,9 @@ export interface LayoutSlice {
 
   grainIntensity: number
   setGrainIntensity: (intensity: number) => void
+
+  isExporting: boolean
+  setIsExporting: (isExporting: boolean) => void
 }
 
 export const initialLayoutState = {
@@ -52,6 +55,7 @@ export const initialLayoutState = {
   copyrightPosition: 'bottom-center' as CopyrightPosition,
   zoom: 100,
   grainIntensity: 0,
+  isExporting: false,
 }
 
 export const createLayoutSlice: StateCreator<LayoutSlice, [], [], LayoutSlice> = (set) => ({
@@ -69,4 +73,5 @@ export const createLayoutSlice: StateCreator<LayoutSlice, [], [], LayoutSlice> =
   setShowCopyright: (show) => set({ showCopyright: show }),
   setZoom: (z) => set({ zoom: z }),
   setGrainIntensity: (intensity) => set({ grainIntensity: intensity }),
+  setIsExporting: (isExporting) => set({ isExporting }),
 })

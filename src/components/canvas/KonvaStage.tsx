@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import { Stage, Layer, Group } from 'react-konva'
 import { useStore } from '@/store/useStore'
+import { useShallow } from 'zustand/react/shallow'
 import { BackgroundLayer } from './layers/BackgroundLayer'
 import { ImageGridLayer } from './layers/ImageGridLayer'
 import { SignatureLayer } from './layers/SignatureLayer'
@@ -11,7 +12,21 @@ import { NoiseLayer } from './layers/NoiseLayer'
 import type Konva from 'konva'
 
 export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Konva.Stage | null> }) {
-  const state = useStore()
+  const {
+    images, layoutPreset, imageGap, imageTransition, blendWidth, canvasRatio,
+    borderWidth, backgroundColor, grainIntensity
+  } = useStore(useShallow(state => ({
+    images: state.images,
+    layoutPreset: state.layoutPreset,
+    imageGap: state.imageGap,
+    imageTransition: state.imageTransition,
+    blendWidth: state.blendWidth,
+    canvasRatio: state.canvasRatio,
+    borderWidth: state.borderWidth,
+    backgroundColor: state.backgroundColor,
+    grainIntensity: state.grainIntensity
+  })))
+  
   const containerRef = useRef<HTMLDivElement>(null)
   
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 })
@@ -22,7 +37,7 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
     const imgInstances: HTMLImageElement[] = []
     
     const loadImages = async () => {
-      const promises = state.images.map(url => {
+      const promises = images.map(url => {
         return new Promise<HTMLImageElement>((resolve, reject) => {
           const img = new window.Image()
           imgInstances.push(img)
@@ -48,9 +63,11 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
         img.src = ''
       })
     }
-  }, [state.images])
+  }, [images])
 
   useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout>
+
     const updateSize = () => {
       if (containerRef.current) {
         setStageSize({
@@ -59,65 +76,76 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
         })
       }
     }
+    
+    // Initial size
     updateSize()
-    window.addEventListener('resize', updateSize)
-    return () => window.removeEventListener('resize', updateSize)
+    
+    const handleResize = () => {
+      clearTimeout(timeoutId)
+      timeoutId = setTimeout(updateSize, 100)
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => {
+      clearTimeout(timeoutId)
+      window.removeEventListener('resize', handleResize)
+    }
   }, [])
 
-  let logicalWidth = 1920
-  let logicalHeight = 1080
+  const { logicalWidth, logicalHeight } = useMemo(() => {
+    let width = 1920
+    let height = 1080
 
-  if (imagesData.length > 0) {
-    const baseHeight = imagesData[0].height
-    let totalWidth = 0
-    let gridHeight = baseHeight
-    
-    if (state.layoutPreset === 'grid' && imagesData.length >= 3) {
-      // 2x2 grid calculation
-      const cellWidth = imagesData[0].width
-      totalWidth = (cellWidth * 2) + state.imageGap
-      gridHeight = (baseHeight * 2) + state.imageGap
-    } else if (state.layoutPreset === 'vertical-split') {
-      // Vertical layout calculation
-      const baseWidth = imagesData[0].width
-      totalWidth = baseWidth
-      gridHeight = 0
-      imagesData.forEach(img => {
-        gridHeight += img.height * (baseWidth / img.width)
-      })
-      gridHeight += Math.max(0, imagesData.length - 1) * state.imageGap
-    } else {
-      // Horizontal layout calculation
-      imagesData.forEach(img => {
-        totalWidth += img.width * (baseHeight / img.height)
-      })
+    if (imagesData.length > 0) {
+      const baseHeight = imagesData[0].height
+      let totalWidth = 0
+      let gridHeight = baseHeight
       
-      if (state.imageTransition === 'soft-blend') {
-        totalWidth -= Math.max(0, imagesData.length - 1) * state.blendWidth
+      if (layoutPreset === 'grid' && imagesData.length >= 3) {
+        const cellWidth = imagesData[0].width
+        totalWidth = (cellWidth * 2) + imageGap
+        gridHeight = (baseHeight * 2) + imageGap
+      } else if (layoutPreset === 'vertical-split') {
+        const baseWidth = imagesData[0].width
+        totalWidth = baseWidth
+        gridHeight = 0
+        imagesData.forEach(img => {
+          gridHeight += img.height * (baseWidth / img.width)
+        })
+        gridHeight += Math.max(0, imagesData.length - 1) * imageGap
       } else {
-        totalWidth += Math.max(0, imagesData.length - 1) * state.imageGap
+        imagesData.forEach(img => {
+          totalWidth += img.width * (baseHeight / img.height)
+        })
+        
+        if (imageTransition === 'soft-blend') {
+          totalWidth -= Math.max(0, imagesData.length - 1) * blendWidth
+        } else {
+          totalWidth += Math.max(0, imagesData.length - 1) * imageGap
+        }
+      }
+
+      if (canvasRatio === '16:9') {
+        width = Math.max(totalWidth, gridHeight * (16 / 9))
+        height = width * (9 / 16)
+      } else if (canvasRatio === '2:1') {
+        width = Math.max(totalWidth, gridHeight * 2)
+        height = width / 2
+      } else {
+        width = totalWidth
+        height = gridHeight
       }
     }
+    return { logicalWidth: width, logicalHeight: height }
+  }, [imagesData, layoutPreset, imageGap, imageTransition, blendWidth, canvasRatio])
 
-    if (state.canvasRatio === '16:9') {
-      logicalWidth = Math.max(totalWidth, gridHeight * (16 / 9))
-      logicalHeight = logicalWidth * (9 / 16)
-    } else if (state.canvasRatio === '2:1') {
-      logicalWidth = Math.max(totalWidth, gridHeight * 2)
-      logicalHeight = logicalWidth / 2
-    } else {
-      logicalWidth = totalWidth
-      logicalHeight = gridHeight
-    }
-  }
-
-  const outerWidth = logicalWidth + (state.borderWidth * 2)
-  const outerHeight = logicalHeight + (state.borderWidth * 2)
+  const outerWidth = logicalWidth + (borderWidth * 2)
+  const outerHeight = logicalHeight + (borderWidth * 2)
 
   const scale = Math.min(
     stageSize.width / outerWidth,
     stageSize.height / outerHeight
-  ) * (state.zoom / 100) * 0.9
+  ) * 0.9
 
   // Add a fallback if scale is invalid
   if (!scale || scale <= 0 || !outerWidth || !outerHeight) return <div ref={containerRef} className="w-full h-full" />
@@ -135,7 +163,7 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
           <BackgroundLayer 
             width={outerWidth} 
             height={outerHeight} 
-            color={state.backgroundColor} 
+            color={backgroundColor} 
           />
         </Layer>
         
@@ -143,15 +171,15 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
           images={imagesData}
           contentWidth={logicalWidth}
           contentHeight={logicalHeight}
-          gap={state.imageTransition === 'soft-blend' ? -state.blendWidth : state.imageGap}
-          borderWidth={state.borderWidth}
-          isSoftBlend={state.imageTransition === 'soft-blend'}
-          blendWidth={state.blendWidth}
-          layoutPreset={state.layoutPreset}
+          gap={imageTransition === 'soft-blend' ? -blendWidth : imageGap}
+          borderWidth={borderWidth}
+          isSoftBlend={imageTransition === 'soft-blend'}
+          blendWidth={blendWidth}
+          layoutPreset={layoutPreset}
         />
 
         {imagesData.length > 0 && (
-          <Layer x={state.borderWidth} y={state.borderWidth}>
+          <Layer x={borderWidth} y={borderWidth}>
             <SignatureLayer 
               contentWidth={logicalWidth}
               contentHeight={logicalHeight}
@@ -170,7 +198,7 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
         <NoiseLayer 
           width={outerWidth} 
           height={outerHeight} 
-          intensity={state.grainIntensity} 
+          intensity={grainIntensity} 
         />
       </Stage>
     </div>

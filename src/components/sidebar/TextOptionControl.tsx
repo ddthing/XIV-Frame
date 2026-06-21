@@ -33,40 +33,43 @@ export function TextOptionControl({
 }: TextOptionControlProps) {
   const t = useTranslations('SignatureSettings')
   return (
-    <div className="space-y-1.5">
-      <div className="grid grid-cols-[80px_1fr] items-center gap-2">
-        <Label className="text-xs text-muted-foreground font-medium">{label}</Label>
+    <div className="space-y-3 p-4 bg-background border border-border rounded-xl shadow-subtle">
+      <div className="space-y-1.5">
+        <Label className="text-sm font-medium text-foreground block">{label}</Label>
         <Input 
           value={value} 
           onChange={(e) => onChangeValue(e.target.value)}
           placeholder={placeholder}
-          className="text-sm h-10 rounded-sm"
+          className="text-sm h-10 rounded-md bg-card border-border focus-visible:ring-primary focus-visible:border-primary transition-colors w-full"
           maxLength={30}
         />
       </div>
-      <div className="pl-[88px] flex items-center gap-2">
-        <button 
-          type="button" 
-          aria-label={bold ? 'Remove bold' : 'Make text bold'}
-          className={`flex items-center justify-center w-9 h-9 rounded-sm border transition-colors ${bold ? 'bg-primary text-white border-primary shadow-sm' : 'bg-card text-muted-foreground border-border hover:bg-muted/50'}`} 
-          onClick={() => onChangeBold(!bold)}
-        >
-          <Bold className="w-3.5 h-3.5" />
-        </button>
-        <button 
-          type="button" 
-          aria-label={italic ? 'Remove italic' : 'Make text italic'}
-          className={`flex items-center justify-center w-9 h-9 rounded-sm border transition-colors ${italic ? 'bg-primary text-white border-primary shadow-sm' : 'bg-card text-muted-foreground border-border hover:bg-muted/50'}`} 
-          onClick={() => onChangeItalic(!italic)}
-        >
-          <Italic className="w-3.5 h-3.5" />
-        </button>
-        <div className="flex-1 pl-2 flex items-center gap-2 border-l border-border">
-          <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap">{t('letterSpacing')}</span>
+      <div className="flex flex-wrap sm:flex-nowrap items-center gap-3">
+        <div className="flex items-center gap-2 shrink-0">
+          <button 
+            type="button" 
+            aria-label={bold ? 'Remove bold' : 'Make text bold'}
+            className={`flex items-center justify-center w-10 h-10 rounded-md border transition-colors shadow-subtle ${bold ? 'bg-[#d5f5c2] text-primary border-transparent font-semibold' : 'bg-card text-muted-foreground border-border hover:bg-muted/50'}`} 
+            onClick={() => onChangeBold(!bold)}
+          >
+            <Bold className="w-4 h-4" />
+          </button>
+          <button 
+            type="button" 
+            aria-label={italic ? 'Remove italic' : 'Make text italic'}
+            className={`flex items-center justify-center w-10 h-10 rounded-md border transition-colors shadow-subtle ${italic ? 'bg-[#d5f5c2] text-primary border-transparent font-semibold' : 'bg-card text-muted-foreground border-border hover:bg-muted/50'}`} 
+            onClick={() => onChangeItalic(!italic)}
+          >
+            <Italic className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="flex-1 w-full flex items-center gap-3">
+          <span className="text-xs text-muted-foreground font-medium whitespace-nowrap shrink-0">{t('letterSpacing')}</span>
           <Slider 
             value={[letterSpacing]} 
             onValueChange={v => onChangeLetterSpacing(Array.isArray(v) ? v[0] : v)} 
-            min={-10} max={20} step={1} 
+            min={-10} max={20} step={1}
+            className="flex-1"
           />
         </div>
       </div>

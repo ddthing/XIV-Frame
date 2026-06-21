@@ -1,22 +1,27 @@
 import React from 'react'
 import { Text } from 'react-konva'
 import { useStore } from '@/store/useStore'
+import { useShallow } from 'zustand/react/shallow'
 
 import { useTranslations } from 'next-intl'
 
 function CopyrightLayerComponent({ contentWidth, contentHeight }: { contentWidth: number, contentHeight: number }) {
-  const state = useStore()
+  const { showCopyright, copyrightColor, copyrightPosition } = useStore(useShallow(state => ({
+    showCopyright: state.showCopyright,
+    copyrightColor: state.copyrightColor,
+    copyrightPosition: state.copyrightPosition
+  })))
   const t = useTranslations('CopyrightLayer')
 
-  if (!state.showCopyright) return null
+  if (!showCopyright) return null
 
   return (
     <Text
       text={t('text')}
       fontFamily="Pretendard, sans-serif"
       fontSize={16}
-      fill={state.copyrightColor === 'black' ? '#000000' : state.copyrightColor === 'white' ? '#FFFFFF' : '#888888'}
-      align={state.copyrightPosition === 'bottom-left' ? 'left' : state.copyrightPosition === 'bottom-right' ? 'right' : 'center'}
+      fill={copyrightColor === 'black' ? '#000000' : copyrightColor === 'white' ? '#FFFFFF' : '#888888'}
+      align={copyrightPosition === 'bottom-left' ? 'left' : copyrightPosition === 'bottom-right' ? 'right' : 'center'}
       width={contentWidth - 60}
       x={30}
       y={contentHeight - 30}

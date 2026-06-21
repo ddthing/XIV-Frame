@@ -30,7 +30,7 @@ function ImageGridLayerComponent({
   const setImageScale = useStore(state => state.setImageScale)
 
   const isShiftPressed = React.useRef(false)
-  const dragContexts = React.useRef<{ [key: number]: { startX: number, startY: number, axis: 'x' | 'y' | null } }>({})
+  const dragContexts = React.useRef<{ [key: number]: { startX: number, startY: number, axis: 'x' | 'y' | null, inverseTransform?: Konva.Transform, absoluteTransform?: Konva.Transform } }>({})
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => { if (e.key === 'Shift') isShiftPressed.current = true }
@@ -128,7 +128,20 @@ function ImageGridLayerComponent({
                 x={savedPos.x}
                 y={savedPos.y}
                 onDragStart={(e) => {
-                  dragContexts.current[index] = { startX: e.target.x(), startY: e.target.y(), axis: null }
+                  const parent = e.target.parent;
+                  let inverseTransform = undefined;
+                  let absoluteTransform = undefined;
+                  if (parent) {
+                    absoluteTransform = parent.getAbsoluteTransform().copy();
+                    inverseTransform = absoluteTransform.copy().invert();
+                  }
+                  dragContexts.current[index] = { 
+                    startX: e.target.x(), 
+                    startY: e.target.y(), 
+                    axis: null,
+                    inverseTransform,
+                    absoluteTransform
+                  }
                 }}
                 onDragEnd={(e) => {
                   setImagePosition(index, { x: e.target.x(), y: e.target.y() })
@@ -144,15 +157,10 @@ function ImageGridLayerComponent({
                 onDblClick={() => handleFileUpload(index)}
                 onDblTap={() => handleFileUpload(index)}
                 dragBoundFunc={function(this: Konva.Node, pos) {
-                  // eslint-disable-next-line @typescript-eslint/no-this-alias
-                  const node = this;
-                  const parent = node.parent;
-                  if (!parent) return pos;
+                  const ctx = dragContexts.current[index];
+                  if (!ctx || !ctx.inverseTransform || !ctx.absoluteTransform) return pos;
                   
-                  const transform = parent.getAbsoluteTransform().copy();
-                  transform.invert();
-                  
-                  const relativePos = transform.point(pos);
+                  const relativePos = ctx.inverseTransform.point(pos);
                   
                   const scaledWidth = img.width * scale;
                   const scaledHeight = img.height * scale;
@@ -183,27 +191,50 @@ function ImageGridLayerComponent({
                     }
                   }
                   
-                  return parent.getAbsoluteTransform().point({ x: newX, y: newY });
+                  return ctx.absoluteTransform.point({ x: newX, y: newY });
                 }}
               />
             </Group>
-            {isSoftBlend && !isGrid && index > 0 && blendWidth > 0 && (
-              <Rect
-                listening={false}
-                x={0}
-                y={0}
-                width={itemWidth}
-                height={itemHeight}
-                globalCompositeOperation="destination-in"
-                fillLinearGradientStartPoint={{ x: 0, y: 0 }}
-                fillLinearGradientEndPoint={{ x: itemWidth, y: 0 }}
-                fillLinearGradientColorStops={[
-                  0, 'rgba(0,0,0,0)',
-                  Math.min(1, blendWidth / itemWidth), 'rgba(0,0,0,1)',
-                  1, 'rgba(0,0,0,1)'
-                ]}
-              />
-              )}
+            {isSoftBlend && blendWidth > 0 && (
+              <>
+                {/* 가로 블렌드 (Left to Right) */}
+                {((!isGrid && !isVertical && index > 0) || (isGrid && (index === 1 || index === 3))) && (
+                  <Rect
+                    listening={false}
+                    x={0}
+                    y={0}
+                    width={itemWidth}
+                    height={itemHeight}
+                    globalCompositeOperation="destination-in"
+                    fillLinearGradientStartPoint={{ x: 0, y: 0 }}
+                    fillLinearGradientEndPoint={{ x: itemWidth, y: 0 }}
+                    fillLinearGradientColorStops={[
+                      0, 'rgba(0,0,0,0)',
+                      Math.min(1, blendWidth / itemWidth), 'rgba(0,0,0,1)',
+                      1, 'rgba(0,0,0,1)'
+                    ]}
+                  />
+                )}
+                {/* 세로 블렌드 (Top to Bottom) */}
+                {((!isGrid && isVertical && index > 0) || (isGrid && (index === 2 || index === 3))) && (
+                  <Rect
+                    listening={false}
+                    x={0}
+                    y={0}
+                    width={itemWidth}
+                    height={itemHeight}
+                    globalCompositeOperation="destination-in"
+                    fillLinearGradientStartPoint={{ x: 0, y: 0 }}
+                    fillLinearGradientEndPoint={{ x: 0, y: itemHeight }}
+                    fillLinearGradientColorStops={[
+                      0, 'rgba(0,0,0,0)',
+                      Math.min(1, blendWidth / itemHeight), 'rgba(0,0,0,1)',
+                      1, 'rgba(0,0,0,1)'
+                    ]}
+                  />
+                )}
+              </>
+            )}
             </Group>
           </Layer>
         )

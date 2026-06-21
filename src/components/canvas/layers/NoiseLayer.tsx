@@ -1,6 +1,7 @@
 import React from 'react'
 import { Layer, Rect } from 'react-konva'
 import useImage from 'use-image'
+import { useStore } from '@/store/useStore'
 
 interface NoiseLayerProps {
   width: number
@@ -10,8 +11,9 @@ interface NoiseLayerProps {
 
 export function NoiseLayer({ width, height, intensity }: NoiseLayerProps) {
   const [noiseImage] = useImage('/noise-pattern.png')
+  const isExporting = useStore(state => state.isExporting)
 
-  if (!noiseImage || intensity <= 0) return null
+  if (!noiseImage || intensity <= 0 || !isExporting) return null
 
   // Since the noise pattern is 256x256, we can use it as a fillPattern
   return (

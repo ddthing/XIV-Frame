@@ -24,11 +24,19 @@ export const initialImageState = {
 export const createImageSlice: StateCreator<ImageSlice, [], [], ImageSlice> = (set, get) => ({
   ...initialImageState,
   
-  setImages: (images) => set({ 
-    images,
-    imagePositions: images.map((_, i) => get().imagePositions[i] || { x: 0, y: 0 }),
-    imageScales: images.map((_, i) => get().imageScales[i] || 1)
-  }),
+  setImages: (images) => {
+    // Revoke old object URLs
+    get().images.forEach(url => {
+      if (url && url.startsWith('blob:')) {
+        URL.revokeObjectURL(url)
+      }
+    })
+    set({ 
+      images,
+      imagePositions: images.map((_, i) => get().imagePositions[i] || { x: 0, y: 0 }),
+      imageScales: images.map((_, i) => get().imageScales[i] || 1)
+    })
+  },
   
   setImagePosition: (index, pos) => set((state) => {
     const newPositions = [...state.imagePositions]
@@ -44,12 +52,20 @@ export const createImageSlice: StateCreator<ImageSlice, [], [], ImageSlice> = (s
   
   setImageAt: (index, url) => set((state) => {
     const newImages = [...state.images]
+    const oldUrl = newImages[index]
+    if (oldUrl && oldUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(oldUrl)
+    }
     newImages[index] = url
     return { images: newImages }
   }),
   
   removeImageAt: (index) => set((state) => {
     const newImages = [...state.images]
+    const oldUrl = newImages[index]
+    if (oldUrl && oldUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(oldUrl)
+    }
     newImages.splice(index, 1)
     const newPositions = [...state.imagePositions]
     newPositions.splice(index, 1)

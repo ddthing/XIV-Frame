@@ -77,49 +77,49 @@ export default async function BlogPostPage({ params }: PostPageProps) {
   }
 
   return (
-    <Container size="sm" className="py-12 lg:py-24">
-      <Link href={`/${locale}/blog`} className="inline-flex items-center text-sm font-normal text-muted-foreground hover:text-foreground mb-12 transition-colors">
+    <Container size="sm" className="pt-24 pb-8 lg:pt-32 lg:pb-16">
+      <Link href={`/${locale}/blog`} className="inline-flex items-center text-[14px] font-medium text-foreground hover:bg-muted px-4 py-2 rounded-md border border-transparent hover:border-border transition-colors mb-8">
         ← {t('back')}
       </Link>
       
       <article>
-        <header className="mb-12 text-center">
-          <h1 className="text-3xl lg:text-4xl font-semibold tracking-tight text-foreground mb-6">
+        <header className="mb-10 text-center">
+          <h1 className="text-[32px] lg:text-[40px] font-extrabold tracking-[0.04em] text-foreground mb-4 leading-[1.2] font-['Bricolage_Grotesque']">
             {post.metadata.title}
           </h1>
-          <time dateTime={post.metadata.date} className="text-sm text-muted-foreground font-normal">
+          <time dateTime={post.metadata.date} className="text-[14px] text-muted-foreground font-medium">
             {new Date(post.metadata.date).toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' })}
           </time>
         </header>
 
-        <div className="prose dark:prose-invert  max-w-none prose-headings:font-normal prose-headings:tracking-tight prose-p:leading-[1.75] prose-p:tracking-[-0.01em] prose-li:leading-[1.75] prose-li:tracking-[-0.01em] prose-a:text-primary hover:prose-a:text-primary/80 prose-img:rounded-xl break-keep">
+        <div className="prose dark:prose-invert max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-foreground prose-p:text-[16px] prose-p:text-foreground prose-p:leading-[1.6] prose-li:text-[16px] prose-li:text-foreground prose-li:leading-[1.6] prose-a:text-primary hover:prose-a:text-primary/80 prose-img:rounded-xl break-words">
           <MarkdownRenderer content={post.content} />
         </div>
       </article>
 
       {/* CTA Section */}
-      <section className="mt-16 bg-muted rounded-[32px] p-8 sm:p-12 text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent pointer-events-none" />
+      <section className="mt-12 bg-muted border border-border shadow-subtle rounded-xl p-6 sm:p-8 text-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
         <div className="relative z-10">
-          <h2 className="text-3xl font-normal tracking-tight mb-4 text-foreground">{t('ctaTitle')}</h2>
-          <p className="text-muted-foreground mb-8 max-w-xl mx-auto text-lg">{t('ctaDescription')}</p>
+          <h2 className="text-[28px] font-extrabold tracking-[0.04em] mb-3 text-foreground font-['Bricolage_Grotesque']">{t('ctaTitle')}</h2>
+          <p className="text-[16px] text-foreground mb-6 max-w-xl mx-auto font-normal leading-[1.5]">{t('ctaDescription')}</p>
           <Link 
             href={`/${locale}`}
-            className="inline-flex items-center justify-center px-10 py-6 text-base font-normal text-primary-foreground bg-primary rounded-full hover:bg-primary/90 transition-colors"
+            className="inline-flex items-center justify-center px-[40px] py-[19px] text-[16px] font-medium text-[#fcfaf5] bg-[#1a3300] rounded-[6px] shadow-subtle hover:-translate-y-0.5 hover:shadow-md transition-all"
           >
-            {t('ctaButton')}
+            {t('ctaButton')} →
           </Link>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="mt-20">
-        <h2 className="text-3xl font-normal tracking-tight text-foreground mb-8 text-center">{t('faqTitle')}</h2>
+      <section className="mt-12">
+        <h2 className="text-[28px] font-extrabold tracking-[0.04em] text-foreground mb-6 text-center font-['Bricolage_Grotesque']">{t('faqTitle')}</h2>
         <div className="space-y-4 max-w-2xl mx-auto">
           {[1, 2, 3].map((num) => (
-            <div key={num} className="bg-card border border-border rounded-[24px] p-6 sm:p-8">
-              <h3 className="font-normal text-xl tracking-tight text-foreground mb-3">{t(`faqQ${num}` as any)}</h3>
-              <p className="text-muted-foreground leading-[1.75] tracking-[-0.01em] break-keep">{t(`faqA${num}` as any)}</p>
+            <div key={num} className="bg-card border border-border rounded-xl shadow-subtle p-6 sm:p-8">
+              <h3 className="font-semibold text-[20px] text-foreground mb-3">{t(`faqQ${num}` as any)}</h3>
+              <p className="text-[16px] text-foreground leading-[1.5] tracking-[-0.01em] break-words font-normal">{t(`faqA${num}` as any)}</p>
             </div>
           ))}
         </div>

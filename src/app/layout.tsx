@@ -1,14 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Bricolage_Grotesque, Inter, Roboto_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-bricolage-grotesque",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
+
+const robotoMono = Roboto_Mono({
+  variable: "--font-roboto-mono",
   subsets: ["latin"],
 });
 
@@ -55,12 +61,39 @@ export default function RootLayout({
       <html
         lang="en"
         suppressHydrationWarning
-        className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+        className={`${bricolage.variable} ${inter.variable} ${robotoMono.variable} h-full antialiased`}
       >
         <head>
-          <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2169729065542563" crossOrigin="anonymous"></script>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "SoftwareApplication",
+                "name": "XIV Frame",
+                "applicationCategory": "MultimediaApplication",
+                "operatingSystem": "Web",
+                "url": "https://xiv-frame.com",
+                "description": "파이널판타지14(FF14) 스크린샷 프레임 제작 도구",
+                "offers": {
+                  "@type": "Offer",
+                  "price": "0",
+                  "priceCurrency": "KRW"
+                }
+              })
+            }}
+          />
         </head>
-        <body className="min-h-full flex flex-col">{children}</body>
+        <body className="min-h-full flex flex-col">
+          {children}
+          <Script 
+            id="adsbygoogle-script"
+            async 
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2169729065542563" 
+            crossOrigin="anonymous" 
+            strategy="afterInteractive"
+          />
+        </body>
     </html>
   );
 }
