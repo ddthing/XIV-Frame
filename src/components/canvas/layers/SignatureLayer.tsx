@@ -1,23 +1,20 @@
 import React from 'react'
 import { Text, Group } from 'react-konva'
 import { useStore } from '@/store/useStore'
+import { useShallow } from 'zustand/react/shallow'
 import { useSignatureLayout } from '@/hooks/useSignatureLayout'
 
 function SignatureLayerComponent({ contentWidth, contentHeight }: { contentWidth: number, contentHeight: number }) {
-  const state = useStore()
-
-  const upperFontSize = (state.signatureSize / 100) * 40
-  const lowerFontSize = (state.signatureSize / 100) * 24
-
-  const { groupRef, upperRef, lowerRef, groupX, groupY } = useSignatureLayout({
-    contentWidth,
-    contentHeight,
+  const {
+    signatureSize, signaturePosition, signatureAlign, characterName, serverName, fontFamily,
+    upperLetterSpacing, upperBold, upperItalic, lowerLetterSpacing, lowerBold, lowerItalic,
+    signatureColor, signatureOpacity
+  } = useStore(useShallow(state => ({
+    signatureSize: state.signatureSize,
     signaturePosition: state.signaturePosition,
     signatureAlign: state.signatureAlign,
     characterName: state.characterName,
     serverName: state.serverName,
-    upperFontSize,
-    lowerFontSize,
     fontFamily: state.fontFamily,
     upperLetterSpacing: state.upperLetterSpacing,
     upperBold: state.upperBold,
@@ -25,37 +22,60 @@ function SignatureLayerComponent({ contentWidth, contentHeight }: { contentWidth
     lowerLetterSpacing: state.lowerLetterSpacing,
     lowerBold: state.lowerBold,
     lowerItalic: state.lowerItalic,
-    signatureSize: state.signatureSize
+    signatureColor: state.signatureColor,
+    signatureOpacity: state.signatureOpacity
+  })))
+
+  const upperFontSize = (signatureSize / 100) * 40
+  const lowerFontSize = (signatureSize / 100) * 24
+
+  const { groupRef, upperRef, lowerRef, groupX, groupY } = useSignatureLayout({
+    contentWidth,
+    contentHeight,
+    signaturePosition,
+    signatureAlign,
+    characterName,
+    serverName,
+    upperFontSize,
+    lowerFontSize,
+    fontFamily,
+    upperLetterSpacing,
+    upperBold,
+    upperItalic,
+    lowerLetterSpacing,
+    lowerBold,
+    lowerItalic,
+    signatureSize
   })
 
-  if (!state.characterName && !state.serverName) return null
+  if (!characterName && !serverName) return null
 
   return (
     <Group ref={groupRef} x={groupX} y={groupY}>
-      {state.characterName && (
+      {characterName && (
         <Text
           ref={upperRef}
-          text={state.characterName}
-          fill={state.signatureColor}
-          opacity={state.signatureOpacity / 100}
-          fontFamily={state.fontFamily}
+          text={characterName}
+          fill={signatureColor}
+          opacity={signatureOpacity / 100}
+          fontFamily={fontFamily}
           fontSize={upperFontSize}
-          letterSpacing={state.upperLetterSpacing}
-          fontStyle={`${state.upperItalic ? 'italic ' : ''}${state.upperBold ? 'bold' : 'normal'}`.trim()}
-          align={state.signatureAlign}
+          letterSpacing={upperLetterSpacing}
+          fontStyle={`${upperItalic ? 'italic ' : ''}${upperBold ? 'bold' : 'normal'}`.trim()}
+          align={signatureAlign}
         />
       )}
-      {state.serverName && (
+      {serverName && (
         <Text
           ref={lowerRef}
-          text={`✦ ${state.serverName} ✦`}
-          fill={state.signatureColor}
-          opacity={state.signatureOpacity / 100}
-          fontFamily={state.fontFamily}
+          text={`✦ ${serverName} ✦`}
+          fill={signatureColor}
+          opacity={signatureOpacity / 100}
+          fontFamily={fontFamily}
           fontSize={lowerFontSize}
-          letterSpacing={state.lowerLetterSpacing}
-          fontStyle={`${state.lowerItalic ? 'italic ' : ''}${state.lowerBold ? 'bold' : 'normal'}`.trim()}
-          align={state.signatureAlign}
+          letterSpacing={lowerLetterSpacing}
+          fontStyle={`${lowerItalic ? 'italic ' : ''}${lowerBold ? 'bold' : 'normal'}`.trim()}
+          align={signatureAlign}
         />
       )}
     </Group>

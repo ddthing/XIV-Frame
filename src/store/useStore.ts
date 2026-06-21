@@ -19,17 +19,38 @@ export const useStore = create<AppState>()(
       ...createLayoutSlice(set, get, api),
       ...createSignatureSlice(set, get, api),
       
-      resetAll: () => set({
-        ...initialImageState,
-        ...initialLayoutState,
-        ...initialSignatureState,
-      }),
+      resetAll: () => {
+        // Revoke all existing blob URLs before resetting
+        get().images.forEach(url => {
+          if (url && url.startsWith('blob:')) {
+            URL.revokeObjectURL(url)
+          }
+        })
+        set({
+          ...initialImageState,
+          ...initialLayoutState,
+          ...initialSignatureState,
+        })
+      },
     }),
     {
       name: 'xiv-frame-settings-v2',
+      version: 2, // Bump version to 2 for layoutPreset migration
+      migrate: (persistedState: any, version: number) => {
+        let state = { ...persistedState }
+        
+        // Migrate legacy 'blend' preset
+        if (state.layoutPreset === 'blend') {
+          state.layoutPreset = 'split'
+          state.imageTransition = 'soft-blend'
+        }
+        
+        return state as AppState
+      },
       partialize: (state) => {
         // Exclude ephemeral and non-serializable state from persistence
-        const { images, imagePositions, imageScales, isImageLocked, logoUrl, ...rest } = state
+        // Note: logoUrl is NOT excluded, allowing the Base64 string to persist
+        const { images, imagePositions, imageScales, isImageLocked, ...rest } = state
         return rest
       }
     }

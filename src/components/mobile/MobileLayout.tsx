@@ -27,7 +27,7 @@ export function MobileLayout({ stageRef }: { stageRef: React.MutableRefObject<Ko
       </main>
 
       {/* Bottom Navigation */}
-      <div className="shrink-0 z-20 pb-[env(safe-area-inset-bottom,0px)] bg-card border-t border-border">
+      <div className="shrink-0 z-20 pb-[calc(env(safe-area-inset-bottom,0px)+80px)] bg-card border-t border-border">
         <MobileBottomNav activeSheet={activeSheet} onSelect={setActiveSheet} />
       </div>
 

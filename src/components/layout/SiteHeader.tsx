@@ -19,40 +19,45 @@ export function SiteHeader({ locale, hideBorder = false, className = '' }: { loc
   ]
 
   return (
-    <header className={`sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md ${hideBorder ? '' : 'border-b border-border'} ${className}`}>
-      <Container size="lg" className="h-16 flex items-center justify-between">
-        <div className="flex items-center gap-8">
-          <Link href={`/${locale}`} className="flex items-center">
-            <Logo size="md" />
-          </Link>
+    <div className="fixed top-0 left-0 w-full z-50 md:top-4 md:left-1/2 md:-translate-x-1/2 md:w-[calc(100%-2rem)] md:max-w-xl">
+      <header className={`bg-[#fcfaf5] border-b border-[#b6b6b6] md:border md:rounded-[12px] shadow-[rgba(255,235,90,0.05)_0px_20px_40px_-10px] transition-all ${className}`}>
+        <div className="h-12 px-4 flex items-center justify-between relative">
           
-          <nav className="hidden md:flex items-center gap-2">
+          {/* Left: Logo */}
+          <div className="flex-1 flex items-center justify-start">
+            <Link href={`/${locale}`} className="flex items-center">
+              <Logo size="sm" />
+            </Link>
+          </div>
+          
+          {/* Center: Nav Links */}
+          <nav className="hidden md:flex items-center justify-center gap-2 absolute left-1/2 -translate-x-1/2">
             {navLinks.map((link) => (
               <Link 
                 key={link.href} 
                 href={link.href} 
-                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors"
+                className="px-3 py-1.5 text-[14px] font-medium text-[#1a3300] hover:bg-[#d5f5c2] rounded-[6px] transition-colors"
               >
                 {link.label}
               </Link>
             ))}
           </nav>
-        </div>
 
-        <div className="flex items-center gap-4">
-          <div className="hidden sm:block">
-            <LanguageSwitcher />
+          {/* Right: Actions */}
+          <div className="flex-1 flex items-center justify-end gap-3">
+            <div className="hidden sm:block">
+              <LanguageSwitcher />
+            </div>
+            
+            <button 
+              className="md:hidden p-2 text-[#1a3300]"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle mobile menu"
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
-          
-          <button 
-            className="md:hidden p-2 text-foreground"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Toggle mobile menu"
-          >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
         </div>
-      </Container>
 
       {/* Mobile Navigation */}
       {isMobileMenuOpen && (
@@ -62,7 +67,7 @@ export function SiteHeader({ locale, hideBorder = false, className = '' }: { loc
               <Link 
                 key={link.href} 
                 href={link.href} 
-                className="px-4 py-3 text-base font-medium text-foreground hover:bg-muted rounded-xl transition-colors"
+                className="px-4 py-3 text-base font-medium text-foreground hover:bg-muted rounded-xl transition-colors font-sans"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.label}
@@ -74,6 +79,7 @@ export function SiteHeader({ locale, hideBorder = false, className = '' }: { loc
           </div>
         </div>
       )}
-    </header>
+      </header>
+    </div>
   )
 }

@@ -29,17 +29,17 @@ export function ClientApp({ currentLocale }: { currentLocale: string }) {
     <div className="flex h-full w-full bg-background font-sans text-foreground overflow-hidden flex-col md:flex-row">
       
       {/* Desktop Layout (Hidden on Mobile) */}
-      <div className="hidden md:flex w-full h-full">
-        {/* Desktop Sidebar */}
-        <aside className="w-[280px] xl:w-[360px] flex-shrink-0 bg-card border-r border-border h-full z-10">
-          <SettingsPanel />
-        </aside>
-
+      <div className="hidden md:flex w-full h-full pt-24 pb-6 px-6 gap-6 bg-background relative">
         {/* Desktop Main Area */}
-        <main className="flex-1 flex flex-col h-full overflow-hidden relative">
+        <main className="flex-1 flex flex-col h-full overflow-hidden relative rounded-[12px] border border-border shadow-subtle bg-card/50 backdrop-blur-sm">
           <DesktopToolbar stageRef={stageRef} />
           <PreviewCanvas stageRef={stageRef} />
         </main>
+
+        {/* Floating Sidebar */}
+        <aside className="w-[300px] xl:w-[340px] flex-shrink-0 bg-card border border-border rounded-[12px] shadow-subtle h-full z-10 overflow-hidden flex flex-col">
+          <SettingsPanel />
+        </aside>
       </div>
 
       {/* Mobile Layout (Hidden on Desktop) */}

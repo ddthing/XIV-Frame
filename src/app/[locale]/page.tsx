@@ -58,7 +58,7 @@ export default async function LocalePage({ params }: { params: { locale: string 
   }
 
   return (
-    <PageShell locale={locale} hideFooter={true} headerClassName="md:hidden">
+    <PageShell locale={locale} hideFooter={true} hideHeader={true}>
       <ClientApp currentLocale={locale} />
     </PageShell>
   )

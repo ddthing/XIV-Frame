@@ -55,35 +55,44 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
   const t = await getTranslations({ locale, namespace: 'Blog' })
 
   return (
-    <Container size="md" className="py-12 lg:py-24">
+    <Container size="md" className="pt-32 pb-12 lg:pt-40 lg:pb-24">
       <div className="mb-16 text-center space-y-4">
-        <h1 className="text-3xl lg:text-4xl font-semibold tracking-tight text-foreground">{t('title')}</h1>
-        <p className="text-base text-muted-foreground max-w-2xl mx-auto leading-[1.75] tracking-[-0.01em] break-keep">
+        <div className="inline-flex items-center justify-center px-3 py-1 mb-4 rounded-[6px] bg-[#ffe95c]">
+          <span className="text-[14px] font-bold text-[#1a3300] tracking-tight">지식 보관소</span>
+        </div>
+        <h1 className="text-[55px] lg:text-[72px] font-extrabold tracking-[0.04em] text-foreground leading-[1.1] font-['Bricolage_Grotesque']">
+          {t('title')}
+        </h1>
+        <p className="text-[18px] lg:text-[20px] text-foreground font-normal max-w-2xl mx-auto leading-[1.5] mt-6">
           {t('description')}
         </p>
       </div>
 
-      <div className="space-y-6">
-        {posts.map((post) => (
-          <Link key={post.slug} href={`/${locale}/blog/${post.slug}`} className="block group">
-            <article className="p-6 sm:p-8 bg-card border border-border rounded-[24px] shadow-none hover:bg-muted/50 transition-all">
-              <div className="flex flex-col sm:flex-row sm:items-baseline gap-4 mb-3">
-                <h2 className="text-xl font-semibold tracking-tight text-foreground group-hover:text-primary transition-colors">
-                  {post.metadata.title}
-                </h2>
-                <time className="text-sm text-muted-foreground whitespace-nowrap">
-                  {new Date(post.metadata.date).toLocaleDateString(locale)}
-                </time>
-              </div>
-              <p className="text-muted-foreground leading-[1.75] tracking-[-0.01em] break-keep">
-                {post.metadata.description}
-              </p>
-              <div className="mt-6 flex items-center text-sm font-normal text-primary">
-                {t('readMore')} <span className="ml-2 transition-transform group-hover:translate-x-1">→</span>
-              </div>
-            </article>
-          </Link>
-        ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto">
+        {posts.map((post, index) => {
+          const pastelColors = ['bg-[#fcfaf5]', 'bg-[#d5f5c2]', 'bg-[#fcfaf5]', 'bg-[#a8e5e5]', 'bg-[#fcfaf5]', 'bg-[#f6d0ff]'];
+          const bgColor = pastelColors[index % pastelColors.length];
+          return (
+            <Link key={post.slug} href={`/${locale}/blog/${post.slug}`} className="block group h-full">
+              <article className={`p-8 border border-border rounded-[12px] transition-transform hover:-translate-y-1 hover:shadow-subtle ${bgColor} flex flex-col h-full`}>
+                <div className="flex flex-col gap-3 mb-4">
+                  <time className="text-[14px] text-foreground/60 font-medium font-mono uppercase tracking-wider">
+                    {new Date(post.metadata.date).toLocaleDateString(locale)}
+                  </time>
+                  <h2 className="text-[24px] font-bold tracking-tight text-foreground leading-[1.3] group-hover:text-primary transition-colors line-clamp-3">
+                    {post.metadata.title}
+                  </h2>
+                </div>
+                <p className="text-[16px] text-foreground/80 leading-[1.5] tracking-[-0.01em] break-words font-normal flex-1">
+                  {post.metadata.description}
+                </p>
+                <div className="mt-8 flex items-center text-[16px] font-bold text-foreground">
+                  {t('readMore')} <span className="ml-2 transition-transform group-hover:translate-x-1">→</span>
+                </div>
+              </article>
+            </Link>
+          )
+        })}
       </div>
     </Container>
   )

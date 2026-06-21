@@ -6,11 +6,11 @@ import { useTranslations } from 'next-intl'
 export function SiteFooter({ locale }: { locale: string }) {
   const t = useTranslations('Navigation')
   return (
-    <footer className="border-t border-border bg-card mt-auto">
-      <Container size="lg" className="py-8 flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-muted-foreground">
-        <p className="flex items-center gap-1">
+    <footer className="border-t border-border bg-transparent mt-12">
+      <Container size="lg" className="py-8 flex flex-col md:flex-row items-center justify-between gap-8 text-[14px] text-foreground/60 font-medium">
+        <p className="flex items-center gap-2">
           © {new Date().getFullYear()} XIV Frame.
-          <span className="mx-1 text-border">|</span>
+          <span className="text-border mx-1">/</span>
           Not affiliated with Square Enix.
         </p>
         
@@ -22,9 +22,6 @@ export function SiteFooter({ locale }: { locale: string }) {
           <Link href={`/${locale}/legal/terms`} className="hover:text-foreground transition-colors">{t('terms')}</Link>
           <a href="https://ko-fi.com/reconeur" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
             {t('donate')}
-          </a>
-          <a href="https://x.com/reconeur" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
-            @reconeur
           </a>
         </div>
       </Container>
