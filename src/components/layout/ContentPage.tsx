@@ -8,6 +8,7 @@ interface ContentPageProps {
   description?: React.ReactNode
   children: React.ReactNode
   size?: 'sm' | 'md' | 'lg'
+  density?: 'default' | 'editor'
   className?: string
   contentClassName?: string
 }
@@ -18,26 +19,37 @@ export function ContentPage({
   description,
   children,
   size = 'md',
+  density = 'default',
   className,
   contentClassName,
 }: ContentPageProps) {
+  const isEditorDensity = density === 'editor'
+
   return (
     <div className={cn('app-backdrop relative isolate min-h-full overflow-hidden', className)}>
-      <Container size={size} className="relative py-12 sm:py-16 lg:py-20">
-        <header className="max-w-3xl">
+      <Container size={size} className={cn('relative', isEditorDensity ? 'py-8 sm:py-10 lg:py-12' : 'py-12 sm:py-16 lg:py-20')}>
+        <header className={cn('max-w-3xl', isEditorDensity && 'max-w-2xl')}>
           <p className="editor-meta">{eyebrow}</p>
           {title && (
-            <h1 className="mt-3 max-w-[18ch] font-display text-[clamp(2.25rem,5vw,4rem)] font-bold leading-[1.08] tracking-[0.02em] text-foreground">
+            <h1 className={cn(
+              'font-display font-bold text-foreground',
+              isEditorDensity
+                ? 'mt-2 max-w-none text-2xl leading-8 tracking-[0.01em]'
+                : 'mt-3 max-w-[18ch] text-[clamp(2.25rem,5vw,4rem)] leading-[1.08] tracking-[0.02em]',
+            )}>
               {title}
             </h1>
           )}
           {description && (
-            <p className="mt-5 max-w-[62ch] font-body text-base leading-7 text-muted-foreground sm:text-lg">
+            <p className={cn(
+              'font-body text-muted-foreground',
+              isEditorDensity ? 'mt-2 max-w-[31rem] text-[13px] leading-5' : 'mt-5 max-w-[62ch] text-base leading-7 sm:text-lg',
+            )}>
               {description}
             </p>
           )}
         </header>
-        <div className={cn('mt-10 sm:mt-14', contentClassName)}>{children}</div>
+        <div className={cn(isEditorDensity ? 'mt-8 sm:mt-10' : 'mt-10 sm:mt-14', contentClassName)}>{children}</div>
       </Container>
     </div>
   )
