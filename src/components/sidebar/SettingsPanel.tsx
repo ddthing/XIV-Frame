@@ -73,13 +73,13 @@ export function SettingsPanel() {
           </div>
           <p className="mt-2 max-w-[31rem] font-body text-[13px] leading-5 text-muted-foreground">{currentTab.description}</p>
 
-          <div className="-mx-5 mt-4 min-h-[72px] overflow-hidden border-t border-border px-5">
-            <TabsList aria-label={t('flowLabel')} className="flex h-auto min-h-[72px] w-full min-w-0 items-stretch justify-start gap-1 rounded-none border-0 bg-transparent p-0">
+          <div className="-mx-5 mt-4 overflow-hidden border-t border-border px-4 py-3">
+            <TabsList aria-label={t('flowLabel')} className="grid min-h-0 w-full grid-cols-3 gap-1.5 rounded-xl border border-border bg-surface-inset/70 p-1.5">
               {tabs.map(({ value, label, role, icon: Icon }, index) => (
                 <TabsTrigger
                   key={value}
                   value={value}
-                  className="group relative min-h-[71px] min-w-0 flex-1 items-start justify-start gap-1.5 rounded-none border-b-2 border-transparent px-1.5 py-3 text-left text-muted-foreground shadow-none transition-colors hover:bg-surface-inset/60 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-active:border-primary data-active:bg-transparent data-active:text-foreground data-active:shadow-none"
+                  className="group min-h-[62px] min-w-0 items-center justify-start gap-2 rounded-lg border border-transparent bg-transparent px-2 py-2 text-left text-muted-foreground shadow-none transition-[background-color,border-color,box-shadow,color] hover:bg-background/70 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 after:!hidden data-[state=active]:border-primary/25 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-subtle data-active:border-primary/25 data-active:bg-card data-active:text-foreground data-active:shadow-subtle"
                 >
                   <span className="mt-0.5 font-mono text-[10px] font-semibold tabular-nums text-muted-foreground/80">{String(index + 1).padStart(2, '0')}</span>
                   <Icon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
