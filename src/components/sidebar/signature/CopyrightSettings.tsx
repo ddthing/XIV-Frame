@@ -40,7 +40,7 @@ export function CopyrightSettings() {
         <div className="flex items-center justify-between gap-4">
           <div>
             <EditorFieldHeader label={t('copyrightToggle')} />
-            <p className="mt-1 text-[11px] leading-4 text-muted-foreground">{t('creditHint')}</p>
+            <p className="mt-1 font-body text-[11px] leading-4 text-muted-foreground">{t('creditHint')}</p>
           </div>
           <Switch checked={showCopyright} onCheckedChange={setShowCopyright} aria-label={t('copyrightToggle')} />
         </div>

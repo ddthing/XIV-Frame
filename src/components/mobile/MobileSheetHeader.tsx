@@ -18,7 +18,7 @@ export function MobileSheetHeader({
         <DrawerTitle className="font-display text-xl font-bold tracking-[0.01em] text-foreground">{title}</DrawerTitle>
         <span className="rounded-full border border-border bg-surface-inset/70 px-2 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">{role}</span>
       </div>
-      <DrawerDescription className="mt-2 text-xs leading-5 text-muted-foreground">{description}</DrawerDescription>
+      <DrawerDescription className="mt-2 font-body text-xs leading-5 text-muted-foreground">{description}</DrawerDescription>
     </div>
   )
 }

@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap");
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
 
 @font-face {
     font-family: 'NexonMaplestory';
@@ -176,9 +177,10 @@
   --color-sidebar-border: rgba(26, 51, 0, 0.12);
 
   /* Typography */
-  --font-sans: 'Terrarum Sans Bitmap', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Terrarum Sans Bitmap', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'Terrarum Sans Bitmap', ui-monospace, monospace;
+    --font-sans: 'Terrarum Sans Bitmap', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Terrarum Sans Bitmap', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Pretendard', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'Terrarum Sans Bitmap', ui-monospace, monospace;
 
   /* Spacing */
   --spacing-8: 8px;
@@ -399,5 +401,6 @@
     --font-sans: 'Terrarum Sans Bitmap', ui-sans-serif, system-ui, sans-serif;
     --font-display: 'Terrarum Sans Bitmap', ui-sans-serif, system-ui, sans-serif;
     --font-heading: 'Terrarum Sans Bitmap', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Pretendard', ui-sans-serif, system-ui, sans-serif;
     --font-mono: 'Terrarum Sans Bitmap', ui-monospace, monospace;
 }
