@@ -34,7 +34,7 @@ export function ContentPage({
             <h1 className={cn(
               'font-display font-bold text-foreground',
               isEditorDensity
-                ? 'mt-2 max-w-none text-2xl leading-8 tracking-[0.01em]'
+                ? 'mt-2 max-w-none text-2xl leading-[2rem] tracking-[0.01em]'
                 : 'mt-3 max-w-[18ch] text-[clamp(2.25rem,5vw,4rem)] leading-[1.08] tracking-[0.02em]',
             )}>
               {title}
