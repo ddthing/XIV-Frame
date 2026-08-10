@@ -84,36 +84,36 @@ export default async function BlogPostPage({ params }: PostPageProps) {
   } as const
 
   return (
-    <ContentPage eyebrow={`03 / GUIDE · ${formattedDate}`} title={post.metadata.title} description={post.metadata.description} size="sm">
-      <Link href={`/${locale}/blog`} className="mb-8 inline-flex items-center gap-2 rounded-md border border-transparent px-3 py-2 text-sm font-medium text-foreground transition-colors hover:border-border hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+    <ContentPage eyebrow={`03 / GUIDE · ${formattedDate}`} title={post.metadata.title} description={post.metadata.description} size="sm" density="editor">
+      <Link href={`/${locale}/blog`} className="mb-6 inline-flex h-9 items-center gap-2 rounded-md border border-transparent px-3 py-2 font-body text-xs font-semibold text-foreground transition-colors hover:border-border hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
         <ArrowLeft size={16} aria-hidden="true" />
         {t('back')}
       </Link>
 
       <article>
-        <div className="prose max-w-none break-words font-body prose-headings:font-display prose-headings:font-bold prose-headings:tracking-[0.02em] prose-headings:text-foreground prose-p:text-base prose-p:leading-7 prose-p:text-foreground/80 prose-li:text-base prose-li:leading-7 prose-li:text-foreground/80 prose-a:text-primary prose-a:underline-offset-4 hover:prose-a:text-primary/75 prose-img:rounded-xl">
+        <div className="prose max-w-none break-words font-body prose-headings:font-display prose-headings:font-bold prose-headings:tracking-[0.01em] prose-headings:text-xl prose-headings:leading-7 prose-headings:text-foreground prose-h2:mt-8 prose-h2:mb-3 prose-h3:text-base prose-h3:leading-6 prose-p:text-[13px] prose-p:leading-5 prose-p:text-foreground/80 prose-li:text-[13px] prose-li:leading-5 prose-li:text-foreground/80 prose-ol:list-decimal prose-ol:pl-5 prose-ul:list-disc prose-ul:pl-5 prose-strong:font-semibold prose-a:text-primary prose-a:underline-offset-4 hover:prose-a:text-primary/75 prose-img:rounded-xl">
           <MarkdownRenderer content={post.content} />
         </div>
       </article>
 
-      <section className="mt-14 rounded-xl border border-border bg-sticky-note-mint p-6 shadow-subtle sm:p-8">
+      <section className="mt-10 rounded-xl border border-border bg-sticky-note-mint p-5 shadow-subtle sm:p-6">
         <p className="editor-meta">NEXT STEP</p>
-        <h2 className="mt-3 font-display text-2xl font-bold tracking-[0.02em] text-foreground">{t('ctaTitle')}</h2>
-        <p className="mt-3 max-w-xl font-body text-base leading-7 text-foreground/80">{t('ctaDescription')}</p>
-        <Link href={`/${locale}`} className="mt-6 inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-bold text-primary-foreground shadow-subtle transition-transform hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-sticky-note-mint">
+        <h2 className="mt-2 font-display text-xl font-bold leading-7 tracking-[0.01em] text-foreground">{t('ctaTitle')}</h2>
+        <p className="mt-2 max-w-xl font-body text-[13px] leading-5 text-foreground/80">{t('ctaDescription')}</p>
+        <Link href={`/${locale}`} className="mt-5 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 font-body text-xs font-bold text-primary-foreground shadow-subtle transition-transform hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-sticky-note-mint">
           {t('ctaButton')}
           <ArrowUpRight size={16} aria-hidden="true" />
         </Link>
       </section>
 
-      <section className="mt-14 border-t border-border pt-10">
+      <section className="mt-10 border-t border-border pt-8">
         <p className="editor-meta">FAQ</p>
-        <h2 className="mt-3 font-display text-2xl font-bold tracking-[0.02em] text-foreground">{t('faqTitle')}</h2>
+        <h2 className="mt-2 font-display text-xl font-bold leading-7 tracking-[0.01em] text-foreground">{t('faqTitle')}</h2>
         <div className="mt-6 space-y-3">
           {[1, 2, 3].map((num) => (
-            <div key={num} className="rounded-xl border border-border bg-card p-5 shadow-subtle sm:p-6">
-              <h3 className="font-display text-lg font-bold text-foreground">{t(faqKeys.questions[num - 1])}</h3>
-              <p className="mt-2 font-body text-base leading-7 text-foreground/75">{t(faqKeys.answers[num - 1])}</p>
+            <div key={num} className="rounded-xl border border-border bg-card p-4 shadow-subtle sm:p-5">
+              <h3 className="font-display text-base font-bold leading-6 text-foreground">{t(faqKeys.questions[num - 1])}</h3>
+              <p className="mt-2 font-body text-[13px] leading-5 text-foreground/75">{t(faqKeys.answers[num - 1])}</p>
             </div>
           ))}
         </div>
