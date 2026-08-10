@@ -19,7 +19,7 @@ export function MobileBottomNav({ activeSheet, onSelect }: MobileBottomNavProps)
   ] as const
 
   return (
-    <nav className="grid h-16 w-full grid-cols-4 gap-1 bg-background px-2 py-1.5" aria-label={t('navLabel')}>
+    <nav className="grid h-[64px] w-full grid-cols-4 gap-1 bg-background px-2 py-1.5" aria-label={t('navLabel')}>
       {items.map(({ id, label, icon: Icon }) => {
         const isActive = activeSheet === id
         return (
