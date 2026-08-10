@@ -3,7 +3,7 @@ import { TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export function SketchbookTabsList({ children, className = '' }: { children: React.ReactNode, className?: string }) {
   return (
-    <TabsList className={`grid w-full grid-cols-2 gap-1.5 rounded-xl border border-border bg-surface-inset/70 p-1.5 ${className}`}>
+    <TabsList className={`grid min-h-[50px] w-full grid-cols-2 gap-1.5 rounded-xl border border-border bg-surface-inset/70 p-1.5 ${className}`}>
       {children}
     </TabsList>
   )
