@@ -22,11 +22,7 @@ export function ContentPage({
   contentClassName,
 }: ContentPageProps) {
   return (
-    <div className={cn('relative isolate min-h-full overflow-hidden bg-background', className)}>
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,rgba(255,233,92,0.14),transparent_28%)] [background-image:radial-gradient(rgba(26,51,0,0.08)_1px,transparent_1px)] [background-size:24px_24px]"
-      />
+    <div className={cn('app-backdrop relative isolate min-h-full overflow-hidden', className)}>
       <Container size={size} className="relative py-12 sm:py-16 lg:py-20">
         <header className="max-w-3xl">
           <p className="editor-meta">{eyebrow}</p>

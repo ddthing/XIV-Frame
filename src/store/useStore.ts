@@ -12,6 +12,11 @@ export interface AppState extends ImageSlice, LayoutSlice, SignatureSlice {
   resetAll: () => void
 }
 
+type PersistedAppState = Omit<Partial<AppState>, 'layoutPreset' | 'imageTransition'> & {
+  layoutPreset?: string
+  imageTransition?: string
+}
+
 // Keep edits usable in private browsing and when a large legacy logo fills the
 // browser quota. The current Zustand state remains available for the session;
 // persistence is best-effort and existing stored settings are read unchanged.
@@ -64,8 +69,10 @@ export const useStore = create<AppState>()(
       name: 'xiv-frame-settings-v2',
       storage: createJSONStorage(() => safeLocalStorage),
       version: 2, // Bump version to 2 for layoutPreset migration
-      migrate: (persistedState: any, version: number) => {
-        let state = { ...persistedState }
+      migrate: (persistedState: unknown) => {
+        const state: PersistedAppState = persistedState && typeof persistedState === 'object'
+          ? { ...(persistedState as PersistedAppState) }
+          : {}
         
         // Migrate legacy 'blend' preset
         if (state.layoutPreset === 'blend') {
@@ -78,8 +85,12 @@ export const useStore = create<AppState>()(
       partialize: (state) => {
         // Exclude ephemeral and non-serializable state from persistence
         // Note: logoUrl is NOT excluded, allowing the Base64 string to persist
-        const { images, imagePositions, imageScales, isImageLocked, ...rest } = state
-        return rest
+        const persistedState = { ...state } as Partial<AppState> & Record<string, unknown>
+        delete persistedState.images
+        delete persistedState.imagePositions
+        delete persistedState.imageScales
+        delete persistedState.isImageLocked
+        return persistedState
       }
     }
   )

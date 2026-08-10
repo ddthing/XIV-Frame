@@ -1,6 +1,5 @@
 import { Feed } from 'feed'
 import { getAllPosts } from '@/lib/markdown'
-import { locales } from '@/i18n/request'
 
 export const dynamic = 'force-static'
 

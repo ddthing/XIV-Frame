@@ -8,6 +8,7 @@ import { SignatureSheet } from './SignatureSheet'
 import { LayoutSheet } from './LayoutSheet'
 import { ExportSheet } from './ExportSheet'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { Logo } from '@/components/ui/Logo'
 import { useTranslations } from 'next-intl'
 
 export type BottomSheetType = 'image' | 'signature' | 'layout' | 'export' | null
@@ -20,11 +21,10 @@ export function MobileLayout({ stageRef }: { stageRef: React.MutableRefObject<Ko
 
   return (
     <div className="relative flex h-full min-h-0 w-full flex-col bg-background">
-      <header className="flex h-14 shrink-0 items-center gap-3 border-b border-primary-foreground/15 bg-primary px-4 text-primary-foreground">
-        <div className="grid size-7 place-items-center rounded-md border border-accent/70 font-display text-[9px] font-bold tracking-[-0.08em] text-accent">XIV</div>
-        <div className="min-w-0">
-          <p className="font-display text-sm font-bold leading-none">XIV Frame</p>
-          <p className="mt-1 font-mono text-[8px] uppercase tracking-[0.12em] text-primary-foreground/55">{t('savedLocally')}</p>
+      <header className="app-header flex items-center gap-3 border-b border-primary-foreground/15 bg-primary px-4 text-primary-foreground">
+        <div className="flex min-w-0 items-center gap-3">
+          <Logo size="md" inverse />
+          <span className="hidden font-body text-[10px] text-primary-foreground/55 sm:inline">{t('savedLocally')}</span>
         </div>
         <div className="ml-auto"><LanguageSwitcher inverse /></div>
       </header>

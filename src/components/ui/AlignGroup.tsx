@@ -11,8 +11,8 @@ export function AlignGroup({ value, onChange }: { value: SignatureAlign; onChang
         <button
           key={optVal}
           type="button"
-          aria-label={t(label as any)}
-          title={t(label as any)}
+          aria-label={t(label)}
+          title={t(label)}
           onClick={() => onChange(optVal)}
           className={`flex h-10 flex-1 items-center justify-center rounded-md border transition-all shadow-subtle
             ${value === optVal

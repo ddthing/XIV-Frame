@@ -65,17 +65,17 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
       <article className={`flex h-full flex-col rounded-xl border border-border p-6 shadow-subtle transition-[transform,box-shadow,border-color] duration-200 group-hover:-translate-y-1 group-hover:border-primary/40 group-hover:shadow-md sm:p-8 ${isFeatured ? 'bg-sticky-note-mint lg:min-h-[22rem]' : 'bg-card'}`}>
         <div className="flex items-center justify-between gap-3">
           <p className="editor-meta">{isFeatured ? 'FEATURED' : `GUIDE ${String(index + 1).padStart(2, '0')}`}</p>
-          <time dateTime={post.metadata.date} className="text-xs font-medium text-muted-foreground">
+          <time dateTime={post.metadata.date} className="font-body text-xs font-medium text-muted-foreground">
             {new Date(post.metadata.date).toLocaleDateString(locale)}
           </time>
         </div>
         <h2 className={`mt-8 font-display font-bold leading-tight tracking-[0.02em] text-foreground transition-colors group-hover:text-primary ${isFeatured ? 'text-3xl sm:text-4xl' : 'text-2xl'}`}>
           {post.metadata.title}
         </h2>
-        <p className="mt-4 flex-1 text-base leading-7 text-foreground/75">
+        <p className="mt-4 flex-1 font-body text-base leading-7 text-foreground/75">
           {post.metadata.description}
         </p>
-        <div className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-foreground">
+        <div className="mt-8 inline-flex items-center gap-2 font-body text-sm font-bold text-foreground">
           {t('readMore')}
           <ArrowUpRight size={16} aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-1" />
         </div>
@@ -93,7 +93,7 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
           </div>
         </div>
       ) : (
-        <p className="rounded-xl border border-dashed border-border bg-card p-8 text-center text-muted-foreground">{t('description')}</p>
+        <p className="rounded-xl border border-dashed border-border bg-card p-8 text-center font-body text-muted-foreground">{t('description')}</p>
       )}
     </ContentPage>
   )

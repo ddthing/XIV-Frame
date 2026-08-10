@@ -1,10 +1,11 @@
 import { useTranslations } from 'next-intl'
 import { SignaturePosition } from '@/store/useStore'
+import { SignatureTranslationKey } from '@/constants/signature'
 import React from 'react'
 
 export function PositionGrid({ value, options, onChange }: {
   value: SignaturePosition,
-  options: { value: SignaturePosition; label: string; icon: React.ReactNode }[],
+  options: { value: SignaturePosition; label: SignatureTranslationKey; icon: React.ReactNode }[],
   onChange: (v: SignaturePosition) => void
 }) {
   const t = useTranslations('SignatureSettings')
@@ -14,8 +15,8 @@ export function PositionGrid({ value, options, onChange }: {
         <button
           key={optVal}
           type="button"
-          aria-label={t(label as any)}
-          title={t(label as any)}
+          aria-label={t(label)}
+          title={t(label)}
           onClick={() => onChange(optVal)}
           className={`flex h-10 items-center justify-center rounded-md border transition-all shadow-subtle
             ${value === optVal

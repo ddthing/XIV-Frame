@@ -248,6 +248,36 @@
   .editor-meta {
     @apply font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground;
   }
+
+  /* Shared chrome for the editor and content pages. */
+  .app-header {
+    height: 64px;
+    flex-shrink: 0;
+  }
+
+  .app-header-inner {
+    display: flex;
+    height: 100%;
+    min-width: 0;
+    align-items: center;
+  }
+
+  /* One quiet paper texture across the product surfaces. */
+  .app-backdrop {
+    background-color: var(--background);
+    background-image:
+      radial-gradient(circle at top right, rgb(255 233 92 / 0.14), transparent 28%),
+      radial-gradient(rgb(26 51 0 / 0.08) 1px, transparent 1px);
+    background-position: top right, 0 0;
+    background-repeat: no-repeat, repeat;
+    background-size: 100% 100%, 24px 24px;
+  }
+
+  @media (max-width: 767px) {
+    .app-header {
+      height: 56px;
+    }
+  }
 }
 
 @layer utilities {
@@ -291,38 +321,38 @@
 }
 
 :root {
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
+    --card: #fffdf8;
+    --card-foreground: var(--color-forest-ink);
+    --popover: #fffdf8;
+    --popover-foreground: var(--color-forest-ink);
+    --primary: var(--color-forest-ink);
+    --primary-foreground: var(--color-cream-paper);
+    --secondary: var(--color-whisper-gray);
+    --secondary-foreground: var(--color-forest-ink);
+    --muted: var(--color-whisper-gray);
+    --muted-foreground: var(--color-pencil-gray);
+    --accent: var(--color-highlighter-yellow);
+    --accent-foreground: var(--color-forest-ink);
+    --destructive: #cf2d56;
+    --border: rgba(26, 51, 0, 0.12);
+    --input: rgba(26, 51, 0, 0.12);
+    --ring: var(--color-forest-ink);
     --chart-1: oklch(0.87 0 0);
     --chart-2: oklch(0.556 0 0);
     --chart-3: oklch(0.439 0 0);
     --chart-4: oklch(0.371 0 0);
     --chart-5: oklch(0.269 0 0);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
+    --radius: 6px;
+    --sidebar: var(--color-cream-paper);
+    --sidebar-foreground: var(--color-forest-ink);
+    --sidebar-primary: var(--color-forest-ink);
+    --sidebar-primary-foreground: var(--color-cream-paper);
+    --sidebar-accent: var(--color-whisper-gray);
+    --sidebar-accent-foreground: var(--color-forest-ink);
+    --sidebar-border: rgba(26, 51, 0, 0.12);
+    --sidebar-ring: var(--color-forest-ink);
+    --background: var(--color-cream-paper);
+    --foreground: var(--color-forest-ink);
 }
 
 .dark {
