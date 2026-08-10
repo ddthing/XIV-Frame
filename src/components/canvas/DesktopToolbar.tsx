@@ -20,9 +20,9 @@ export function DesktopToolbar({ stageRef, className = '' }: DesktopToolbarProps
   const locale = useLocale()
 
   return (
-    <header className={`flex h-16 shrink-0 items-center gap-5 border-b border-primary-foreground/15 bg-primary px-5 text-primary-foreground ${className}`}>
+    <header className={`flex h-[64px] shrink-0 items-center gap-5 border-b border-primary-foreground/15 bg-primary px-5 text-primary-foreground ${className}`}>
       <div className="flex min-w-0 items-center gap-3">
-        <div className="grid size-8 shrink-0 place-items-center rounded-md border border-accent/70 font-display text-[10px] font-bold tracking-[-0.08em] text-accent">
+        <div className="grid size-[32px] shrink-0 place-items-center rounded-md border border-accent/70 font-display text-[10px] font-bold tracking-[-0.08em] text-accent">
           XIV
         </div>
         <div className="hidden min-w-0 sm:block">
