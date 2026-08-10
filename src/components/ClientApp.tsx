@@ -26,27 +26,23 @@ export function ClientApp({ currentLocale }: { currentLocale: string }) {
   }, [currentLocale, router])
 
   return (
-    <div className="flex h-full w-full bg-background font-sans text-foreground overflow-hidden flex-col md:flex-row">
-      
-      {/* Desktop Layout (Hidden on Mobile) */}
-      <div className="hidden md:flex w-full h-full pt-24 pb-6 px-6 gap-6 bg-background relative">
-        {/* Desktop Main Area */}
-        <main className="flex-1 flex flex-col h-full overflow-hidden relative rounded-[12px] border border-border shadow-subtle bg-card/50 backdrop-blur-sm">
-          <DesktopToolbar stageRef={stageRef} />
-          <PreviewCanvas stageRef={stageRef} />
-        </main>
+    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-background font-sans text-foreground">
+      <div className="hidden min-h-0 flex-1 flex-col md:flex">
+        <DesktopToolbar stageRef={stageRef} />
+        <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_360px] border-b border-border xl:grid-cols-[minmax(0,1fr)_390px]">
+          <main className="relative min-h-0 overflow-hidden border-r border-border bg-background">
+            <PreviewCanvas stageRef={stageRef} />
+          </main>
 
-        {/* Floating Sidebar */}
-        <aside className="w-[300px] xl:w-[340px] flex-shrink-0 bg-card border border-border rounded-[12px] shadow-subtle h-full z-10 overflow-hidden flex flex-col">
-          <SettingsPanel />
-        </aside>
+          <aside className="z-10 flex min-h-0 flex-col overflow-hidden bg-background">
+            <SettingsPanel />
+          </aside>
+        </div>
       </div>
 
-      {/* Mobile Layout (Hidden on Desktop) */}
-      <div className="md:hidden flex w-full h-full">
+      <div className="flex min-h-0 h-full w-full md:hidden">
         <MobileLayout stageRef={stageRef} />
       </div>
-
     </div>
   )
 }

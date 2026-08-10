@@ -1,19 +1,19 @@
 import React from 'react'
-import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer'
+import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import { LayoutSettings } from '@/components/sidebar/LayoutSettings'
 import { useTranslations } from 'next-intl'
+import { MobileSheetHeader } from './MobileSheetHeader'
+import { MobileSheetBody } from './MobileSheetBody'
 
 export function LayoutSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const t = useTranslations('MobileLayout')
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85vh] bg-background">
-        <DrawerTitle className="sr-only">{t('sheetTitle')}</DrawerTitle>
-        <div className="p-4 pb-[calc(env(safe-area-inset-bottom,1rem)+1rem)] custom-scrollbar overflow-y-auto">
-          <div className="space-y-6">
-            <LayoutSettings />
-          </div>
-        </div>
+      <DrawerContent className="max-h-[88vh] rounded-t-2xl bg-background">
+        <MobileSheetHeader eyebrow="02 / Inspector" title={t('layoutSheetTitle')} description={t('layoutSheetDescription')} role={t('layoutSheetRole')} />
+        <MobileSheetBody open={open} className="custom-scrollbar overflow-y-auto px-5 pb-[calc(env(safe-area-inset-bottom,1rem)+1.25rem)] pt-5">
+          <LayoutSettings />
+        </MobileSheetBody>
       </DrawerContent>
     </Drawer>
   )

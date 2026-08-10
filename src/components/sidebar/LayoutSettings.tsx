@@ -1,23 +1,28 @@
-import { useStore, BackgroundColor } from '@/store/useStore'
-import { useShallow } from 'zustand/react/shallow'
-import { Label } from '@/components/ui/label'
-import { Slider } from '@/components/ui/slider'
-import { Switch } from '@/components/ui/switch'
+import { Blend, Grid2X2, LayoutTemplate, Rows2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useShallow } from 'zustand/react/shallow'
+
+import { EditorChoice, EditorFieldHeader, EditorSection } from '@/components/ui/editor'
+import { Slider } from '@/components/ui/slider'
+import { useStore, type BackgroundColor } from '@/store/useStore'
 
 export function LayoutSettings() {
   const {
-    layoutPreset, setLayoutPreset,
-    imageTransition, setImageTransition,
-    imageGap, setImageGap,
-    blendWidth, setBlendWidth,
-    borderWidth, setBorderWidth,
-    grainIntensity, setGrainIntensity,
-    backgroundColor, setBackgroundColor,
-    showCopyright, setShowCopyright,
-    copyrightPosition, setCopyrightPosition,
-    copyrightColor, setCopyrightColor,
-    images
+    layoutPreset,
+    setLayoutPreset,
+    imageTransition,
+    setImageTransition,
+    imageGap,
+    setImageGap,
+    blendWidth,
+    setBlendWidth,
+    borderWidth,
+    setBorderWidth,
+    grainIntensity,
+    setGrainIntensity,
+    backgroundColor,
+    setBackgroundColor,
+    images,
   } = useStore(useShallow(state => ({
     layoutPreset: state.layoutPreset,
     setLayoutPreset: state.setLayoutPreset,
@@ -33,193 +38,87 @@ export function LayoutSettings() {
     setGrainIntensity: state.setGrainIntensity,
     backgroundColor: state.backgroundColor,
     setBackgroundColor: state.setBackgroundColor,
-    showCopyright: state.showCopyright,
-    setShowCopyright: state.setShowCopyright,
-    copyrightPosition: state.copyrightPosition,
-    setCopyrightPosition: state.setCopyrightPosition,
-    copyrightColor: state.copyrightColor,
-    setCopyrightColor: state.setCopyrightColor,
-    images: state.images
+    images: state.images,
   })))
 
   const t = useTranslations('LayoutSettings')
   const colors: BackgroundColor[] = ['white', 'light-gray', 'transparent']
+  const imageCount = images.filter(Boolean).length
 
   return (
-    <div className="space-y-4 pt-1 font-sans">
-      <div className="space-y-2">
-        <Label className="text-sm font-medium text-foreground block">{t('layoutPreset')}</Label>
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => setLayoutPreset('split')}
-            className={`flex-1 min-w-[80px] h-10 text-sm font-medium rounded-md border transition-all shadow-subtle ${layoutPreset === 'split' ? 'bg-[#d5f5c2] text-primary border-transparent font-semibold shadow-sm' : 'bg-card border-border text-muted-foreground hover:bg-muted/50'}`}
-          >
-            {t('presetSplit')}
-          </button>
-          <button
-            onClick={() => setLayoutPreset('vertical-split')}
-            className={`flex-1 min-w-[80px] h-10 text-sm font-medium rounded-md border transition-all shadow-subtle ${layoutPreset === 'vertical-split' ? 'bg-[#d5f5c2] text-primary border-transparent font-semibold shadow-sm' : 'bg-card border-border text-muted-foreground hover:bg-muted/50'}`}
-          >
-            {t('presetVertical')}
-          </button>
-          <button
-            onClick={() => setLayoutPreset('grid')}
-            className={`flex-1 min-w-[80px] h-10 text-sm font-medium rounded-md border transition-all shadow-subtle ${layoutPreset === 'grid' ? 'bg-[#d5f5c2] text-primary border-transparent font-semibold shadow-sm' : 'bg-card border-border text-muted-foreground hover:bg-muted/50 disabled:opacity-50'}`}
-            disabled={images.filter(Boolean).length < 3}
-          >
-            {t('presetGrid')}
-          </button>
+    <div className="space-y-6">
+      <EditorSection title={t('compositionTitle')} description={t('compositionDescription')}>
+        <div className="grid grid-cols-3 gap-2">
+          <EditorChoice active={layoutPreset === 'split'} onClick={() => setLayoutPreset('split')} className="min-h-[76px] flex-col px-2">
+            <ColumnsIcon />
+            <span>{t('presetSplit')}</span>
+          </EditorChoice>
+          <EditorChoice active={layoutPreset === 'vertical-split'} onClick={() => setLayoutPreset('vertical-split')} className="min-h-[76px] flex-col px-2">
+            <Rows2 className="size-5" />
+            <span>{t('presetVertical')}</span>
+          </EditorChoice>
+          <EditorChoice active={layoutPreset === 'grid'} onClick={() => setLayoutPreset('grid')} disabled={imageCount < 3} className="min-h-[76px] flex-col px-2">
+            <Grid2X2 className="size-5" />
+            <span>{t('presetGrid')}</span>
+          </EditorChoice>
         </div>
-      </div>
+        {imageCount < 3 && <p className="text-[11px] leading-4 text-muted-foreground">{t('gridHint')}</p>}
+      </EditorSection>
 
-      <div className="space-y-2">
-        <Label className="text-sm font-medium text-foreground block">{t('transition') || 'Transition'}</Label>
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => setImageTransition('none')}
-            className={`flex-1 min-w-[80px] h-10 text-sm font-medium rounded-md border transition-all shadow-subtle ${imageTransition === 'none' ? 'bg-[#d5f5c2] text-primary border-transparent font-semibold shadow-sm' : 'bg-card border-border text-muted-foreground hover:bg-muted/50'}`}
-          >
-            {t('transitionNone') || 'Gap'}
-          </button>
-          <button
-            onClick={() => setImageTransition('soft-blend')}
-            className={`flex-1 min-w-[80px] h-10 text-sm font-medium rounded-md border transition-all shadow-subtle ${imageTransition === 'soft-blend' ? 'bg-[#d5f5c2] text-primary border-transparent font-semibold shadow-sm' : 'bg-card border-border text-muted-foreground hover:bg-muted/50'}`}
-          >
-            {t('transitionSoftBlend') || 'Soft Blend'}
-          </button>
+      <EditorSection title={t('transition')} description={t('transitionDescription')}>
+        <div className="grid grid-cols-2 gap-2">
+          <EditorChoice active={imageTransition === 'none'} onClick={() => setImageTransition('none')}>
+            {t('transitionNone')}
+          </EditorChoice>
+          <EditorChoice active={imageTransition === 'soft-blend'} onClick={() => setImageTransition('soft-blend')}>
+            <Blend className="size-4" />
+            {t('transitionSoftBlend')}
+          </EditorChoice>
         </div>
-      </div>
+      </EditorSection>
 
-      {imageTransition === 'none' ? (
-        <div className="space-y-2">
-          <Label className="text-sm font-medium text-foreground flex justify-between">
-            {t('imageGap')}
-            <span className="text-muted-foreground">{imageGap} px</span>
-          </Label>
-          <Slider 
-            value={[imageGap]} 
-            onValueChange={(vals) => setImageGap(Array.isArray(vals) ? vals[0] : vals)}
-            min={0} max={100} step={1} 
-          />
+      <EditorSection title={t('spacingTitle')} description={t('spacingDescription')}>
+        <div className="editor-control-surface space-y-5 p-4">
+          {imageTransition === 'none' ? (
+            <div className="space-y-3">
+              <EditorFieldHeader label={t('imageGap')} value={`${imageGap} px`} htmlFor="image-gap" />
+              <Slider id="image-gap" value={[imageGap]} onValueChange={(values) => setImageGap(Array.isArray(values) ? values[0] : values)} min={0} max={100} step={1} aria-label={t('imageGap')} />
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <EditorFieldHeader label={t('blendWidth')} value={`${blendWidth} px`} htmlFor="blend-width" />
+              <Slider id="blend-width" value={[blendWidth]} onValueChange={(values) => setBlendWidth(Array.isArray(values) ? values[0] : values)} min={0} max={200} step={1} aria-label={t('blendWidth')} />
+            </div>
+          )}
+          <div className="space-y-3 border-t border-border pt-4">
+            <EditorFieldHeader label={t('borderWidth')} value={`${borderWidth} px`} htmlFor="border-width" />
+            <Slider id="border-width" value={[borderWidth]} onValueChange={(values) => setBorderWidth(Array.isArray(values) ? values[0] : values)} min={0} max={50} step={1} aria-label={t('borderWidth')} />
+          </div>
         </div>
-      ) : (
-        <div className="space-y-2">
-          <Label className="text-sm font-medium text-foreground flex justify-between">
-            {t('blendWidth')}
-            <span className="text-muted-foreground">{blendWidth} px</span>
-          </Label>
-          <Slider 
-            value={[blendWidth]} 
-            onValueChange={(vals) => setBlendWidth(Array.isArray(vals) ? vals[0] : vals)}
-            min={0} max={200} step={1} 
-          />
-        </div>
-      )}
+      </EditorSection>
 
-      <div className="space-y-2">
-        <Label className="text-sm font-medium text-foreground flex justify-between">
-          {t('borderWidth')}
-          <span className="text-muted-foreground">{borderWidth} px</span>
-        </Label>
-        <Slider 
-          value={[borderWidth]} 
-          onValueChange={(vals) => setBorderWidth(Array.isArray(vals) ? vals[0] : vals)}
-          min={0} max={50} step={1} 
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label className="text-sm font-medium text-foreground flex justify-between">
-          {t('grainIntensity') || 'Grain'}
-          <span className="text-muted-foreground">{grainIntensity}%</span>
-        </Label>
-        <Slider 
-          value={[grainIntensity]} 
-          onValueChange={(vals) => setGrainIntensity(Array.isArray(vals) ? vals[0] : vals as any)}
-          min={0} max={100} step={1} 
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label className="text-sm font-medium text-foreground block">{t('background')}</Label>
-        <div className="flex flex-wrap gap-2">
-          {colors.map(color => (
-            <button
-              key={color}
-              onClick={() => setBackgroundColor(color)}
-              className={`flex-1 min-w-[60px] h-10 text-sm font-medium rounded-md border transition-all shadow-subtle ${backgroundColor === color ? 'bg-[#d5f5c2] text-primary border-transparent font-semibold shadow-sm' : 'bg-card border-border text-muted-foreground hover:bg-muted/50'}`}
-            >
-              {color === 'white' ? t('bgWhite') : color === 'light-gray' ? t('bgLightGray') : t('bgTransparent')}
-            </button>
-          ))}
-        </div>
-      </div>
-      
-      <div className="flex items-center justify-between pt-4 border-t border-border">
-        <Label className="text-sm font-medium text-foreground cursor-pointer" onClick={() => setShowCopyright(!showCopyright)}>
-          {t('copyrightToggle')}
-        </Label>
-        <Switch 
-          checked={showCopyright} 
-          onCheckedChange={setShowCopyright} 
-        />
-      </div>
-
-      {showCopyright && (
-        <div className="space-y-4 pt-2">
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-foreground block">{t('copyrightPosition')}</Label>
-            <div className="grid grid-cols-3 gap-2 w-full">
-              {(
-                [
-                  { value: 'bottom-left', label: t('posLeft') },
-                  { value: 'bottom-center', label: t('posCenter') },
-                  { value: 'bottom-right', label: t('posRight') },
-                ] as const
-              ).map(({ value, label }) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setCopyrightPosition(value)}
-                  className={`flex items-center justify-center h-10 text-sm font-medium rounded-md border transition-all shadow-subtle
-                    ${copyrightPosition === value
-                      ? 'bg-[#d5f5c2] text-primary border-transparent font-semibold shadow-sm'
-                      : 'bg-card text-muted-foreground border-border hover:bg-muted/50'
-                    }`}
-                >
-                  {label}
-                </button>
+      <EditorSection title={t('finishTitle')} description={t('finishDescription')}>
+        <div className="space-y-5">
+          <div className="space-y-3">
+            <EditorFieldHeader label={t('background')} value={backgroundColor === 'white' ? t('bgWhite') : backgroundColor === 'light-gray' ? t('bgLightGray') : t('bgTransparent')} />
+            <div className="grid grid-cols-3 gap-2">
+              {colors.map((color) => (
+                <EditorChoice key={color} active={backgroundColor === color} onClick={() => setBackgroundColor(color)} className="px-2">
+                  {color === 'white' ? t('bgWhite') : color === 'light-gray' ? t('bgLightGray') : t('bgTransparent')}
+                </EditorChoice>
               ))}
             </div>
           </div>
-
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-foreground block">{t('copyrightColor')}</Label>
-            <div className="grid grid-cols-3 gap-2 w-full">
-              {(
-                [
-                  { value: 'black', label: t('colorBlack') },
-                  { value: 'white', label: t('colorWhite') },
-                  { value: 'gray', label: t('colorGray') },
-                ] as const
-              ).map(({ value, label }) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setCopyrightColor(value)}
-                  className={`flex items-center justify-center h-10 text-sm font-medium rounded-md border transition-all shadow-subtle
-                    ${copyrightColor === value
-                      ? 'bg-[#d5f5c2] text-primary border-transparent font-semibold shadow-sm'
-                      : 'bg-card text-muted-foreground border-border hover:bg-muted/50'
-                    }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+          <div className="space-y-3 border-t border-border pt-4">
+            <EditorFieldHeader label={t('grainIntensity')} value={`${grainIntensity}%`} htmlFor="grain-intensity" />
+            <Slider id="grain-intensity" value={[grainIntensity]} onValueChange={(values) => setGrainIntensity(Array.isArray(values) ? values[0] : values)} min={0} max={100} step={1} aria-label={t('grainIntensity')} />
           </div>
         </div>
-      )}
+      </EditorSection>
     </div>
   )
+}
+
+function ColumnsIcon() {
+  return <LayoutTemplate className="size-5" />
 }

@@ -19,7 +19,22 @@
     "guideMove": "Drag: Move Image",
     "guideZoom": "Scroll: Zoom In/Out",
     "guideNotice": "This does not affect the final export.",
-    "positionNudge": "Position Nudge"
+    "positionNudge": "Position Nudge",
+    "sourceTitle": "Image source",
+    "sourceDescription": "Upload, reorder, and tune the frames that make up the composition.",
+    "imageCount": "Frames in canvas",
+    "uploadTitle": "Add your frames",
+    "uploadDescription": "Select a frame to adjust its scale and canvas position.",
+    "uploadImage": "Image",
+    "selectImage": "Select image",
+    "selected": "Selected",
+    "selectedImage": "Selected image {index}",
+    "selectedImageDescription": "Scale the active frame. Drag it directly on the canvas to reposition.",
+    "movePrevious": "Move image left",
+    "moveNext": "Move image right",
+    "lockPositionHint": "Prevent dragging on the canvas.",
+    "sheetDescription": "Upload, reorder, and tune the screenshot frames in your canvas.",
+    "sheetRole": "Source"
   },
   "LayoutSettings": {
     "layoutPreset": "Layout",
@@ -57,7 +72,18 @@
     "colorGray": "Gray",
     "logoUpload": "Add Free Company / Custom Logo",
     "logoUploadDesc": "Place any custom logo (PNG) freely on the canvas.",
-    "logoDelete": "Delete Logo"
+    "logoDelete": "Delete Logo",
+    "compositionTitle": "Canvas composition",
+    "compositionDescription": "Choose how the frames meet and breathe on the canvas.",
+    "gridHint": "Add at least three images to use the grid preset.",
+    "transitionDescription": "Control the seam between adjacent frames.",
+    "spacingTitle": "Spacing & border",
+    "spacingDescription": "Tune the breathing room without changing your saved layout choice.",
+    "finishTitle": "Surface finish",
+    "finishDescription": "Set the canvas surface and the final texture layer.",
+    "creditTitle": "Copyright overlay",
+    "creditDescription": "Keep the credit with the overlay controls, separate from composition.",
+    "creditHint": "This setting is saved with your frame preferences."
   },
   "SignatureSettings": {
     "sheetTitle": "Signature Settings",
@@ -102,7 +128,9 @@
     "posCenter": "Center",
     "alignLeft": "Align Left",
     "alignCenter": "Align Center",
-    "alignRight": "Align Right"
+    "alignRight": "Align Right",
+    "sheetDescription": "Text, logos, and credit layers that sit on top of the frame.",
+    "sheetRole": "Overlay"
   },
   "DesktopToolbar": {
     "ratio": "Ratio",
@@ -111,7 +139,10 @@
     "export": "Export",
     "exporting": "Exporting...",
     "copyrightToggle": "Show Copyright",
-    "reset": "Reset"
+    "reset": "Reset",
+    "zoom": "Zoom",
+    "appSubtitle": "Screenshot editor",
+    "savedLocally": "Saved locally"
   },
   "MobileLayout": {
     "sheetTitle": "Export & Ratio Settings",
@@ -126,7 +157,14 @@
     "resetDefault": "Reset to Default",
     "savePhoto": "Save Photo",
     "zoomOut": "Zoom Out",
-    "zoomIn": "Zoom In"
+    "zoomIn": "Zoom In",
+    "navLabel": "Mobile editor tools",
+    "sheetDescription": "Set export ratio and canvas zoom before saving the frame.",
+    "exportDescription": "Set export ratio and canvas zoom before saving the frame.",
+    "exportRole": "Export",
+    "layoutSheetTitle": "Canvas composition",
+    "layoutSheetDescription": "Presets, spacing, transitions, background, and texture.",
+    "layoutSheetRole": "Composition"
   },
   "LanguageSwitcher": {
     "language": "Language"
@@ -139,6 +177,23 @@
     "blog": "Blog & Guides",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
+    "inspectorEyebrow": "02 / Inspector",
+    "inspectorTitle": "Shape the moment.",
+    "tabImageRole": "Source",
+    "tabSignatureRole": "Overlay",
+    "tabLayoutRole": "Composition",
+    "panelImageTitle": "Image source",
+    "panelImageDescription": "Upload, order, and tune the frames that make up your canvas.",
+    "panelSignatureTitle": "Overlay content",
+    "panelSignatureDescription": "Text, logos, and copyright layers that sit on top of the frame.",
+    "panelLayoutTitle": "Canvas composition",
+    "panelLayoutDescription": "Choose how images meet, breathe, and sit on the surface.",
+    "flowLabel": "Editor flow",
+    "flowSource": "Source",
+    "flowOverlay": "Overlay",
+    "flowComposition": "Composition",
+    "savedLocally": "Saved locally",
+    "settingsPersisted": "Preferences persist locally",
     "donate": "☕ Donate"
   },
   "Navigation": {

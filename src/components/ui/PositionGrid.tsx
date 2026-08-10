@@ -17,10 +17,10 @@ export function PositionGrid({ value, options, onChange }: {
           aria-label={t(label as any)}
           title={t(label as any)}
           onClick={() => onChange(optVal)}
-          className={`flex items-center justify-center h-10 rounded-md border transition-all shadow-subtle
+          className={`flex h-10 items-center justify-center rounded-md border transition-all shadow-subtle
             ${value === optVal
-              ? 'bg-[#d5f5c2] text-primary border-transparent font-semibold'
-              : 'bg-card text-muted-foreground border-border hover:bg-muted/50'
+              ? 'border-primary bg-sticky-note-mint text-primary font-semibold'
+              : 'border-border bg-card text-muted-foreground hover:bg-muted/50'
             }`}
         >
           {icon}

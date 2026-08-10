@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/u
 import { Slider } from '@/components/ui/slider'
 import { useTranslations } from 'next-intl'
 import { TextOptionControl } from '../TextOptionControl'
+import { EditorFieldHeader } from '@/components/ui/editor'
 import { PositionGrid } from '@/components/ui/PositionGrid'
 import { AlignGroup } from '@/components/ui/AlignGroup'
 import { FONT_MAP, POSITION_OPTIONS } from '@/constants/signature'
@@ -58,7 +59,7 @@ export function TextSettingsGroup() {
   const t = useTranslations('SignatureSettings')
 
   return (
-    <div className="space-y-3 font-sans">
+    <div className="space-y-4 font-sans">
       <TextOptionControl
         label={t('upperText')}
         placeholder="Name"
@@ -85,9 +86,9 @@ export function TextSettingsGroup() {
         onChangeLetterSpacing={setLowerLetterSpacing}
       />
 
-      <div className="pt-4 space-y-4">
+      <div className="space-y-5 border-t border-border pt-5">
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-foreground block">{t('position')}</Label>
+          <Label className="block text-xs font-semibold text-foreground">{t('position')}</Label>
           <PositionGrid
             value={signaturePosition}
             options={POSITION_OPTIONS}
@@ -96,17 +97,17 @@ export function TextSettingsGroup() {
         </div>
 
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-foreground block">{t('align')}</Label>
+          <Label className="block text-xs font-semibold text-foreground">{t('align')}</Label>
           <AlignGroup value={signatureAlign} onChange={setSignatureAlign} />
         </div>
 
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-foreground block">{t('font')}</Label>
+          <Label className="block text-xs font-semibold text-foreground">{t('font')}</Label>
           <Select value={fontFamily} onValueChange={(val) => val && setFontFamily(val)}>
-            <SelectTrigger className="text-sm h-10 w-full rounded-md border-border focus-visible:ring-primary focus-visible:border-primary">
+            <SelectTrigger className="h-10 w-full rounded-md border-border bg-background text-sm focus-visible:border-primary focus-visible:ring-primary">
               <span className="flex flex-1 text-left truncate">{FONT_MAP[fontFamily]}</span>
             </SelectTrigger>
-            <SelectContent className="rounded-md">
+            <SelectContent className="rounded-xl">
               <SelectItem value="Pretendard" className="text-sm font-sans font-medium">{t('fontDefault')}</SelectItem>
               <SelectItem value="NexonMaplestory" className="text-sm font-medium" style={{ fontFamily: 'NexonMaplestory' }}>{t('fontMaplestory')}</SelectItem>
               <SelectItem value="TMoneyDungunbaram" className="text-sm font-medium" style={{ fontFamily: 'TMoneyDungunbaram' }}>{t('fontTmoney')}</SelectItem>
@@ -125,11 +126,9 @@ export function TextSettingsGroup() {
         </div>
 
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-foreground flex justify-between">
-            {t('size')}
-            <span className="text-muted-foreground">{signatureSize}%</span>
-          </Label>
+          <EditorFieldHeader label={t('size')} value={`${signatureSize}%`} htmlFor="signature-size" />
           <Slider 
+            id="signature-size"
             value={[signatureSize]} 
             onValueChange={(vals) => setSignatureSize(Array.isArray(vals) ? vals[0] : vals)} 
             min={50} max={200} step={1} 
@@ -137,8 +136,8 @@ export function TextSettingsGroup() {
         </div>
 
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-foreground block">{t('color')}</Label>
-          <div className="relative w-full h-10 rounded-md overflow-hidden border border-border shadow-subtle cursor-pointer focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-1 transition-shadow bg-background">
+          <Label className="block text-xs font-semibold text-foreground">{t('color')}</Label>
+          <div className="relative h-10 w-full cursor-pointer overflow-hidden rounded-md border border-border bg-background shadow-subtle transition-shadow focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-1">
             <input 
               type="color" 
               aria-label={t('color')}
@@ -150,11 +149,9 @@ export function TextSettingsGroup() {
         </div>
 
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-foreground flex justify-between">
-            {t('opacity')}
-            <span className="text-muted-foreground">{signatureOpacity}%</span>
-          </Label>
+          <EditorFieldHeader label={t('opacity')} value={`${signatureOpacity}%`} htmlFor="signature-opacity" />
           <Slider 
+            id="signature-opacity"
             value={[signatureOpacity]} 
             onValueChange={(vals) => setSignatureOpacity(Array.isArray(vals) ? vals[0] : vals)} 
             min={0} max={100} step={1} 

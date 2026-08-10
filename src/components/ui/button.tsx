@@ -10,7 +10,7 @@ const buttonVariants = cva(
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-subtle",
         sketchbookPrimary: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-subtle font-medium border-transparent",
-        sketchbookOutline: "bg-transparent text-primary border-primary hover:bg-[#d5f5c2] shadow-none font-medium",
+        sketchbookOutline: "bg-transparent text-primary border-primary hover:bg-sticky-note-mint shadow-none font-medium",
         outline:
           "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground",
         secondary:

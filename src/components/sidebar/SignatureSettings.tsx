@@ -1,26 +1,39 @@
+import { ImagePlus, Type } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+
 import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { SketchbookTabsList, SketchbookTabsTrigger } from '@/components/ui/SketchbookTabs'
-import { TextSettingsGroup } from './signature/TextSettingsGroup'
+import { CopyrightSettings } from './signature/CopyrightSettings'
 import { LogoUploadArea } from './signature/LogoUploadArea'
-import { useTranslations } from 'next-intl'
+import { TextSettingsGroup } from './signature/TextSettingsGroup'
 
 export function SignatureSettings() {
   const t = useTranslations('SignatureSettings')
 
   return (
-    <Tabs defaultValue="text" className="w-full font-sans">
-      <SketchbookTabsList className="grid grid-cols-2 mb-6">
-        <SketchbookTabsTrigger value="text">{t('tabText')}</SketchbookTabsTrigger>
-        <SketchbookTabsTrigger value="logo">{t('tabLogo')}</SketchbookTabsTrigger>
-      </SketchbookTabsList>
+    <div className="space-y-6">
+      <Tabs defaultValue="text" className="w-full">
+        <SketchbookTabsList className="h-11">
+          <SketchbookTabsTrigger value="text" className="gap-2">
+            <Type className="size-3.5" aria-hidden="true" />
+            {t('tabText')}
+          </SketchbookTabsTrigger>
+          <SketchbookTabsTrigger value="logo" className="gap-2">
+            <ImagePlus className="size-3.5" aria-hidden="true" />
+            {t('tabLogo')}
+          </SketchbookTabsTrigger>
+        </SketchbookTabsList>
 
-      <TabsContent value="text" className="space-y-3">
-        <TextSettingsGroup />
-      </TabsContent>
+        <TabsContent value="text" className="mt-5 space-y-4 focus-visible:outline-none">
+          <TextSettingsGroup />
+        </TabsContent>
 
-      <TabsContent value="logo" className="space-y-3">
-        <LogoUploadArea />
-      </TabsContent>
-    </Tabs>
+        <TabsContent value="logo" className="mt-5 space-y-4 focus-visible:outline-none">
+          <LogoUploadArea />
+        </TabsContent>
+      </Tabs>
+
+      <CopyrightSettings />
+    </div>
   )
 }
