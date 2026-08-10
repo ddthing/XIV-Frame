@@ -3,6 +3,7 @@ import { Text, Group } from 'react-konva'
 import { useStore } from '@/store/useStore'
 import { useShallow } from 'zustand/react/shallow'
 import { useSignatureLayout } from '@/hooks/useSignatureLayout'
+import { resolveSignatureFont } from '@/constants/signature'
 
 function SignatureLayerComponent({ contentWidth, contentHeight }: { contentWidth: number, contentHeight: number }) {
   const {
@@ -28,6 +29,7 @@ function SignatureLayerComponent({ contentWidth, contentHeight }: { contentWidth
 
   const upperFontSize = (signatureSize / 100) * 40
   const lowerFontSize = (signatureSize / 100) * 24
+  const resolvedFontFamily = resolveSignatureFont(fontFamily)
 
   const { groupRef, upperRef, lowerRef, groupX, groupY } = useSignatureLayout({
     contentWidth,
@@ -38,7 +40,7 @@ function SignatureLayerComponent({ contentWidth, contentHeight }: { contentWidth
     serverName,
     upperFontSize,
     lowerFontSize,
-    fontFamily,
+    fontFamily: resolvedFontFamily,
     upperLetterSpacing,
     upperBold,
     upperItalic,
@@ -58,7 +60,7 @@ function SignatureLayerComponent({ contentWidth, contentHeight }: { contentWidth
           text={characterName}
           fill={signatureColor}
           opacity={signatureOpacity / 100}
-          fontFamily={fontFamily}
+          fontFamily={resolvedFontFamily}
           fontSize={upperFontSize}
           letterSpacing={upperLetterSpacing}
           fontStyle={`${upperItalic ? 'italic ' : ''}${upperBold ? 'bold' : 'normal'}`.trim()}
@@ -71,7 +73,7 @@ function SignatureLayerComponent({ contentWidth, contentHeight }: { contentWidth
           text={`✦ ${serverName} ✦`}
           fill={signatureColor}
           opacity={signatureOpacity / 100}
-          fontFamily={fontFamily}
+          fontFamily={resolvedFontFamily}
           fontSize={lowerFontSize}
           letterSpacing={lowerLetterSpacing}
           fontStyle={`${lowerItalic ? 'italic ' : ''}${lowerBold ? 'bold' : 'normal'}`.trim()}

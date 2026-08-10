@@ -14,7 +14,7 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
   const zoom = useStore(state => state.zoom)
 
   return (
-    <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-background">
+    <div className="flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden bg-background">
       <CanvasToolbar className="hidden md:flex" />
 
       <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-background [background-image:radial-gradient(rgba(26,51,0,0.09)_1px,transparent_1px)] [background-size:24px_24px]">

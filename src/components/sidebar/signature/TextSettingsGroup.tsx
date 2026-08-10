@@ -8,7 +8,7 @@ import { TextOptionControl } from '../TextOptionControl'
 import { EditorFieldHeader } from '@/components/ui/editor'
 import { PositionGrid } from '@/components/ui/PositionGrid'
 import { AlignGroup } from '@/components/ui/AlignGroup'
-import { FONT_MAP, POSITION_OPTIONS } from '@/constants/signature'
+import { DEFAULT_SIGNATURE_FONT, FONT_MAP, POSITION_OPTIONS } from '@/constants/signature'
 
 export function TextSettingsGroup() {
   const {
@@ -108,7 +108,7 @@ export function TextSettingsGroup() {
               <span className="flex flex-1 text-left truncate">{FONT_MAP[fontFamily]}</span>
             </SelectTrigger>
             <SelectContent className="rounded-xl">
-              <SelectItem value="Pretendard" className="text-sm font-sans font-medium">{t('fontDefault')}</SelectItem>
+              <SelectItem value="Pretendard" className="text-sm font-sans font-medium" style={{ fontFamily: DEFAULT_SIGNATURE_FONT }}>{t('fontDefault')}</SelectItem>
               <SelectItem value="NexonMaplestory" className="text-sm font-medium" style={{ fontFamily: 'NexonMaplestory' }}>{t('fontMaplestory')}</SelectItem>
               <SelectItem value="TMoneyDungunbaram" className="text-sm font-medium" style={{ fontFamily: 'TMoneyDungunbaram' }}>{t('fontTmoney')}</SelectItem>
               <SelectItem value="OgRenaissanceSecret" className="text-sm font-medium" style={{ fontFamily: 'OgRenaissanceSecret' }}>{t('fontOg')}</SelectItem>

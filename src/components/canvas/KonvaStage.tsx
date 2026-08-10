@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useMemo } from 'react'
-import { Stage, Layer, Group } from 'react-konva'
+import { Stage, Layer } from 'react-konva'
 import { useStore } from '@/store/useStore'
 import { useShallow } from 'zustand/react/shallow'
 import { BackgroundLayer } from './layers/BackgroundLayer'
@@ -66,29 +66,34 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
   }, [images])
 
   useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout>
-
     const updateSize = () => {
-      if (containerRef.current) {
-        setStageSize({
-          width: containerRef.current.offsetWidth,
-          height: containerRef.current.offsetHeight,
-        })
-      }
-    }
-    
-    // Initial size
-    updateSize()
-    
-    const handleResize = () => {
-      clearTimeout(timeoutId)
-      timeoutId = setTimeout(updateSize, 100)
+      const container = containerRef.current
+      if (!container) return
+
+      setStageSize((current) => {
+        const next = {
+          width: container.offsetWidth,
+          height: container.offsetHeight,
+        }
+
+        return current.width === next.width && current.height === next.height
+          ? current
+          : next
+      })
     }
 
-    window.addEventListener('resize', handleResize)
+    updateSize()
+
+    const resizeObserver = typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver(updateSize)
+      : null
+
+    if (containerRef.current) resizeObserver?.observe(containerRef.current)
+    window.addEventListener('resize', updateSize)
+
     return () => {
-      clearTimeout(timeoutId)
-      window.removeEventListener('resize', handleResize)
+      resizeObserver?.disconnect()
+      window.removeEventListener('resize', updateSize)
     }
   }, [])
 

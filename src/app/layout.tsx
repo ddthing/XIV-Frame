@@ -1,22 +1,6 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Inter, Roboto_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
-
-const bricolage = Bricolage_Grotesque({
-  variable: "--font-bricolage-grotesque",
-  subsets: ["latin"],
-});
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
-
-const robotoMono = Roboto_Mono({
-  variable: "--font-roboto-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://xiv-frame.com"),
@@ -61,7 +45,7 @@ export default function RootLayout({
       <html
         lang="en"
         suppressHydrationWarning
-        className={`${bricolage.variable} ${inter.variable} ${robotoMono.variable} h-full antialiased`}
+        className="h-full antialiased"
       >
         <head>
           <script

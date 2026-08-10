@@ -3,6 +3,7 @@ import { SignaturePosition, SignatureAlign } from '@/store/useStore'
 
 export const FONT_MAP: Record<string, string> = {
   'Pretendard': 'fontDefault',
+  'Terrarum Sans Bitmap': 'fontDefault',
   'NexonMaplestory': 'fontMaplestory',
   'TMoneyDungunbaram': 'fontTmoney',
   'OgRenaissanceSecret': 'fontOg',
@@ -15,6 +16,12 @@ export const FONT_MAP: Record<string, string> = {
   'SlowGothic': 'fontSlowGothic',
   'Ridibatang': 'fontRidibatang',
   'Mulmaru': 'fontMulmaru'
+}
+
+export const DEFAULT_SIGNATURE_FONT = 'Terrarum Sans Bitmap'
+
+export function resolveSignatureFont(fontFamily: string) {
+  return fontFamily === 'Pretendard' ? DEFAULT_SIGNATURE_FONT : fontFamily
 }
 
 export const POSITION_OPTIONS: { value: SignaturePosition; label: string; icon: React.ReactNode }[] = [

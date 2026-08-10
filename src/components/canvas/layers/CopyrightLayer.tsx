@@ -2,6 +2,7 @@ import React from 'react'
 import { Text } from 'react-konva'
 import { useStore } from '@/store/useStore'
 import { useShallow } from 'zustand/react/shallow'
+import { DEFAULT_SIGNATURE_FONT } from '@/constants/signature'
 
 import { useTranslations } from 'next-intl'
 
@@ -18,7 +19,7 @@ function CopyrightLayerComponent({ contentWidth, contentHeight }: { contentWidth
   return (
     <Text
       text={t('text')}
-      fontFamily="Pretendard, sans-serif"
+      fontFamily={DEFAULT_SIGNATURE_FONT}
       fontSize={16}
       fill={copyrightColor === 'black' ? '#000000' : copyrightColor === 'white' ? '#FFFFFF' : '#888888'}
       align={copyrightPosition === 'bottom-left' ? 'left' : copyrightPosition === 'bottom-right' ? 'right' : 'center'}

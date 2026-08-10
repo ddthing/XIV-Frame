@@ -29,7 +29,7 @@ export function MobileLayout({ stageRef }: { stageRef: React.MutableRefObject<Ko
         <div className="ml-auto"><LanguageSwitcher inverse /></div>
       </header>
 
-      <main className="relative min-h-0 flex-1 overflow-hidden">
+      <main className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
         <PreviewCanvas stageRef={stageRef} />
       </main>
 
