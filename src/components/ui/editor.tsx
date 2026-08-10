@@ -17,8 +17,8 @@ export function EditorSection({
     <section className={cn('space-y-3', className)}>
       {(title || description) && (
         <div className="space-y-1">
-          {title && <h3 className="text-[13px] font-semibold tracking-tight text-foreground">{title}</h3>}
-          {description && <p className="text-xs leading-5 text-muted-foreground">{description}</p>}
+          {title && <h3 className="text-sm font-semibold leading-5 tracking-tight text-foreground">{title}</h3>}
+          {description && <p className="text-[13px] leading-5 text-muted-foreground">{description}</p>}
         </div>
       )}
       {children}

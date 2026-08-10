@@ -87,7 +87,7 @@ export function ImageUploader() {
     <div className="space-y-6">
       <EditorSection title={t('sourceTitle')} description={t('sourceDescription')}>
         <div className="flex items-center justify-between rounded-md border border-border bg-surface-inset/60 px-3 py-2.5">
-          <span className="text-xs font-semibold text-foreground">{t('imageCount')}</span>
+          <span className="text-[13px] font-semibold text-foreground">{t('imageCount')}</span>
           <span className="font-mono text-[11px] font-semibold tabular-nums text-muted-foreground">{String(imageCount).padStart(2, '0')} / 04</span>
         </div>
       </EditorSection>
@@ -105,6 +105,7 @@ export function ImageUploader() {
                 role="button"
                 tabIndex={0}
                 aria-label={image ? `${t('selectImage')} ${index + 1}` : `${t('uploadImage')} ${index + 1}`}
+                aria-pressed={selected}
                 onClick={() => handleSelect(index)}
                 onKeyDown={(event) => {
                   if (event.key === 'Enter' || event.key === ' ') {
@@ -123,17 +124,17 @@ export function ImageUploader() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={image} alt={`${t('uploadImage')} ${index + 1}`} className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" />
                     <div className="pointer-events-none absolute inset-0 bg-primary/45 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
-                    <div className="absolute inset-x-2 bottom-2 flex items-center justify-center gap-1.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
+                    <div className={`absolute inset-x-2 bottom-2 flex min-w-0 items-center justify-center gap-1.5 transition-opacity duration-200 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'}`}>
                       {index > 0 && images[index - 1] && (
-                        <button type="button" aria-label={t('movePrevious')} onClick={(event) => handleMove(event, index, 'prev')} className="grid size-8 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 text-foreground shadow-subtle transition-colors hover:bg-background">
+                        <button type="button" aria-label={t('movePrevious')} onClick={(event) => handleMove(event, index, 'prev')} className="grid size-[32px] shrink-0 place-items-center rounded-md border border-primary-foreground/20 bg-background/95 text-foreground shadow-subtle transition-colors hover:bg-background">
                           <ChevronLeft className="size-4" />
                         </button>
                       )}
-                      <button type="button" aria-label={t('change')} onClick={(event) => { event.stopPropagation(); handleFileUpload(index) }} className="h-8 rounded-md border border-primary-foreground/20 bg-background/90 px-3 text-xs font-semibold text-foreground shadow-subtle transition-colors hover:bg-background">
+                      <button type="button" aria-label={t('change')} onClick={(event) => { event.stopPropagation(); handleFileUpload(index) }} className="h-[32px] min-h-[32px] min-w-0 flex-1 truncate rounded-md border border-primary-foreground/20 bg-background/95 px-2 text-[11px] font-semibold leading-none whitespace-nowrap text-foreground shadow-subtle transition-colors hover:bg-background">
                         {t('change')}
                       </button>
                       {index < images.length - 1 && images[index + 1] && (
-                        <button type="button" aria-label={t('moveNext')} onClick={(event) => handleMove(event, index, 'next')} className="grid size-8 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 text-foreground shadow-subtle transition-colors hover:bg-background">
+                        <button type="button" aria-label={t('moveNext')} onClick={(event) => handleMove(event, index, 'next')} className="grid size-[32px] shrink-0 place-items-center rounded-md border border-primary-foreground/20 bg-background/95 text-foreground shadow-subtle transition-colors hover:bg-background">
                           <ChevronRight className="size-4" />
                         </button>
                       )}
@@ -142,12 +143,11 @@ export function ImageUploader() {
                     <button type="button" aria-label={t('deleteImage')} onClick={(event) => handleRemove(event, index)} className="absolute right-2 top-2 grid size-7 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 text-foreground opacity-0 shadow-subtle transition-all hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100 group-focus-within:opacity-100">
                       <X className="size-3.5" />
                     </button>
-                    {selected && <span className="absolute bottom-2 left-2 rounded-full bg-accent px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.08em] text-accent-foreground">{t('selected')}</span>}
                   </>
                 ) : (
                   <div className="flex size-full flex-col items-center justify-center gap-2 border border-dashed border-primary/20 text-muted-foreground transition-colors group-hover:bg-surface-inset/60 group-hover:text-foreground">
                     <span className="grid size-9 place-items-center rounded-md bg-surface-inset text-foreground"><Upload className="size-4" /></span>
-                    <span className="text-xs font-semibold">{t('uploadImage')} {index + 1}</span>
+                    <span className="text-[13px] font-semibold">{t('uploadImage')} {index + 1}</span>
                   </div>
                 )}
               </div>
