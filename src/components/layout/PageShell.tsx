@@ -15,13 +15,14 @@ interface PageShellProps {
 
 export async function PageShell({ children, locale, hideFooter = false, hideHeader = false, hideHeaderBorder = false, headerClassName = '' }: PageShellProps) {
   const messages = await getMessages();
+  const fullViewport = hideHeader && hideFooter
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <div className="min-h-[100dvh] h-[100dvh] bg-background flex flex-col font-sans selection:bg-primary/20">
+      <div className={`${fullViewport ? 'h-[100dvh] overflow-hidden' : 'min-h-[100dvh]'} bg-background flex flex-col font-sans selection:bg-primary/20`}>
       {!hideHeader && <SiteHeader locale={locale} hideBorder={hideHeaderBorder} className={headerClassName} />}
       
-      <main className="flex-1 flex flex-col overflow-hidden">
+      <main className={`min-h-0 flex flex-1 flex-col ${fullViewport ? 'overflow-hidden' : 'overflow-y-auto custom-scrollbar'}`}>
         {children}
       </main>
       

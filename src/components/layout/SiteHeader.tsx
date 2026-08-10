@@ -2,83 +2,71 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { useTranslations } from 'next-intl'
 import { Logo } from '@/components/ui/Logo'
-import { Menu, X } from 'lucide-react'
-import { Container } from './Container'
+import { ArrowUpRight, Menu, X } from 'lucide-react'
 
 export function SiteHeader({ locale, hideBorder = false, className = '' }: { locale: string, hideBorder?: boolean, className?: string }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const t = useTranslations('Navigation')
+  const pathname = usePathname()
 
   const navLinks = [
-    { href: `/${locale}`, label: t('app') },
     { href: `/${locale}/blog`, label: t('blog') },
     { href: `/${locale}/about`, label: t('about') },
+    { href: `/${locale}/contact`, label: t('contact') },
   ]
 
   return (
-    <div className="fixed top-0 left-0 w-full z-50 md:top-4 md:left-1/2 md:-translate-x-1/2 md:w-[calc(100%-2rem)] md:max-w-xl">
-      <header className={`bg-[#fcfaf5] border-b border-[#b6b6b6] md:border md:rounded-[12px] shadow-[rgba(255,235,90,0.05)_0px_20px_40px_-10px] transition-all ${className}`}>
-        <div className="h-12 px-4 flex items-center justify-between relative">
-          
-          {/* Left: Logo */}
-          <div className="flex-1 flex items-center justify-start">
-            <Link href={`/${locale}`} className="flex items-center">
-              <Logo size="sm" />
-            </Link>
-          </div>
-          
-          {/* Center: Nav Links */}
-          <nav className="hidden md:flex items-center justify-center gap-2 absolute left-1/2 -translate-x-1/2">
+    <div className="sticky top-0 z-50 w-full">
+      <header className={`border-b bg-primary text-primary-foreground ${hideBorder ? 'border-transparent' : 'border-primary-foreground/15'} transition-colors ${className}`}>
+        <div className="mx-auto flex min-h-[64px] max-w-6xl items-center justify-between gap-6 px-4 sm:min-h-[72px] sm:px-6 lg:px-8">
+          <Link href={`/${locale}`} className="shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sticky-note-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-primary">
+            <Logo size="md" inverse />
+          </Link>
+
+          <nav className="hidden items-center gap-1 md:flex" aria-label="Primary navigation">
             {navLinks.map((link) => (
-              <Link 
-                key={link.href} 
-                href={link.href} 
-                className="px-3 py-1.5 text-[14px] font-medium text-[#1a3300] hover:bg-[#d5f5c2] rounded-[6px] transition-colors"
-              >
+              <Link key={link.href} href={link.href} className={`rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-primary-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sticky-note-yellow ${pathname === link.href || pathname.startsWith(`${link.href}/`) ? 'bg-primary-foreground/12 text-primary-foreground' : 'text-primary-foreground/70'}`}>
                 {link.label}
               </Link>
             ))}
           </nav>
 
-          {/* Right: Actions */}
-          <div className="flex-1 flex items-center justify-end gap-3">
+          <div className="flex items-center justify-end gap-2">
             <div className="hidden sm:block">
-              <LanguageSwitcher />
+              <LanguageSwitcher inverse />
             </div>
-            
-            <button 
-              className="md:hidden p-2 text-[#1a3300]"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label="Toggle mobile menu"
-            >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            <Link href={`/${locale}`} className="hidden items-center gap-1 rounded-md bg-sticky-note-yellow px-3 py-2 text-sm font-bold text-primary transition-transform hover:-translate-y-0.5 hover:bg-sticky-note-yellow/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sticky-note-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-primary md:inline-flex">
+              {t('app')}
+              <ArrowUpRight size={15} aria-hidden="true" />
+            </Link>
+            <button type="button" className="rounded-md p-2 text-primary-foreground transition-colors hover:bg-primary-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sticky-note-yellow md:hidden" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-label="Toggle mobile menu" aria-expanded={isMobileMenuOpen}>
+              {isMobileMenuOpen ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
             </button>
           </div>
         </div>
 
-      {/* Mobile Navigation */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-border bg-background px-4 py-4 space-y-4">
-          <nav className="flex flex-col gap-2">
+        {isMobileMenuOpen && (
+        <div className="border-t border-primary-foreground/15 bg-primary px-4 py-4 md:hidden">
+          <nav className="mx-auto flex max-w-6xl flex-col gap-1" aria-label="Mobile navigation">
             {navLinks.map((link) => (
-              <Link 
-                key={link.href} 
-                href={link.href} 
-                className="px-4 py-3 text-base font-medium text-foreground hover:bg-muted rounded-xl transition-colors font-sans"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
+              <Link key={link.href} href={link.href} className={`rounded-md px-3 py-3 text-sm font-medium transition-colors hover:bg-primary-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sticky-note-yellow ${pathname === link.href || pathname.startsWith(`${link.href}/`) ? 'bg-primary-foreground/12 text-primary-foreground' : 'text-primary-foreground/70'}`} onClick={() => setIsMobileMenuOpen(false)}>
                 {link.label}
               </Link>
             ))}
           </nav>
-          <div className="pt-2 border-t border-border flex justify-end">
-            <LanguageSwitcher />
+          <div className="mx-auto mt-3 flex max-w-6xl items-center justify-between gap-3 border-t border-primary-foreground/15 pt-3">
+            <LanguageSwitcher inverse />
+            <Link href={`/${locale}`} className="inline-flex items-center gap-1 rounded-md bg-sticky-note-yellow px-3 py-2 text-sm font-bold text-primary hover:bg-sticky-note-yellow/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sticky-note-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-primary" onClick={() => setIsMobileMenuOpen(false)}>
+              {t('app')}
+              <ArrowUpRight size={15} aria-hidden="true" />
+            </Link>
           </div>
         </div>
-      )}
+        )}
       </header>
     </div>
   )
