@@ -6,6 +6,7 @@ import { Upload, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { PositionGrid } from '@/components/ui/PositionGrid'
 import { LOGO_POSITION_OPTIONS } from '@/constants/signature'
+import { EditorFieldHeader } from '@/components/ui/editor'
 
 export function LogoUploadArea() {
   const {
@@ -77,34 +78,34 @@ export function LogoUploadArea() {
   }
 
   return (
-    <div className="space-y-4 font-sans">
+    <div className="space-y-5 font-sans">
       {!logoUrl ? (
         <div 
           role="button"
           tabIndex={0}
           onClick={handleLogoUpload}
           onKeyDown={handleKeyDown}
-          className="w-full aspect-[2/1] rounded-xl border border-border bg-background shadow-subtle flex flex-col items-center justify-center cursor-pointer hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
+          className="flex aspect-[2/1] w-full cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-primary/25 bg-card shadow-subtle transition-colors hover:bg-surface-inset/60 focus:outline-none focus:ring-2 focus:ring-primary"
         >
-          <Upload className="w-5 h-5 text-muted-foreground mb-2" />
-          <span className="text-sm font-medium text-muted-foreground">{t('logoUploadLabel')}</span>
+          <span className="mb-3 grid size-9 place-items-center rounded-md bg-surface-inset text-foreground"><Upload className="size-4" /></span>
+          <span className="text-xs font-semibold text-muted-foreground">{t('logoUploadLabel')}</span>
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="relative w-full aspect-[2/1] bg-background shadow-subtle rounded-xl border border-border overflow-hidden flex items-center justify-center group">
+          <div className="group relative flex aspect-[2/1] w-full items-center justify-center overflow-hidden rounded-xl border border-border bg-card shadow-subtle">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={logoUrl} alt="Logo" className="max-w-[80%] max-h-[80%] object-contain" />
             <button 
               aria-label={t('logoDelete')}
               onClick={() => setLogoUrl(null)}
-              className="absolute top-2 right-2 bg-background text-foreground p-1.5 rounded-md hover:bg-destructive/10 hover:text-destructive shadow-subtle border border-border transition-colors opacity-0 group-hover:opacity-100"
+              className="absolute right-2 top-2 grid size-7 place-items-center rounded-md border border-border bg-background text-foreground opacity-0 shadow-subtle transition-colors hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
             >
-              <X className="w-4 h-4" />
+              <X className="size-3.5" />
             </button>
           </div>
           
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-foreground block">{t('position')}</Label>
+            <Label className="block text-xs font-semibold text-foreground">{t('position')}</Label>
             <PositionGrid
               value={logoPosition}
               options={LOGO_POSITION_OPTIONS}
@@ -113,11 +114,9 @@ export function LogoUploadArea() {
           </div>
           
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-foreground flex justify-between">
-              {t('size')}
-              <span className="text-muted-foreground">{logoScale}%</span>
-            </Label>
+            <EditorFieldHeader label={t('size')} value={`${logoScale}%`} htmlFor="logo-scale" />
             <Slider 
+              id="logo-scale"
               value={[logoScale]} 
               onValueChange={(vals) => setLogoScale(Array.isArray(vals) ? vals[0] : vals)} 
               min={10} max={200} step={1} 
@@ -125,11 +124,9 @@ export function LogoUploadArea() {
           </div>
 
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-foreground flex justify-between">
-              {t('opacity')}
-              <span className="text-muted-foreground">{logoOpacity}%</span>
-            </Label>
+            <EditorFieldHeader label={t('opacity')} value={`${logoOpacity}%`} htmlFor="logo-opacity" />
             <Slider 
+              id="logo-opacity"
               value={[logoOpacity]} 
               onValueChange={(vals) => setLogoOpacity(Array.isArray(vals) ? vals[0] : vals)} 
               min={0} max={100} step={1} 

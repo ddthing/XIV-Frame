@@ -2,6 +2,7 @@ import React from 'react'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
+import { EditorFieldHeader } from '@/components/ui/editor'
 import { Bold, Italic } from 'lucide-react'
 
 interface TextOptionControlProps {
@@ -33,23 +34,23 @@ export function TextOptionControl({
 }: TextOptionControlProps) {
   const t = useTranslations('SignatureSettings')
   return (
-    <div className="space-y-3 p-4 bg-background border border-border rounded-xl shadow-subtle">
+    <div className="editor-control-surface space-y-4 p-4">
       <div className="space-y-1.5">
-        <Label className="text-sm font-medium text-foreground block">{label}</Label>
+        <Label className="block text-xs font-semibold text-foreground">{label}</Label>
         <Input 
           value={value} 
           onChange={(e) => onChangeValue(e.target.value)}
           placeholder={placeholder}
-          className="text-sm h-10 rounded-md bg-card border-border focus-visible:ring-primary focus-visible:border-primary transition-colors w-full"
+          className="h-10 w-full rounded-md border-border bg-background text-sm transition-colors focus-visible:border-primary focus-visible:ring-primary"
           maxLength={30}
         />
       </div>
-      <div className="flex flex-wrap sm:flex-nowrap items-center gap-3">
-        <div className="flex items-center gap-2 shrink-0">
+      <div className="flex flex-wrap items-center gap-3 sm:flex-nowrap">
+        <div className="flex shrink-0 items-center gap-2">
           <button 
             type="button" 
             aria-label={bold ? 'Remove bold' : 'Make text bold'}
-            className={`flex items-center justify-center w-10 h-10 rounded-md border transition-colors shadow-subtle ${bold ? 'bg-[#d5f5c2] text-primary border-transparent font-semibold' : 'bg-card text-muted-foreground border-border hover:bg-muted/50'}`} 
+            className={`flex size-9 items-center justify-center rounded-md border transition-colors shadow-subtle ${bold ? 'border-primary bg-sticky-note-mint text-primary font-semibold' : 'border-border bg-card text-muted-foreground hover:bg-muted/50'}`}
             onClick={() => onChangeBold(!bold)}
           >
             <Bold className="w-4 h-4" />
@@ -57,14 +58,14 @@ export function TextOptionControl({
           <button 
             type="button" 
             aria-label={italic ? 'Remove italic' : 'Make text italic'}
-            className={`flex items-center justify-center w-10 h-10 rounded-md border transition-colors shadow-subtle ${italic ? 'bg-[#d5f5c2] text-primary border-transparent font-semibold' : 'bg-card text-muted-foreground border-border hover:bg-muted/50'}`} 
+            className={`flex size-9 items-center justify-center rounded-md border transition-colors shadow-subtle ${italic ? 'border-primary bg-sticky-note-mint text-primary font-semibold' : 'border-border bg-card text-muted-foreground hover:bg-muted/50'}`}
             onClick={() => onChangeItalic(!italic)}
           >
             <Italic className="w-4 h-4" />
           </button>
         </div>
-        <div className="flex-1 w-full flex items-center gap-3">
-          <span className="text-xs text-muted-foreground font-medium whitespace-nowrap shrink-0">{t('letterSpacing')}</span>
+        <div className="flex w-full flex-1 flex-col gap-2">
+          <EditorFieldHeader label={t('letterSpacing')} value={`${letterSpacing}px`} />
           <Slider 
             value={[letterSpacing]} 
             onValueChange={v => onChangeLetterSpacing(Array.isArray(v) ? v[0] : v)} 

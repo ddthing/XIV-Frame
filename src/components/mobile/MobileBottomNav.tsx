@@ -19,19 +19,20 @@ export function MobileBottomNav({ activeSheet, onSelect }: MobileBottomNavProps)
   ] as const
 
   return (
-    <nav className="flex items-center justify-around w-full h-[60px] px-2 bg-card border-t border-border">
+    <nav className="grid h-16 w-full grid-cols-4 gap-1 bg-background px-2 py-1.5" aria-label={t('navLabel')}>
       {items.map(({ id, label, icon: Icon }) => {
         const isActive = activeSheet === id
         return (
           <button
             key={id}
             aria-label={label}
+            aria-pressed={isActive}
             onClick={() => onSelect(isActive ? null : id)}
-            className={`flex flex-col items-center justify-center flex-1 h-full min-h-[44px] gap-1 transition-colors ${
-              isActive ? 'text-primary' : 'text-muted-foreground'
+            className={`flex min-h-11 flex-col items-center justify-center gap-1 rounded-md text-[10px] transition-all ${
+              isActive ? 'bg-sticky-note-mint text-primary shadow-subtle' : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
             }`}
           >
-            <Icon className={`w-5 h-5 ${isActive ? 'stroke-2' : 'stroke-[1.5]'}`} />
+            <Icon className={`size-4 ${isActive ? 'stroke-[2]' : 'stroke-[1.5]'}`} />
             <span className={`text-[10px] ${isActive ? 'font-semibold' : 'font-medium'}`}>
               {label}
             </span>

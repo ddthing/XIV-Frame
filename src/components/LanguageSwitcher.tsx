@@ -4,8 +4,9 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useLocale } from 'next-intl'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Globe } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
-export function LanguageSwitcher() {
+export function LanguageSwitcher({ inverse = false }: { inverse?: boolean }) {
   const router = useRouter()
   const pathname = usePathname()
   const currentLocale = useLocale()
@@ -32,9 +33,14 @@ export function LanguageSwitcher() {
 
   return (
     <div className="flex items-center gap-2">
-      <Globe className="w-4 h-4 text-muted-foreground" />
+      <Globe className={cn('size-4', inverse ? 'text-primary-foreground/60' : 'text-muted-foreground')} />
       <Select value={currentLocale} onValueChange={handleLanguageChange}>
-        <SelectTrigger className="w-[110px] h-10 text-sm font-medium rounded-md bg-transparent border border-border shadow-subtle hover:bg-muted/50 transition-colors">
+        <SelectTrigger className={cn(
+          'h-9 w-[104px] rounded-md text-xs font-semibold transition-colors',
+          inverse
+            ? 'border-primary-foreground/20 bg-transparent text-primary-foreground hover:bg-primary-foreground/10'
+            : 'border-border bg-transparent shadow-subtle hover:bg-muted/50'
+        )}>
           <SelectValue placeholder="Language" />
         </SelectTrigger>
         <SelectContent>
