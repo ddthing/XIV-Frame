@@ -13,7 +13,7 @@ export async function GET() {
     link: site_url,
     language: 'ko', // default
     image: `${site_url}/og-image.jpg`,
-    favicon: `${site_url}/favicon.ico`,
+    favicon: `${site_url}/icon.svg`,
     copyright: `All rights reserved ${new Date().getFullYear()}, XIV Frame`,
     author: {
       name: 'XIV Frame',

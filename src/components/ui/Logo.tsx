@@ -1,5 +1,4 @@
-import React from 'react'
-import Image from 'next/image'
+import { XivFrameMark } from './XivFrameMark'
 
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg'
@@ -22,15 +21,7 @@ export function Logo({ size = 'md', className = '', inverse = false }: LogoProps
 
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      <Image 
-        src="/logo.png" 
-        alt="XIV Frame Logo" 
-        width={iconSizes[size]} 
-        height={iconSizes[size]} 
-        className="object-contain"
-        priority
-        unoptimized
-      />
+      <XivFrameMark size={iconSizes[size]} />
       <span className={`font-bold tracking-tight ${inverse ? 'text-primary-foreground' : 'text-foreground'} ${sizeClasses[size]}`}>
         XIV Frame
       </span>
