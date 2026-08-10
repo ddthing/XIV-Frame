@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware'
 
 import { ImageSlice, createImageSlice, initialImageState } from './slices/imageSlice'
 import { LayoutSlice, createLayoutSlice, initialLayoutState, CanvasRatio, BackgroundColor, CopyrightPosition, CopyrightColor } from './slices/layoutSlice'
@@ -10,6 +10,33 @@ export type { CanvasRatio, BackgroundColor, CopyrightPosition, CopyrightColor, S
 
 export interface AppState extends ImageSlice, LayoutSlice, SignatureSlice {
   resetAll: () => void
+}
+
+// Keep edits usable in private browsing and when a large legacy logo fills the
+// browser quota. The current Zustand state remains available for the session;
+// persistence is best-effort and existing stored settings are read unchanged.
+const safeLocalStorage: StateStorage = {
+  getItem: (name) => {
+    try {
+      return typeof window === 'undefined' ? null : window.localStorage.getItem(name)
+    } catch {
+      return null
+    }
+  },
+  setItem: (name, value) => {
+    try {
+      if (typeof window !== 'undefined') window.localStorage.setItem(name, value)
+    } catch {
+      // Do not let a storage quota error break text or logo controls.
+    }
+  },
+  removeItem: (name) => {
+    try {
+      if (typeof window !== 'undefined') window.localStorage.removeItem(name)
+    } catch {
+      // Storage can be unavailable in private browsing contexts.
+    }
+  },
 }
 
 export const useStore = create<AppState>()(
@@ -35,6 +62,7 @@ export const useStore = create<AppState>()(
     }),
     {
       name: 'xiv-frame-settings-v2',
+      storage: createJSONStorage(() => safeLocalStorage),
       version: 2, // Bump version to 2 for layoutPreset migration
       migrate: (persistedState: any, version: number) => {
         let state = { ...persistedState }
