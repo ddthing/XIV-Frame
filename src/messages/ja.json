@@ -106,6 +106,8 @@
     "letterSpacing": "文字間隔",
     "logoUploadLabel": "ロゴ画像をアップロード (PNG推奨)",
     "logoDelete": "ロゴを削除",
+    "logoUploadError": "ロゴ画像を読み込めませんでした。PNGまたはJPGファイルをもう一度選択してください。",
+    "logoUploadTooLarge": "画像が大きすぎます。小さいロゴファイルを選択してください。",
     "fontDefault": "基本 (Terrarum Sans bitmap)",
     "fontMaplestory": "ネクソン メイプルストーリー",
     "fontTmoney": "T-money 丸ゴシック",

@@ -104,6 +104,8 @@
     "letterSpacing": "Spacing",
     "logoUploadLabel": "Upload Logo Image (PNG Rec.)",
     "logoDelete": "Delete Logo",
+    "logoUploadError": "The logo could not be read. Please choose a PNG or JPG file again.",
+    "logoUploadTooLarge": "This image is too large. Please choose a smaller logo file.",
     "fontDefault": "Default (Terrarum Sans bitmap)",
     "fontMaplestory": "Nexon Maplestory",
     "fontTmoney": "Tmoney RoundWind",
