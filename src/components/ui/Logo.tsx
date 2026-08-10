@@ -1,4 +1,4 @@
-import { XivFrameMark } from './XivFrameMark'
+import { FrameWindowMark } from './FrameWindowMark'
 
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg'
@@ -21,7 +21,7 @@ export function Logo({ size = 'md', className = '', inverse = false }: LogoProps
 
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      <XivFrameMark size={iconSizes[size]} />
+      <FrameWindowMark size={iconSizes[size]} />
       <span className={`font-bold tracking-tight ${inverse ? 'text-primary-foreground' : 'text-foreground'} ${sizeClasses[size]}`}>
         XIV Frame
       </span>
