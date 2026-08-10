@@ -1,26 +1,53 @@
 ---
-title: "Adding Custom Logos to Your FFXIV Screenshots"
-description: "Learn how to overlay Free Company logos, FFXIV title graphics, or custom PNG graphics onto your screenshots seamlessly."
+title: "How to Add a Free Company or Custom Logo to an FFXIV Screenshot"
+description: "Upload a logo, place it with the nine-position grid, tune its scale and opacity, and export it with your screenshot."
 date: "2026-06-03"
-tags: ["ffxiv", "screenshot", "gpose"]
+tags: ["ffxiv", "logo", "tutorial"]
 ---
 
+XIV Frame treats a logo as an overlay layer. A transparent PNG is the best choice because only the artwork is placed over the screenshot; a JPG or a logo with a white background may show an unwanted rectangle.
 
-A great way to brand your FFXIV screenshots or represent your Free Company (FC) is by adding a custom transparent logo over your images. 
+## 1. Prepare the logo
 
-## Finding Transparent Logos
-First, you'll need a logo with a transparent background (a PNG file). This could be:
-- The official Final Fantasy XIV title logo.
-- Your Free Company's crest or custom artwork.
-- A custom title for a static recruitment poster.
+1. Use a transparent PNG when possible.
+2. The selected file must be 10MB or smaller.
+3. Crop unnecessary empty space around the artwork before uploading. Extra padding makes the logo appear farther from the canvas edge.
 
-## How to Overlay Logos Easily
-If you don't know how to use layer-based editing tools, **XIV Frame** makes this incredibly simple.
+## 2. Open Logo Upload
 
-1. Open your screenshot in XIV Frame.
-2. Go to the **Signature** settings.
-3. Switch to the **Logo Upload** tab.
-4. Upload your PNG file.
-5. Use the position grid to automatically align your logo to any corner or the center of the image.
+1. Upload a screenshot first so the result is visible.
+2. Open **Signature** on desktop or **Signature** in the mobile bottom navigation.
+3. Select the **Logo Upload** tab.
+4. Click **Upload Logo Image** and choose the file.
+5. If the file cannot be read, choose a PNG or JPG again and check the file size.
 
-It takes just a few clicks to give your images a professional, branded look.
+## 3. Choose a position
+
+1. Use the nine-position grid: top left, top center, top right, middle left, center, middle right, bottom left, bottom center, or bottom right.
+2. Start with a corner that has empty space in the screenshot.
+3. Move the logo to another corner when it covers a face, weapon, or outfit detail.
+
+## 4. Tune scale and opacity
+
+1. Adjust **Size** from 10% to 200%. Start small and increase it only until the mark is easy to recognize.
+2. Adjust **Opacity** from 0% to 100%.
+3. Use full opacity for a clear Free Company mark. Use a lower value when the logo is only a subtle decoration.
+4. Check transparent edges at the final preview size; thin lines can disappear when the logo is too small.
+
+## 5. Combine it with a text signature
+
+1. Switch to **Text** and enter a character name or server label if needed.
+2. Place the text and logo in different areas so they do not compete for the same corner.
+3. If the canvas feels crowded, reduce the logo size or opacity before moving the main signature.
+
+## 6. Replace or remove the logo
+
+1. Upload a different file from the logo upload area when you want to replace the current mark.
+2. Use **Delete Logo** to remove the logo while keeping the screenshot and text settings.
+3. Removing the logo does not delete the uploaded screenshots.
+
+## 7. Export
+
+1. Check the logo edge, transparency, and overlap with the subject.
+2. Click **Save PNG** on desktop or use **Export → Save Photo** on mobile.
+3. If you chose a transparent canvas background, inspect the downloaded PNG to confirm that the area outside the composition remains transparent.
