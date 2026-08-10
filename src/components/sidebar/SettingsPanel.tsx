@@ -74,7 +74,7 @@ export function SettingsPanel() {
           <p className="mt-2 max-w-[31rem] font-body text-[13px] leading-5 text-muted-foreground">{currentTab.description}</p>
 
           <div className="-mx-5 mt-4 overflow-hidden border-t border-border px-4 py-3">
-            <TabsList aria-label={t('flowLabel')} className="grid min-h-0 w-full grid-cols-3 gap-1.5 rounded-xl border border-border bg-surface-inset/70 p-1.5">
+            <TabsList aria-label={t('flowLabel')} className="grid min-h-[78px] w-full grid-cols-3 gap-1.5 rounded-xl border border-border bg-surface-inset/70 p-1.5">
               {tabs.map(({ value, label, role, icon: Icon }, index) => (
                 <TabsTrigger
                   key={value}
