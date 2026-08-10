@@ -62,7 +62,7 @@ export function LayoutSettings() {
             <span>{t('presetGrid')}</span>
           </EditorChoice>
         </div>
-        {imageCount < 3 && <p className="text-[11px] leading-4 text-muted-foreground">{t('gridHint')}</p>}
+        {imageCount < 3 && <p className="font-body text-[11px] leading-4 text-muted-foreground">{t('gridHint')}</p>}
       </EditorSection>
 
       <EditorSection title={t('transition')} description={t('transitionDescription')}>

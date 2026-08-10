@@ -1,4 +1,4 @@
-import { useRef, useState, type ChangeEvent, type KeyboardEvent } from 'react'
+import { useState, type ChangeEvent } from 'react'
 import { useStore } from '@/store/useStore'
 import { useShallow } from 'zustand/react/shallow'
 import { Label } from '@/components/ui/label'
@@ -30,13 +30,7 @@ export function LogoUploadArea() {
     setLogoOpacity: state.setLogoOpacity
   })))
   const t = useTranslations('SignatureSettings')
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const [uploadError, setUploadError] = useState<string | null>(null)
-
-  const handleLogoUpload = () => {
-    setUploadError(null)
-    fileInputRef.current?.click()
-  }
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.currentTarget.files?.[0]
@@ -107,34 +101,22 @@ export function LogoUploadArea() {
     }
   }
 
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      handleLogoUpload()
-    }
-  }
-
   return (
     <div className="space-y-5 font-sans">
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        tabIndex={-1}
-        onChange={handleFileChange}
-        className="hidden"
-        aria-label={t('logoUploadLabel')}
-      />
       {!logoUrl ? (
-        <div 
-          role="button"
-          tabIndex={0}
-          onClick={handleLogoUpload}
-          onKeyDown={handleKeyDown}
-          className="flex aspect-[2/1] w-full cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-primary/25 bg-card shadow-subtle transition-colors hover:bg-surface-inset/60 focus:outline-none focus:ring-2 focus:ring-primary"
-        >
-          <span className="mb-3 grid size-9 place-items-center rounded-md bg-surface-inset text-foreground"><Upload className="size-4" /></span>
-          <span className="text-xs font-semibold text-muted-foreground">{t('logoUploadLabel')}</span>
+        <div className="relative aspect-[2/1] w-full overflow-hidden rounded-xl border border-dashed border-primary/25 bg-card shadow-subtle transition-colors hover:bg-surface-inset/60 focus-within:ring-2 focus-within:ring-primary">
+          <div aria-hidden="true" className="pointer-events-none flex size-full cursor-pointer flex-col items-center justify-center">
+            <span className="mb-3 grid size-9 place-items-center rounded-md bg-surface-inset text-foreground"><Upload className="size-4" /></span>
+            <span className="text-xs font-semibold text-muted-foreground">{t('logoUploadLabel')}</span>
+          </div>
+          <input
+            id="logo-file-input"
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="absolute inset-0 z-10 size-full cursor-pointer opacity-0"
+            aria-label={t('logoUploadLabel')}
+          />
         </div>
       ) : (
         <div className="space-y-4">
@@ -181,7 +163,7 @@ export function LogoUploadArea() {
         </div>
       )}
       {uploadError && (
-        <p role="alert" className="text-[11px] leading-4 text-destructive">
+        <p role="alert" className="font-body text-[11px] leading-4 text-destructive">
           {uploadError}
         </p>
       )}

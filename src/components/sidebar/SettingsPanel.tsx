@@ -71,7 +71,7 @@ export function SettingsPanel() {
               {currentTab.role}
             </span>
           </div>
-          <p className="mt-2 max-w-[31rem] text-[13px] leading-5 text-muted-foreground">{currentTab.description}</p>
+          <p className="mt-2 max-w-[31rem] font-body text-[13px] leading-5 text-muted-foreground">{currentTab.description}</p>
 
           <div className="-mx-5 mt-4 min-h-[72px] overflow-hidden border-t border-border px-5">
             <TabsList aria-label={t('flowLabel')} className="flex h-auto min-h-[72px] w-full min-w-0 items-stretch justify-start gap-1 rounded-none border-0 bg-transparent p-0">
