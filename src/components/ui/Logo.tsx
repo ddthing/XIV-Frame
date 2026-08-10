@@ -4,9 +4,10 @@ import Image from 'next/image'
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg'
   className?: string
+  inverse?: boolean
 }
 
-export function Logo({ size = 'md', className = '' }: LogoProps) {
+export function Logo({ size = 'md', className = '', inverse = false }: LogoProps) {
   const sizeClasses = {
     sm: 'text-base',
     md: 'text-xl',
@@ -30,7 +31,7 @@ export function Logo({ size = 'md', className = '' }: LogoProps) {
         priority
         unoptimized
       />
-      <span className={`font-bold tracking-tight text-foreground ${sizeClasses[size]}`}>
+      <span className={`font-bold tracking-tight ${inverse ? 'text-primary-foreground' : 'text-foreground'} ${sizeClasses[size]}`}>
         XIV Frame
       </span>
     </div>

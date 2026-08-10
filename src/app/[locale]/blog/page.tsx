@@ -1,8 +1,9 @@
 import React from 'react'
 import Link from 'next/link'
+import { ArrowUpRight } from 'lucide-react'
 import { getAllPosts } from '@/lib/markdown'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
-import { Container } from '@/components/layout/Container'
+import { ContentPage } from '@/components/layout/ContentPage'
 import { locales } from '@/i18n/request'
 import { Metadata } from 'next'
 
@@ -14,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params
   setRequestLocale(locale)
   const t = await getTranslations({ locale, namespace: 'Blog' })
-  
+
   const title = t('title')
   const description = t('description')
   const canonicalUrl = `https://xiv-frame.com/${locale}/blog`
@@ -53,47 +54,47 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
   setRequestLocale(locale)
   const posts = getAllPosts(locale)
   const t = await getTranslations({ locale, namespace: 'Blog' })
+  const [featured, ...rest] = posts
+
+  const renderPost = (post: (typeof posts)[number], index: number, isFeatured = false) => (
+    <Link
+      key={post.slug}
+      href={`/${locale}/blog/${post.slug}`}
+      className="group block h-full rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+    >
+      <article className={`flex h-full flex-col rounded-xl border border-border p-6 shadow-subtle transition-[transform,box-shadow,border-color] duration-200 group-hover:-translate-y-1 group-hover:border-primary/40 group-hover:shadow-md sm:p-8 ${isFeatured ? 'bg-sticky-note-mint lg:min-h-[22rem]' : 'bg-card'}`}>
+        <div className="flex items-center justify-between gap-3">
+          <p className="editor-meta">{isFeatured ? 'FEATURED' : `GUIDE ${String(index + 1).padStart(2, '0')}`}</p>
+          <time dateTime={post.metadata.date} className="text-xs font-medium text-muted-foreground">
+            {new Date(post.metadata.date).toLocaleDateString(locale)}
+          </time>
+        </div>
+        <h2 className={`mt-8 font-display font-bold leading-tight tracking-[0.02em] text-foreground transition-colors group-hover:text-primary ${isFeatured ? 'text-3xl sm:text-4xl' : 'text-2xl'}`}>
+          {post.metadata.title}
+        </h2>
+        <p className="mt-4 flex-1 text-base leading-7 text-foreground/75">
+          {post.metadata.description}
+        </p>
+        <div className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-foreground">
+          {t('readMore')}
+          <ArrowUpRight size={16} aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-1" />
+        </div>
+      </article>
+    </Link>
+  )
 
   return (
-    <Container size="md" className="pt-32 pb-12 lg:pt-40 lg:pb-24">
-      <div className="mb-16 text-center space-y-4">
-        <div className="inline-flex items-center justify-center px-3 py-1 mb-4 rounded-[6px] bg-[#ffe95c]">
-          <span className="text-[14px] font-bold text-[#1a3300] tracking-tight">지식 보관소</span>
+    <ContentPage eyebrow="03 / GUIDE" title={t('title')} description={t('description')} size="lg">
+      {featured ? (
+        <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
+          {renderPost(featured, 0, true)}
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-1">
+            {rest.map((post, index) => renderPost(post, index + 1))}
+          </div>
         </div>
-        <h1 className="text-[55px] lg:text-[72px] font-extrabold tracking-[0.04em] text-foreground leading-[1.1] font-['Bricolage_Grotesque']">
-          {t('title')}
-        </h1>
-        <p className="text-[18px] lg:text-[20px] text-foreground font-normal max-w-2xl mx-auto leading-[1.5] mt-6">
-          {t('description')}
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto">
-        {posts.map((post, index) => {
-          const pastelColors = ['bg-[#fcfaf5]', 'bg-[#d5f5c2]', 'bg-[#fcfaf5]', 'bg-[#a8e5e5]', 'bg-[#fcfaf5]', 'bg-[#f6d0ff]'];
-          const bgColor = pastelColors[index % pastelColors.length];
-          return (
-            <Link key={post.slug} href={`/${locale}/blog/${post.slug}`} className="block group h-full">
-              <article className={`p-8 border border-border rounded-[12px] transition-transform hover:-translate-y-1 hover:shadow-subtle ${bgColor} flex flex-col h-full`}>
-                <div className="flex flex-col gap-3 mb-4">
-                  <time className="text-[14px] text-foreground/60 font-medium font-mono uppercase tracking-wider">
-                    {new Date(post.metadata.date).toLocaleDateString(locale)}
-                  </time>
-                  <h2 className="text-[24px] font-bold tracking-tight text-foreground leading-[1.3] group-hover:text-primary transition-colors line-clamp-3">
-                    {post.metadata.title}
-                  </h2>
-                </div>
-                <p className="text-[16px] text-foreground/80 leading-[1.5] tracking-[-0.01em] break-words font-normal flex-1">
-                  {post.metadata.description}
-                </p>
-                <div className="mt-8 flex items-center text-[16px] font-bold text-foreground">
-                  {t('readMore')} <span className="ml-2 transition-transform group-hover:translate-x-1">→</span>
-                </div>
-              </article>
-            </Link>
-          )
-        })}
-      </div>
-    </Container>
+      ) : (
+        <p className="rounded-xl border border-dashed border-border bg-card p-8 text-center text-muted-foreground">{t('description')}</p>
+      )}
+    </ContentPage>
   )
 }

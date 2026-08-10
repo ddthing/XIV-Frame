@@ -1,7 +1,6 @@
 import React from 'react'
 import { PageShell } from '@/components/layout/PageShell'
-import { Container } from '@/components/layout/Container'
-import { getTranslations, setRequestLocale } from 'next-intl/server'
+import { setRequestLocale } from 'next-intl/server'
 
 import { locales } from '@/i18n/request'
 

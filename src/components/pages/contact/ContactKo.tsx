@@ -1,24 +1,24 @@
 import React from 'react'
-import { Container } from '@/components/layout/Container'
+import { ContentPage, ContentPanel } from '@/components/layout/ContentPage'
 
 export function ContactKo() {
   return (
-    <Container size="sm" className="py-12 lg:py-24">
+    <ContentPage eyebrow="05 / CONTACT" size="md" contentClassName="!mt-8">
       <h1 className="text-3xl lg:text-4xl font-semibold tracking-tight mb-8 text-foreground">문의</h1>
-      <div className="prose dark:prose-invert  max-w-none">
+      <ContentPanel className="max-w-3xl [&>h2]:font-display [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:text-foreground [&>p]:text-foreground/75">
         <h2 className="text-xl font-semibold tracking-tight text-foreground">연락처</h2>
         <p className="text-muted-foreground leading-relaxed">
           질문이 있거나 버그를 발견하셨나요? 언제든지 아래의 방법으로 연락해 주세요.
         </p>
-        <div className="mt-8 flex gap-4">
-          <a href="https://coner.luv3r.me/" target="_blank" rel="noopener noreferrer" className="bg-foreground text-background px-6 py-3 rounded-full font-medium hover:bg-foreground/90 transition-colors">
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <a href="https://coner.luv3r.me/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center rounded-md bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition-transform hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
             제보하기
           </a>
-          <a href="https://x.com/reconeur" target="_blank" rel="noopener noreferrer" className="bg-muted text-foreground px-6 py-3 rounded-full font-medium hover:bg-muted/80 transition-colors">
+          <a href="https://x.com/reconeur" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center rounded-md border border-border bg-background px-5 py-3 text-sm font-bold text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
             X (Twitter)
           </a>
         </div>
-      </div>
-    </Container>
+      </ContentPanel>
+    </ContentPage>
   )
 }

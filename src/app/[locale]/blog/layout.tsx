@@ -1,5 +1,4 @@
 import React from 'react'
-import Link from 'next/link'
 import { setRequestLocale } from 'next-intl/server'
 import { locales } from '@/i18n/request'
 import { PageShell } from '@/components/layout/PageShell'
@@ -20,7 +19,7 @@ export default async function BlogLayout({
 
   return (
     <PageShell locale={locale}>
-      <div className="overflow-auto h-full w-full">
+      <div className="min-h-full w-full">
         {children}
       </div>
     </PageShell>
