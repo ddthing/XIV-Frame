@@ -2,14 +2,13 @@
 
 import { useState } from 'react'
 import type { LucideIcon } from 'lucide-react'
-import { ArrowRight, CloudCheck, Images, LayoutTemplate, Type } from 'lucide-react'
+import { CloudCheck, Images, LayoutTemplate, Type } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { ImageUploader } from './ImageUploader'
 import { LayoutSettings } from './LayoutSettings'
 import { SignatureSettings } from './SignatureSettings'
-import { SketchbookTabsList, SketchbookTabsTrigger } from '@/components/ui/SketchbookTabs'
-import { Tabs, TabsContent } from '@/components/ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 type SettingsTab = 'image' | 'signature' | 'layout'
 
@@ -54,11 +53,6 @@ export function SettingsPanel() {
   ]
 
   const currentTab = tabs.find(tab => tab.value === activeTab) ?? tabs[0]
-  const flow = [
-    { value: 'image', label: t('flowSource') },
-    { value: 'signature', label: t('flowOverlay') },
-    { value: 'layout', label: t('flowComposition') },
-  ] as const
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-background">
@@ -77,32 +71,25 @@ export function SettingsPanel() {
               {currentTab.role}
             </span>
           </div>
-          <p className="mt-2 max-w-[31rem] text-xs leading-5 text-muted-foreground">{currentTab.description}</p>
+          <p className="mt-2 max-w-[31rem] text-[13px] leading-5 text-muted-foreground">{currentTab.description}</p>
 
-          <div className="my-4 flex items-center gap-2 overflow-x-auto whitespace-nowrap" aria-label={t('flowLabel')}>
-            {flow.map((item, index) => (
-              <div key={item.value} className="flex items-center gap-2">
-                <span className={`inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.06em] ${activeTab === item.value ? 'text-foreground' : 'text-muted-foreground'}`}>
-                  <span className={`size-1.5 rounded-full border ${activeTab === item.value ? 'border-primary bg-accent' : 'border-muted-foreground/60 bg-transparent'}`} />
-                  {item.label}
-                </span>
-                {index < flow.length - 1 && <ArrowRight className="size-3 text-border" aria-hidden="true" />}
-              </div>
-            ))}
-          </div>
-
-          <div className="-mx-5 border-t border-border px-5 pt-3">
-            <SketchbookTabsList className="h-12 rounded-none border-0 bg-transparent p-0">
-              {tabs.map(({ value, label, role, icon: Icon }) => (
-                <SketchbookTabsTrigger key={value} value={value} className="gap-2 rounded-none px-2 text-left data-[state=active]:bg-transparent data-[state=active]:shadow-none">
-                  <Icon className="size-4 shrink-0" aria-hidden="true" />
+          <div className="-mx-5 mt-4 overflow-x-auto border-t border-border px-5">
+            <TabsList aria-label={t('flowLabel')} className="flex h-auto min-w-full w-max items-stretch justify-start gap-1 rounded-none border-0 bg-transparent p-0">
+              {tabs.map(({ value, label, role, icon: Icon }, index) => (
+                <TabsTrigger
+                  key={value}
+                  value={value}
+                  className="group relative min-w-[7rem] flex-1 items-start justify-start gap-1.5 rounded-none border-b-2 border-transparent px-1.5 py-3 text-left text-muted-foreground shadow-none transition-colors hover:bg-surface-inset/60 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none data-active:border-primary data-active:bg-transparent data-active:text-foreground data-active:shadow-none"
+                >
+                  <span className="mt-0.5 font-mono text-[10px] font-semibold tabular-nums text-muted-foreground/80">{String(index + 1).padStart(2, '0')}</span>
+                  <Icon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
                   <span className="flex min-w-0 flex-col items-start gap-0.5 leading-none">
-                    <strong className="text-xs font-semibold">{label}</strong>
-                    <small className="font-mono text-[9px] font-medium uppercase tracking-[0.05em] text-muted-foreground">{role}</small>
+                    <strong className="text-[13px] font-semibold leading-4">{label}</strong>
+                    <small className="font-mono text-[10px] font-medium uppercase tracking-[0.05em] text-muted-foreground">{role}</small>
                   </span>
-                </SketchbookTabsTrigger>
+                </TabsTrigger>
               ))}
-            </SketchbookTabsList>
+            </TabsList>
           </div>
         </header>
 
