@@ -21,8 +21,8 @@ export function SiteHeader({ locale, hideBorder = false, className = '' }: { loc
 
   return (
     <div className="sticky top-0 z-50 w-full">
-      <header className={`border-b bg-primary text-primary-foreground ${hideBorder ? 'border-transparent' : 'border-primary-foreground/15'} transition-colors ${className}`}>
-        <div className="mx-auto flex min-h-[64px] max-w-6xl items-center justify-between gap-6 px-4 sm:min-h-[72px] sm:px-6 lg:px-8">
+      <header className={`app-header border-b bg-primary text-primary-foreground ${hideBorder ? 'border-transparent' : 'border-primary-foreground/15'} transition-colors ${className}`}>
+        <div className="app-header-inner mx-auto w-full justify-between gap-6 px-4 sm:px-5">
           <Link href={`/${locale}`} className="shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sticky-note-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-primary">
             <Logo size="md" inverse />
           </Link>

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { Logo } from '@/components/ui/Logo'
 import { Button } from '@/components/ui/button'
 import { useCanvasActions } from '@/hooks/useCanvasActions'
 
@@ -20,15 +21,10 @@ export function DesktopToolbar({ stageRef, className = '' }: DesktopToolbarProps
   const locale = useLocale()
 
   return (
-    <header className={`flex h-[64px] shrink-0 items-center gap-5 border-b border-primary-foreground/15 bg-primary px-5 text-primary-foreground ${className}`}>
+    <header className={`app-header flex items-center gap-5 border-b border-primary-foreground/15 bg-primary px-5 text-primary-foreground ${className}`}>
       <div className="flex min-w-0 items-center gap-3">
-        <div className="grid size-[32px] shrink-0 place-items-center rounded-md border border-accent/70 font-display text-[10px] font-bold tracking-[-0.08em] text-accent">
-          XIV
-        </div>
-        <div className="hidden min-w-0 sm:block">
-          <p className="font-display text-sm font-bold leading-none tracking-[0.01em]">XIV Frame</p>
-          <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.13em] text-primary-foreground/55">{t('appSubtitle')}</p>
-        </div>
+        <Logo size="md" inverse />
+        <span className="hidden font-body text-[11px] text-primary-foreground/55 xl:inline">{t('appSubtitle')}</span>
       </div>
 
       <div className="hidden items-center gap-2 text-[10px] font-medium uppercase tracking-[0.1em] text-primary-foreground/55 lg:flex">

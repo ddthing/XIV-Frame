@@ -24,7 +24,21 @@ export function resolveSignatureFont(fontFamily: string) {
   return fontFamily === 'Pretendard' ? DEFAULT_SIGNATURE_FONT : fontFamily
 }
 
-export const POSITION_OPTIONS: { value: SignaturePosition; label: string; icon: React.ReactNode }[] = [
+export type SignatureTranslationKey =
+  | 'posTopLeft'
+  | 'posTopCenter'
+  | 'posTopRight'
+  | 'posMiddleLeft'
+  | 'posMiddleRight'
+  | 'posBottomLeft'
+  | 'posBottomCenter'
+  | 'posBottomRight'
+  | 'posCenter'
+  | 'alignLeft'
+  | 'alignCenter'
+  | 'alignRight'
+
+export const POSITION_OPTIONS: { value: SignaturePosition; label: SignatureTranslationKey; icon: React.ReactNode }[] = [
   { value: 'top-left', label: 'posTopLeft', icon: (
     <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4">
       <path d="M4 4h5M4 4v5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
@@ -83,7 +97,7 @@ export const POSITION_OPTIONS: { value: SignaturePosition; label: string; icon: 
 
 export const LOGO_POSITION_OPTIONS = POSITION_OPTIONS
 
-export const ALIGN_OPTIONS: { value: SignatureAlign; label: string; icon: React.ReactNode }[] = [
+export const ALIGN_OPTIONS: { value: SignatureAlign; label: SignatureTranslationKey; icon: React.ReactNode }[] = [
   { value: 'left', label: 'alignLeft', icon: (
     <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4">
       <path d="M4 6h12M4 10h8M4 14h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>

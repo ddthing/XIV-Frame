@@ -91,7 +91,7 @@ export default async function BlogPostPage({ params }: PostPageProps) {
       </Link>
 
       <article>
-        <div className="prose max-w-none break-words prose-headings:font-display prose-headings:font-bold prose-headings:tracking-[0.02em] prose-headings:text-foreground prose-p:text-base prose-p:leading-7 prose-p:text-foreground/80 prose-li:text-base prose-li:leading-7 prose-li:text-foreground/80 prose-a:text-primary prose-a:underline-offset-4 hover:prose-a:text-primary/75 prose-img:rounded-xl">
+        <div className="prose max-w-none break-words font-body prose-headings:font-display prose-headings:font-bold prose-headings:tracking-[0.02em] prose-headings:text-foreground prose-p:text-base prose-p:leading-7 prose-p:text-foreground/80 prose-li:text-base prose-li:leading-7 prose-li:text-foreground/80 prose-a:text-primary prose-a:underline-offset-4 hover:prose-a:text-primary/75 prose-img:rounded-xl">
           <MarkdownRenderer content={post.content} />
         </div>
       </article>
@@ -99,7 +99,7 @@ export default async function BlogPostPage({ params }: PostPageProps) {
       <section className="mt-14 rounded-xl border border-border bg-sticky-note-mint p-6 shadow-subtle sm:p-8">
         <p className="editor-meta">NEXT STEP</p>
         <h2 className="mt-3 font-display text-2xl font-bold tracking-[0.02em] text-foreground">{t('ctaTitle')}</h2>
-        <p className="mt-3 max-w-xl text-base leading-7 text-foreground/80">{t('ctaDescription')}</p>
+        <p className="mt-3 max-w-xl font-body text-base leading-7 text-foreground/80">{t('ctaDescription')}</p>
         <Link href={`/${locale}`} className="mt-6 inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-bold text-primary-foreground shadow-subtle transition-transform hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-sticky-note-mint">
           {t('ctaButton')}
           <ArrowUpRight size={16} aria-hidden="true" />
@@ -113,7 +113,7 @@ export default async function BlogPostPage({ params }: PostPageProps) {
           {[1, 2, 3].map((num) => (
             <div key={num} className="rounded-xl border border-border bg-card p-5 shadow-subtle sm:p-6">
               <h3 className="font-display text-lg font-bold text-foreground">{t(faqKeys.questions[num - 1])}</h3>
-              <p className="mt-2 text-base leading-7 text-foreground/75">{t(faqKeys.answers[num - 1])}</p>
+              <p className="mt-2 font-body text-base leading-7 text-foreground/75">{t(faqKeys.answers[num - 1])}</p>
             </div>
           ))}
         </div>

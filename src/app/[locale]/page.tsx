@@ -2,7 +2,7 @@ import { ClientApp } from '@/components/ClientApp'
 import { notFound } from 'next/navigation'
 import { setRequestLocale } from 'next-intl/server'
 import type { Metadata } from 'next'
-import { locales } from '@/i18n/request'
+import { isLocale, locales } from '@/i18n/request'
 import { PageShell } from '@/components/layout/PageShell'
 
 export function generateStaticParams() {
@@ -53,7 +53,7 @@ export default async function LocalePage({ params }: { params: { locale: string 
   const { locale } = await params;
   setRequestLocale(locale);
   
-  if (!locales.includes(locale as any)) {
+  if (!isLocale(locale)) {
     notFound();
   }
 
