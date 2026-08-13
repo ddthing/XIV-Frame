@@ -22,6 +22,7 @@ export function SiteFooter({ locale }: { locale: string }) {
           <Link href={`/${locale}/about`} className="transition-colors hover:text-primary-foreground">{t('about')}</Link>
           <Link href={`/${locale}/contact`} className="transition-colors hover:text-primary-foreground">{t('contact')}</Link>
           <Link href={`/${locale}/blog`} className="transition-colors hover:text-primary-foreground">{t('blog')}</Link>
+          <Link href={`/${locale}/faq`} className="transition-colors hover:text-primary-foreground">{t('faq')}</Link>
           <Link href={`/${locale}/legal/privacy`} className="transition-colors hover:text-primary-foreground">{t('privacy')}</Link>
           <Link href={`/${locale}/legal/terms`} className="transition-colors hover:text-primary-foreground">{t('terms')}</Link>
           <a href="https://ko-fi.com/reconeur" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-primary-foreground">

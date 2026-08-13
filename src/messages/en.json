@@ -177,6 +177,7 @@
     "tabLayout": "Layout",
     "tabSignature": "Signature",
     "blog": "Blog & Guides",
+    "faq": "FAQ",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
     "inspectorEyebrow": "02 / Inspector",
@@ -201,6 +202,7 @@
   "Navigation": {
     "app": "App",
     "blog": "Guide",
+    "faq": "FAQ",
     "about": "About",
     "contact": "Contact",
     "privacy": "Privacy Policy",
@@ -227,12 +229,8 @@
     "ctaDescription": "Enhance your FFXIV screenshots, create collages, and add custom signatures right from your browser.",
     "ctaButton": "Try XIV Frame",
     "faqTitle": "Frequently Asked Questions",
-    "faqQ1": "Is XIV Frame completely free?",
-    "faqA1": "Yes! XIV Frame is a free, web-based tool with no registration required.",
-    "faqQ2": "Can I use it on my mobile phone?",
-    "faqA2": "Absolutely. The UI is fully responsive, allowing you to edit screenshots perfectly on mobile devices.",
-    "faqQ3": "Does it reduce image quality?",
-    "faqA3": "No, we render everything in high resolution and export as high-quality PNG to prevent compression artifacts."
+    "faqLink": "Open the full FAQ",
+    "faqLinkDescription": "The full FAQ covers file limits, missing images, saving behavior, and common editor questions."
   },
   "CopyrightLayer": {
     "text": "© SQUARE ENIX"

@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next'
+import { siteUrl } from '@/lib/site'
 
 export const dynamic = 'force-static'
 
@@ -8,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
     },
-    sitemap: 'https://xiv-frame.com/sitemap.xml',
+    sitemap: `${siteUrl}/sitemap.xml`,
   }
 }

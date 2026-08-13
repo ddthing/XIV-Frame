@@ -4,6 +4,7 @@ import { setRequestLocale } from 'next-intl/server'
 import type { Metadata } from 'next'
 import { isLocale, locales } from '@/i18n/request'
 import { PageShell } from '@/components/layout/PageShell'
+import { localizedAlternates, localizedUrl } from '@/lib/site'
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }))
@@ -28,18 +29,13 @@ export async function generateMetadata({ params }: { params: { locale: string } 
     title,
     description,
     alternates: {
-      canonical: `https://xiv-frame.com/${locale}`,
-      languages: {
-        'ko': 'https://xiv-frame.com',
-        'en': 'https://xiv-frame.com/en',
-        'ja': 'https://xiv-frame.com/ja',
-        'x-default': 'https://xiv-frame.com'
-      }
+      canonical: localizedUrl(locale),
+      languages: localizedAlternates(),
     },
     openGraph: {
       title,
       description,
-      url: `https://xiv-frame.com/${locale}`,
+      url: localizedUrl(locale),
       locale: locale === 'en' ? 'en_US' : 'ja_JP',
     },
     twitter: {

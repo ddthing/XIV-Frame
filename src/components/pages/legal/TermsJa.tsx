@@ -1,16 +1,100 @@
-import React from 'react'
-import { ContentPage } from '@/components/layout/ContentPage'
+import { DocumentPage } from '@/components/content/DocumentPage'
+import Link from 'next/link'
 
 export function TermsJa() {
   return (
-    <ContentPage eyebrow="07 / TERMS" size="sm" contentClassName="!mt-8">
-      <h1 className="text-3xl font-semibold tracking-tight mb-8 text-foreground">利用規約</h1>
-      <div className="max-w-2xl space-y-8 text-base leading-7 text-foreground/80 [&>h2]:border-t [&>h2]:border-border [&>h2]:pt-6 [&>h2:first-child]:border-t-0 [&>h2:first-child]:pt-0 [&>h2]:font-display [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:text-foreground [&>p]:-mt-5">
-        <h2 className="text-xl font-semibold tracking-tight">サービスの利用</h2>
-        <p className="mb-4">XIV Frameは、ファイナルファンタジーXIVのスクリーンショットを装飾する目的で提供される無料のウェブサービスです。</p>
-        <h2 className="text-xl font-semibold tracking-tight">免責事項</h2>
-        <p className="mb-4">本サービスを通じて生成された画像の著作権および責任は、画像を生成したユーザーに完全に帰属します。サービス提供者は、事前の通知なしにサービスの内容を変更または一時停止する場合があります。</p>
-      </div>
-    </ContentPage>
+    <DocumentPage
+      eyebrow="07 / TERMS"
+      title="利用規約"
+      description="XIV Frameを安全に利用するためのサービス範囲と利用者の責任を案内します。"
+      updatedLabel="施行日"
+      updated="2026年8月13日"
+      asideLabel="目次"
+      sections={[
+        {
+          id: 'service',
+          index: '01',
+          title: 'サービスの範囲',
+          children: (
+            <>
+              <p>XIV Frameは、ファイナルファンタジーXIVのスクリーンショットをブラウザで構成し、PNGとして保存できる無料のウェブツールです。現在、アカウント、ログイン、有料プラン、サーバー上のプロジェクト保存機能は提供していません。</p>
+              <p>エディターに表示される機能や対応形式は、運用上または技術上の理由により変更される場合があります。</p>
+            </>
+          ),
+        },
+        {
+          id: 'user-content',
+          index: '02',
+          title: '利用者のコンテンツと権利',
+          children: (
+            <>
+              <p>アップロードまたは入力する画像、テキスト、ロゴを利用するための権利や許可を、利用者自身が持っている必要があります。他人の個人情報、必要な同意を得ていない画像、著作権・商標権を侵害する素材は使用しないでください。</p>
+              <p>XIV Frameは入力されたコンテンツの所有権を取得しません。ただし、ゲーム画像、ロゴなど第三者のコンテンツの権利は各権利者に帰属し、フレームを作成したことによって利用者へ移転するものではありません。</p>
+            </>
+          ),
+        },
+        {
+          id: 'acceptable-use',
+          index: '03',
+          title: '許可される利用と禁止事項',
+          children: (
+            <>
+              <p>個人的なスクリーンショット編集、コミュニティ投稿、または迷惑にならないショーケースなど、サービスの目的に沿って利用してください。</p>
+              <ul>
+                <li>サービスを妨害したり、過剰な自動リクエストを送ったりする行為</li>
+                <li>マルウェア、違法コンテンツ、他人の権利を侵害する素材を処理する行為</li>
+                <li>アクセス制限を回避したり、他の利用者の利用を妨げたりする行為</li>
+                <li>XIV Frameや第三者との公式な提携・承認を偽って表示する行為</li>
+              </ul>
+            </>
+          ),
+        },
+        {
+          id: 'local-processing',
+          index: '04',
+          title: 'ブラウザでの処理と保存',
+          children: (
+            <>
+              <p>画像編集はブラウザで行われます。作業中のスクリーンショットはページ更新やブラウザ終了後に残らない場合があるため、必要な元ファイルは別途保管してください。</p>
+              <p>レイアウト、署名、ロゴの設定はブラウザのローカルストレージに残る場合があります。共有端末ではこの点を理解して利用してください。</p>
+            </>
+          ),
+        },
+        {
+          id: 'availability',
+          index: '05',
+          title: 'サービス提供と免責',
+          children: (
+            <>
+              <p>安定したサービスの提供に努めますが、常に中断なく動作すること、すべてのブラウザ・ファイル・端末の組み合わせに対応することを保証しません。ブラウザ、ネットワーク、端末の容量、外部サービスの問題に備え、元ファイルは別途保管してください。</p>
+              <p>サービスの利用や生成物の公開についての判断と責任は利用者が負います。法律、著作権、ゲームの利用規約に関する判断が必要な場合は、権利者または専門家へ確認してください。</p>
+            </>
+          ),
+        },
+        {
+          id: 'third-party-and-rights',
+          index: '06',
+          title: '第三者サービスと商標',
+          children: (
+            <>
+              <p>サイトにはホスティング、フォント、広告、お問い合わせ、支援などの第三者サービスへのリンクが含まれる場合があります。利用時には各サービスの規約とプライバシーポリシーが適用されます。</p>
+              <p>ファイナルファンタジーXIV、そのゲーム画像、関連する商標は各権利者に帰属します。XIV Frameはスクウェア・エニックスと提携または公式承認されたサービスではありません。</p>
+            </>
+          ),
+        },
+        {
+          id: 'changes-and-contact',
+          index: '07',
+          title: '規約の変更とお問い合わせ',
+          children: (
+            <>
+              <p>サービスの範囲、適用される要件、運用方法が変わった場合、本規約を更新することがあります。改定内容はこのページに掲載し、施行日を更新します。</p>
+              <p>規約やサービスについての質問は<Link href="/ja/contact">お問い合わせページ</Link>をご利用ください。</p>
+              <p>最終更新：2026年8月13日</p>
+            </>
+          ),
+        },
+      ]}
+    />
   )
 }

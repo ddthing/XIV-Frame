@@ -6,6 +6,9 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { ContentPage } from '@/components/layout/ContentPage'
 import { locales } from '@/i18n/request'
 import { Metadata } from 'next'
+import { Download, ImagePlus, LayoutGrid, Type } from 'lucide-react'
+import { GuideWorkflow } from '@/components/content/GuideWorkflow'
+import { localizedAlternates, localizedUrl } from '@/lib/site'
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }))
@@ -18,20 +21,14 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
   const title = t('title')
   const description = t('description')
-  const canonicalUrl = `https://xiv-frame.com/${locale}/blog`
-
-  const languages = locales.reduce((acc, l) => {
-    acc[l] = `https://xiv-frame.com/${l}/blog`
-    return acc
-  }, {} as Record<string, string>)
-  languages['x-default'] = `https://xiv-frame.com/ko/blog`
+  const canonicalUrl = localizedUrl(locale, '/blog')
 
   return {
     title,
     description,
     alternates: {
       canonical: canonicalUrl,
-      languages,
+      languages: localizedAlternates('/blog'),
     },
     openGraph: {
       title,
@@ -85,26 +82,41 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
 
   return (
     <ContentPage eyebrow="03 / GUIDE" title={t('title')} description={t('description')} size="lg" density="editor">
-      <section className="mb-8 border-y border-border py-4" aria-labelledby="guide-flow-title">
-        <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
-          <p id="guide-flow-title" className="editor-meta">{t('flowTitle')}</p>
-          <p className="max-w-[42rem] font-body text-[13px] leading-5 text-muted-foreground">{t('flowDescription')}</p>
-        </div>
-        <ol className="mt-4 grid gap-4 sm:grid-cols-4">
-          {[
-            ['01', t('flowStepUpload'), t('flowStepUploadDescription')],
-            ['02', t('flowStepArrange'), t('flowStepArrangeDescription')],
-            ['03', t('flowStepStyle'), t('flowStepStyleDescription')],
-            ['04', t('flowStepExport'), t('flowStepExportDescription')],
-          ].map(([index, title, description]) => (
-            <li key={index} className="min-w-0">
-              <p className="editor-meta">{index}</p>
-              <h2 className="mt-2 font-display text-base font-bold leading-6 tracking-[0.01em] text-foreground">{title}</h2>
-              <p className="mt-1 font-body text-[13px] leading-5 text-muted-foreground">{description}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
+      <GuideWorkflow
+        eyebrow="START HERE"
+        title={t('flowTitle')}
+        description={t('flowDescription')}
+        steps={[
+          {
+            number: '01',
+            label: t('flowStepUpload'),
+            description: t('flowStepUploadDescription'),
+            href: `/${locale}/blog/how-to-combine-ffxiv-screenshots`,
+            icon: ImagePlus,
+          },
+          {
+            number: '02',
+            label: t('flowStepArrange'),
+            description: t('flowStepArrangeDescription'),
+            href: `/${locale}/blog/how-to-combine-ffxiv-screenshots`,
+            icon: LayoutGrid,
+          },
+          {
+            number: '03',
+            label: t('flowStepStyle'),
+            description: t('flowStepStyleDescription'),
+            href: `/${locale}/blog/ffxiv-screenshot-character-signature`,
+            icon: Type,
+          },
+          {
+            number: '04',
+            label: t('flowStepExport'),
+            description: t('flowStepExportDescription'),
+            href: `/${locale}/blog/edit-ffxiv-screenshots-without-photoshop`,
+            icon: Download,
+          },
+        ]}
+      />
       {featured ? (
         <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
           {renderPost(featured, 0, true)}

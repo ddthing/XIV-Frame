@@ -1,10 +1,11 @@
 import { Feed } from 'feed'
 import { getAllPosts } from '@/lib/markdown'
+import { siteUrl } from '@/lib/site'
 
 export const dynamic = 'force-static'
 
 export async function GET() {
-  const site_url = 'https://xiv-frame.com'
+  const site_url = siteUrl
   
   const feed = new Feed({
     title: 'XIV Frame Blog',
@@ -17,7 +18,6 @@ export async function GET() {
     copyright: `All rights reserved ${new Date().getFullYear()}, XIV Frame`,
     author: {
       name: 'XIV Frame',
-      email: 'contact@xiv-frame.com',
       link: site_url,
     },
   })
@@ -35,7 +35,6 @@ export async function GET() {
       author: [
         {
           name: 'XIV Frame',
-          email: 'contact@xiv-frame.com',
           link: site_url,
         },
       ],

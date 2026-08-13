@@ -8,6 +8,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { locales } from '@/i18n/request'
 import { Metadata } from 'next'
 import Link from 'next/link'
+import { articleJsonLd, breadcrumbJsonLd, localizedAlternates, localizedUrl } from '@/lib/site'
 
 interface PostPageProps {
   params: Promise<{ locale: string, slug: string }>
@@ -34,20 +35,14 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
     return {}
   }
 
-  const canonicalUrl = `https://xiv-frame.com/${locale}/blog/${slug}`
-
-  const languages = locales.reduce((acc, l) => {
-    acc[l] = `https://xiv-frame.com/${l}/blog/${slug}`
-    return acc
-  }, {} as Record<string, string>)
-  languages['x-default'] = `https://xiv-frame.com/ko/blog/${slug}`
+  const canonicalUrl = localizedUrl(locale, `/blog/${slug}`)
 
   return {
-    title: `${post.metadata.title} | XIV Frame`,
+    title: post.metadata.title,
     description: post.metadata.description,
     alternates: {
       canonical: canonicalUrl,
-      languages,
+      languages: localizedAlternates(`/blog/${slug}`),
     },
     openGraph: {
       title: post.metadata.title,
@@ -78,13 +73,28 @@ export default async function BlogPostPage({ params }: PostPageProps) {
   }
 
   const formattedDate = new Date(post.metadata.date).toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' })
-  const faqKeys = {
-    questions: ['faqQ1', 'faqQ2', 'faqQ3'],
-    answers: ['faqA1', 'faqA2', 'faqA3'],
-  } as const
-
+  const canonicalUrl = localizedUrl(locale, `/blog/${slug}`)
   return (
     <ContentPage eyebrow={`03 / GUIDE · ${formattedDate}`} title={post.metadata.title} description={post.metadata.description} size="sm" density="editor">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@graph': [
+            articleJsonLd({
+              url: canonicalUrl,
+              title: post.metadata.title,
+              description: post.metadata.description,
+              datePublished: post.metadata.date,
+              inLanguage: locale,
+            }),
+            breadcrumbJsonLd([
+              { name: 'XIV Frame', url: localizedUrl(locale) },
+              { name: t('title'), url: localizedUrl(locale, '/blog') },
+              { name: post.metadata.title },
+            ]),
+          ],
+        }),
+      }} />
       <Link href={`/${locale}/blog`} className="mb-6 inline-flex h-9 items-center gap-2 rounded-md border border-transparent px-3 py-2 font-body text-xs font-semibold text-foreground transition-colors hover:border-border hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
         <ArrowLeft size={16} aria-hidden="true" />
         {t('back')}
@@ -107,16 +117,13 @@ export default async function BlogPostPage({ params }: PostPageProps) {
       </section>
 
       <section className="mt-10 border-t border-border pt-8">
-        <p className="editor-meta">FAQ</p>
+        <p className="editor-meta">REFERENCE</p>
         <h2 className="mt-2 font-display text-xl font-bold leading-7 tracking-[0.01em] text-foreground">{t('faqTitle')}</h2>
-        <div className="mt-6 space-y-3">
-          {[1, 2, 3].map((num) => (
-            <div key={num} className="rounded-xl border border-border bg-card p-4 shadow-subtle sm:p-5">
-              <h3 className="font-display text-base font-bold leading-6 text-foreground">{t(faqKeys.questions[num - 1])}</h3>
-              <p className="mt-2 font-body text-[13px] leading-5 text-foreground/75">{t(faqKeys.answers[num - 1])}</p>
-            </div>
-          ))}
-        </div>
+        <p className="mt-2 max-w-xl font-body text-[13px] leading-5 text-foreground/75">{t('faqLinkDescription')}</p>
+        <Link href={`/${locale}/faq`} className="mt-4 inline-flex items-center gap-2 rounded-md border border-border bg-card px-4 py-2.5 font-body text-xs font-bold text-foreground transition-colors hover:border-primary/35 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+          {t('faqLink')}
+          <ArrowUpRight size={16} aria-hidden="true" />
+        </Link>
       </section>
     </ContentPage>
   )
