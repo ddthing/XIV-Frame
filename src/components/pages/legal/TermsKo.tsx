@@ -1,16 +1,100 @@
-import React from 'react'
-import { ContentPage } from '@/components/layout/ContentPage'
+import { DocumentPage } from '@/components/content/DocumentPage'
+import Link from 'next/link'
 
 export function TermsKo() {
   return (
-    <ContentPage eyebrow="07 / TERMS" size="sm" contentClassName="!mt-8">
-      <h1 className="text-3xl font-semibold tracking-tight mb-8 text-foreground">이용약관</h1>
-      <div className="max-w-2xl space-y-8 text-base leading-7 text-foreground/80 [&>h2]:border-t [&>h2]:border-border [&>h2]:pt-6 [&>h2:first-child]:border-t-0 [&>h2:first-child]:pt-0 [&>h2]:font-display [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:text-foreground [&>p]:-mt-5">
-        <h2 className="text-xl font-semibold tracking-tight">서비스 이용</h2>
-        <p className="mb-4">XIV Frame은 파이널판타지14 스크린샷 프레임 꾸미기를 목적으로 제공되는 무료 웹 서비스입니다.</p>
-        <h2 className="text-xl font-semibold tracking-tight">면책 조항</h2>
-        <p className="mb-4">본 서비스를 통해 생성된 이미지의 저작권 및 책임은 전적으로 이미지를 생성한 사용자에게 있습니다. 서비스 제공자는 사전 통지 없이 서비스의 내용을 변경하거나 중단할 수 있습니다.</p>
-      </div>
-    </ContentPage>
+    <DocumentPage
+      eyebrow="07 / TERMS"
+      title="이용약관"
+      description="XIV Frame을 안전하고 예측 가능하게 사용하기 위한 서비스 범위와 이용자 책임을 안내합니다."
+      updatedLabel="시행일"
+      updated="2026년 8월 13일"
+      asideLabel="목차"
+      sections={[
+        {
+          id: 'service',
+          index: '01',
+          title: '서비스의 범위',
+          children: (
+            <>
+              <p>XIV Frame은 파이널판타지14 스크린샷을 브라우저에서 구성하고 PNG로 저장할 수 있도록 제공되는 무료 웹 도구입니다. 현재 회원가입, 로그인, 유료 플랜, 서버 기반 프로젝트 보관 기능은 제공하지 않습니다.</p>
+              <p>서비스 화면에 표시되는 기능과 지원 범위는 운영·기술적 사정에 따라 변경될 수 있습니다.</p>
+            </>
+          ),
+        },
+        {
+          id: 'user-content',
+          index: '02',
+          title: '이용자 콘텐츠와 권리',
+          children: (
+            <>
+              <p>이용자는 업로드하거나 입력하는 이미지, 텍스트, 로고를 사용할 권리와 필요한 허락을 가지고 있어야 합니다. 타인의 개인정보, 동의받지 않은 이미지, 저작권·상표권을 침해하는 자료를 사용하지 마세요.</p>
+              <p>XIV Frame은 이용자가 입력한 콘텐츠의 소유권을 가져가지 않습니다. 다만 게임 이미지와 로고 등 제3자 콘텐츠의 권리는 원 권리자에게 남아 있으며, 프레임을 만들었다는 이유로 해당 권리가 이용자에게 이전되지는 않습니다.</p>
+            </>
+          ),
+        },
+        {
+          id: 'acceptable-use',
+          index: '03',
+          title: '허용되는 사용과 금지 행위',
+          children: (
+            <>
+              <p>개인적인 스크린샷 편집, 커뮤니티 게시물 제작, 비상업적 쇼케이스와 같이 서비스가 제공하는 목적에 맞게 사용해야 합니다.</p>
+              <ul>
+                <li>서비스를 방해하거나 과도한 요청을 보내는 행위</li>
+                <li>악성 코드, 불법 콘텐츠 또는 타인의 권리를 침해하는 콘텐츠를 처리하는 행위</li>
+                <li>서비스의 접근 제한을 우회하거나 다른 이용자의 이용을 방해하는 행위</li>
+                <li>XIV Frame 또는 제3자와의 공식 제휴·승인을 거짓으로 표시하는 행위</li>
+              </ul>
+            </>
+          ),
+        },
+        {
+          id: 'local-processing',
+          index: '04',
+          title: '브라우저 처리와 저장',
+          children: (
+            <>
+              <p>이미지 편집은 이용자의 브라우저에서 처리됩니다. 작업 중인 스크린샷은 새로고침이나 브라우저 종료 후 유지되지 않을 수 있으며, 이용자는 필요한 원본 파일을 직접 보관해야 합니다.</p>
+              <p>레이아웃·시그니처·로고와 같은 설정이 브라우저 로컬 저장소에 남을 수 있다는 점을 이해하고 사용해 주세요.</p>
+            </>
+          ),
+        },
+        {
+          id: 'availability',
+          index: '05',
+          title: '서비스 제공과 면책',
+          children: (
+            <>
+              <p>서비스는 가능한 안정적으로 제공하기 위해 노력하지만, 항상 중단 없이 작동하거나 모든 브라우저·파일 조합을 지원한다고 보장하지 않습니다. 브라우저, 네트워크, 기기 저장공간 또는 외부 제공자의 문제로 발생한 손실에 대비해 원본 파일을 별도로 보관하세요.</p>
+              <p>서비스의 이용 또는 생성물의 게시로 발생하는 결과는 이용자가 판단하고 책임집니다. 법률·저작권·게임 운영정책에 관한 전문적인 판단이 필요하면 해당 권리자나 전문가에게 확인해야 합니다.</p>
+            </>
+          ),
+        },
+        {
+          id: 'third-party-and-rights',
+          index: '06',
+          title: '제3자 서비스와 상표',
+          children: (
+            <>
+              <p>사이트에는 호스팅, 글꼴, 광고, 문의 또는 후원과 같은 제3자 서비스로 연결되는 링크가 포함될 수 있습니다. 해당 서비스의 이용에는 각 서비스의 약관과 개인정보처리방침이 적용됩니다.</p>
+              <p>Final Fantasy XIV, 관련 게임 이미지와 상표는 각 권리자의 자산입니다. XIV Frame은 Square Enix와 제휴하거나 공식적으로 승인된 서비스가 아닙니다.</p>
+            </>
+          ),
+        },
+        {
+          id: 'changes-and-contact',
+          index: '07',
+          title: '약관 변경과 문의',
+          children: (
+            <>
+              <p>서비스 범위, 법령 또는 운영 방식이 변경되면 이 약관을 수정할 수 있습니다. 변경된 약관은 이 페이지에 게시하며 시행일을 갱신합니다.</p>
+              <p>약관 또는 서비스에 대한 문의는 <Link href="/ko/contact">문의 페이지</Link>를 이용해 주세요.</p>
+              <p>최종 업데이트: 2026년 8월 13일</p>
+            </>
+          ),
+        },
+      ]}
+    />
   )
 }

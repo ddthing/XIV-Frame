@@ -15,6 +15,7 @@ export function SiteHeader({ locale, hideBorder = false, className = '' }: { loc
 
   const navLinks = [
     { href: `/${locale}/blog`, label: t('blog') },
+    { href: `/${locale}/faq`, label: t('faq') },
     { href: `/${locale}/about`, label: t('about') },
     { href: `/${locale}/contact`, label: t('contact') },
   ]

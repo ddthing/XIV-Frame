@@ -1,0 +1,34 @@
+import Script from 'next/script'
+import { siteName, siteUrl } from '@/lib/site'
+
+export function RootDocument({ children, locale }: { children: React.ReactNode; locale: 'ko' | 'en' | 'ja' }) {
+  return (
+    <html lang={locale} suppressHydrationWarning className="h-full antialiased">
+      <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'SoftwareApplication',
+              name: siteName,
+              applicationCategory: 'MultimediaApplication',
+              operatingSystem: 'Web',
+              url: siteUrl,
+              description: '파이널판타지14 스크린샷을 구성하고 PNG로 저장하는 브라우저 기반 편집 도구',
+              offers: { '@type': 'Offer', price: '0', priceCurrency: 'KRW' },
+            }),
+          }}
+        />
+        {children}
+        <Script
+          id="adsbygoogle-script"
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2169729065542563"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
+      </body>
+    </html>
+  )
+}

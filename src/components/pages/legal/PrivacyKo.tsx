@@ -1,18 +1,84 @@
-import React from 'react'
-import { ContentPage } from '@/components/layout/ContentPage'
+import { DocumentPage } from '@/components/content/DocumentPage'
+import Link from 'next/link'
 
 export function PrivacyKo() {
   return (
-    <ContentPage eyebrow="06 / PRIVACY" size="sm" contentClassName="!mt-8">
-      <h1 className="text-3xl font-semibold tracking-tight mb-8 text-foreground">개인정보처리방침</h1>
-      <div className="max-w-2xl space-y-8 text-base leading-7 text-foreground/80 [&>h2]:border-t [&>h2]:border-border [&>h2]:pt-6 [&>h2:first-child]:border-t-0 [&>h2:first-child]:pt-0 [&>h2]:font-display [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:text-foreground [&>p]:-mt-5">
-        <h2 className="text-xl font-semibold tracking-tight">수집하는 개인정보</h2>
-        <p className="mb-4">XIV Frame은 회원가입을 요구하지 않으며, 서버에 이미지를 업로드하거나 저장하지 않습니다. 모든 이미지 처리 및 파일 다운로드는 사용자의 브라우저(클라이언트) 내부에서만 이루어집니다.</p>
-        <h2 className="text-xl font-semibold tracking-tight">쿠키 및 로컬 스토리지</h2>
-        <p className="mb-4">사용자의 편의를 위해 설정 내역(언어, 레이아웃 옵션 등)은 브라우저의 로컬 스토리지에 임시 저장될 수 있습니다.</p>
-        <h2 className="text-xl font-semibold tracking-tight">문의</h2>
-        <p className="mb-4">관련 문의 사항은 서비스 제공자에게 문의해 주시기 바랍니다.</p>
-      </div>
-    </ContentPage>
+    <DocumentPage
+      eyebrow="06 / PRIVACY"
+      title="개인정보처리방침"
+      description="XIV Frame이 편집 이미지, 브라우저 설정, 광고 관련 정보를 어떻게 다루는지 설명합니다."
+      updatedLabel="시행일"
+      updated="2026년 8월 13일"
+      asideLabel="목차"
+      sections={[
+        {
+          id: 'scope',
+          index: '01',
+          title: '적용 범위',
+          children: (
+            <>
+              <p>이 방침은 XIV Frame 웹사이트와 브라우저 기반 편집 기능에 적용됩니다. 회원가입, 로그인, 유료 결제 기능은 현재 제공하지 않습니다.</p>
+              <p>이용자가 외부 링크를 통해 X, GitHub, Ko-fi 또는 문의 서비스로 이동한 경우에는 해당 서비스의 개인정보처리방침이 적용됩니다.</p>
+            </>
+          ),
+        },
+        {
+          id: 'images-and-editor',
+          index: '02',
+          title: '업로드 이미지와 편집 데이터',
+          children: (
+            <>
+              <p>스크린샷은 브라우저에서 읽어 캔버스에 표시하고 합성합니다. 현재 XIV Frame은 스크린샷을 서버에 업로드하거나 계정에 저장하는 기능을 제공하지 않습니다. 스크린샷은 페이지를 새로고침하면 다시 선택해야 합니다.</p>
+              <p>레이아웃, 캔버스 비율, 시그니처 문구·위치·스타일 같은 편집 설정은 다음 방문에 사용할 수 있도록 브라우저의 로컬 저장소에 보관될 수 있습니다. 업로드한 로고는 브라우저에서 크기를 조정한 뒤 로컬 데이터로 저장될 수 있습니다. 이 데이터는 XIV Frame 서버에서 조회할 수 없습니다.</p>
+            </>
+          ),
+        },
+        {
+          id: 'technical-requests',
+          index: '03',
+          title: '접속 기록과 외부 리소스',
+          children: (
+            <>
+              <p>웹사이트를 제공·보호하는 호스팅 또는 CDN은 요청 처리와 보안을 위해 IP 주소, 브라우저 정보, 요청 시간, 요청한 경로와 같은 기술 정보를 자체적으로 기록할 수 있습니다. XIV Frame 운영자는 편집 이미지의 내용을 이 기록과 연결해 프로필을 만들지 않습니다.</p>
+              <p>페이지에는 글꼴, 아이콘 또는 광고를 제공하는 외부 리소스가 포함될 수 있습니다. 해당 리소스를 불러오면 외부 제공자가 요청에 필요한 정보를 처리할 수 있으며, 각 제공자의 정책이 함께 적용됩니다.</p>
+            </>
+          ),
+        },
+        {
+          id: 'ads-and-cookies',
+          index: '04',
+          title: '쿠키와 Google 광고',
+          children: (
+            <>
+              <p>사이트는 Google AdSense 또는 Google의 광고 태그를 사용할 수 있습니다. 광고가 요청되면 Google과 인증된 제3자 광고 제공자가 쿠키, 웹 비콘, IP 주소 또는 유사 기술을 사용해 광고를 제공·측정할 수 있습니다.</p>
+              <p>Google의 광고 쿠키 사용에 관한 안내는 <a href="https://support.google.com/adsense/answer/1348695" target="_blank" rel="noopener noreferrer">AdSense 필수 콘텐츠 안내</a>에서 확인할 수 있습니다. 개인 맞춤 광고는 <a href="https://adssettings.google.com/" target="_blank" rel="noopener noreferrer">Google 광고 설정</a>에서 관리할 수 있으며, 일부 제3자 광고 쿠키는 <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer">About Ads 선택 페이지</a>에서 거부할 수 있습니다.</p>
+              <p>광고가 표시되는 지역에서는 관련 법령과 Google의 동의 요구사항에 따라 동의 관리 도구가 적용될 수 있습니다. 광고를 클릭하도록 유도하거나 광고를 메뉴·다운로드 버튼처럼 보이게 만들지 않습니다.</p>
+            </>
+          ),
+        },
+        {
+          id: 'your-controls',
+          index: '05',
+          title: '이용자가 할 수 있는 조치',
+          children: (
+            <>
+              <p>브라우저 설정에서 로컬 저장소와 쿠키를 삭제하거나 차단할 수 있습니다. 다만 로컬 저장소를 삭제하면 저장된 레이아웃·시그니처·로고 설정이 초기화될 수 있습니다.</p>
+              <p>개인정보, 서비스 이용, 정책 관련 문의는 <Link href="/ko/contact">문의 페이지</Link>를 이용해 주세요. 외부 서비스가 직접 처리한 정보의 열람·삭제 요청은 해당 서비스에 문의해야 합니다.</p>
+            </>
+          ),
+        },
+        {
+          id: 'changes-and-contact',
+          index: '06',
+          title: '방침 변경과 문의',
+          children: (
+            <>
+              <p>서비스 기능, 광고 제공 방식 또는 관련 법령이 바뀌면 이 방침을 갱신할 수 있습니다. 변경된 내용은 이 페이지의 시행일과 함께 게시합니다.</p>
+              <p>최종 업데이트: 2026년 8월 13일</p>
+            </>
+          ),
+        },
+      ]}
+    />
   )
 }
