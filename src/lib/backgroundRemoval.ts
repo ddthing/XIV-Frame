@@ -1,3 +1,5 @@
+import { ImageUploadError, revokeObjectUrl, validateImageFile } from './imageUpload'
+
 export const CHARACTER_MODEL_ID = 'onnx-community/ormbg-ONNX'
 export const CHARACTER_MODEL_DTYPE = 'q8'
 export const CHARACTER_MAX_DIMENSION = 1536
@@ -36,9 +38,15 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 
 export async function dataUrlToImageData(dataUrl: string): Promise<{ data: Uint8ClampedArray; width: number; height: number }> {
   const image = await loadImage(dataUrl)
+  const width = image.naturalWidth || image.width
+  const height = image.naturalHeight || image.height
+  if (!isValidDimension(width) || !isValidDimension(height)) {
+    throw new Error('이미지 크기가 올바르지 않습니다.')
+  }
+
   const canvas = document.createElement('canvas')
-  canvas.width = image.naturalWidth || image.width
-  canvas.height = image.naturalHeight || image.height
+  canvas.width = width
+  canvas.height = height
   const context = canvas.getContext('2d')
   if (!context) throw new Error('Canvas context unavailable')
   context.drawImage(image, 0, 0)
@@ -59,12 +67,17 @@ function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
 }
 
 export async function prepareCharacterImage(file: File): Promise<{ blob: Blob; dataUrl: string }> {
+  validateImageFile(file)
   const objectUrl = URL.createObjectURL(file)
 
   try {
     const image = await loadImage(objectUrl)
     const sourceWidth = image.naturalWidth || image.width
     const sourceHeight = image.naturalHeight || image.height
+    if (!Number.isFinite(sourceWidth) || !Number.isFinite(sourceHeight) || sourceWidth <= 0 || sourceHeight <= 0) {
+      throw new ImageUploadError('decode', '이미지를 읽지 못했습니다.')
+    }
+
     const scale = Math.min(1, CHARACTER_MAX_DIMENSION / Math.max(sourceWidth, sourceHeight))
     const width = Math.max(1, Math.round(sourceWidth * scale))
     const height = Math.max(1, Math.round(sourceHeight * scale))
@@ -83,8 +96,11 @@ export async function prepareCharacterImage(file: File): Promise<{ blob: Blob; d
       blob: await canvasToBlob(canvas),
       dataUrl: canvas.toDataURL('image/png'),
     }
+  } catch (error) {
+    if (error instanceof ImageUploadError) throw error
+    throw new ImageUploadError('prepare', '이미지를 준비하지 못했습니다.')
   } finally {
-    URL.revokeObjectURL(objectUrl)
+    revokeObjectUrl(objectUrl)
   }
 }
 
@@ -150,7 +166,7 @@ export async function removeImageBackground(
       ? output.data
       : new Uint8ClampedArray(output.data)
 
-    if (output.channels !== 4 || data.length !== output.width * output.height * 4) {
+    if (!isValidDimension(output.width) || !isValidDimension(output.height) || output.channels !== 4 || data.length !== output.width * output.height * 4) {
       throw new Error('배경 제거 결과 형식이 올바르지 않습니다.')
     }
 
@@ -161,6 +177,10 @@ export async function removeImageBackground(
 }
 
 export function imageDataToDataUrl(data: Uint8ClampedArray, width: number, height: number): string {
+  if (!isValidDimension(width) || !isValidDimension(height) || data.length !== width * height * 4) {
+    throw new Error('픽셀 데이터 형식이 올바르지 않습니다.')
+  }
+
   const canvas = document.createElement('canvas')
   canvas.width = width
   canvas.height = height
@@ -170,4 +190,8 @@ export function imageDataToDataUrl(data: Uint8ClampedArray, width: number, heigh
   imageData.data.set(data)
   context.putImageData(imageData, 0, 0)
   return canvas.toDataURL('image/png')
+}
+
+function isValidDimension(value: number) {
+  return Number.isSafeInteger(value) && value > 0 && value <= CHARACTER_MAX_DIMENSION
 }

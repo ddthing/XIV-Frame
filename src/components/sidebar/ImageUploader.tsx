@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ArrowLeftRight, ChevronLeft, ChevronRight, Lock, RefreshCw, Trash2, Unlock, Upload, UserRound, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useShallow } from 'zustand/react/shallow'
@@ -11,8 +11,10 @@ import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { SketchbookTabsList, SketchbookTabsTrigger } from '@/components/ui/SketchbookTabs'
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
-import { ImageUploadError, prepareImageForCanvas } from '@/lib/imageUpload'
+import { ImageUploadError, prepareImageForCanvas, revokeObjectUrl } from '@/lib/imageUpload'
 import { LazyCharacterSettings } from './LazySettings'
+
+type PendingUpload = { requestId: number; sourceUrl: string | undefined }
 
 export function ImageUploader() {
   const {
@@ -40,6 +42,46 @@ export function ImageUploader() {
   })))
   const t = useTranslations('ImageUploader')
   const [selectedIndex, setSelectedIndex] = useState(0)
+  const uploadRequests = useRef(new Map<number, PendingUpload>())
+  const mountedRef = useRef(true)
+
+  useEffect(() => {
+    const requests = uploadRequests.current
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+      requests.clear()
+    }
+  }, [])
+
+  useEffect(() => {
+    uploadRequests.current.forEach((pending, index) => {
+      if (images[index] !== pending.sourceUrl) {
+        uploadRequests.current.set(index, { ...pending, requestId: pending.requestId + 1 })
+      }
+    })
+  }, [images])
+
+  const beginUpload = (index: number) => {
+    const requestId = (uploadRequests.current.get(index)?.requestId ?? 0) + 1
+    uploadRequests.current.set(index, { requestId, sourceUrl: images[index] })
+    return requestId
+  }
+
+  const invalidateUpload = (index: number) => {
+    const pending = uploadRequests.current.get(index)
+    if (!pending) return
+    uploadRequests.current.set(index, {
+      requestId: pending.requestId + 1,
+      sourceUrl: pending.sourceUrl,
+    })
+  }
+
+  const invalidateAllUploads = () => {
+    uploadRequests.current.forEach((pending, index) => {
+      uploadRequests.current.set(index, { ...pending, requestId: pending.requestId + 1 })
+    })
+  }
 
   const imageCount = images.filter(Boolean).length
   const activeIndex = images[selectedIndex] ? selectedIndex : images.findIndex(Boolean)
@@ -53,16 +95,25 @@ export function ImageUploader() {
     input.onchange = (event) => {
       const file = (event.target as HTMLInputElement).files?.[0]
       if (!file) return
+      const requestId = beginUpload(index)
 
       void prepareImageForCanvas(file)
         .then((url) => {
+          if (!mountedRef.current || uploadRequests.current.get(index)?.requestId !== requestId) {
+            revokeObjectUrl(url)
+            return
+          }
+
           setImageAt(index, url)
           setImageScale(index, 1)
           setImagePosition(index, { x: 0, y: 0 })
           setSelectedIndex(index)
+          uploadRequests.current.delete(index)
         })
         .catch((error: unknown) => {
+          if (!mountedRef.current || uploadRequests.current.get(index)?.requestId !== requestId) return
           alert(error instanceof ImageUploadError && error.code === 'too-large' ? t('uploadLimit') : t('uploadError'))
+          uploadRequests.current.delete(index)
         })
     }
     input.click()
@@ -72,6 +123,8 @@ export function ImageUploader() {
     event.stopPropagation()
     const targetIndex = direction === 'prev' ? index - 1 : index + 1
     if (targetIndex < 0 || targetIndex >= images.length || !images[targetIndex]) return
+    invalidateUpload(index)
+    invalidateUpload(targetIndex)
     swapImages(index, targetIndex)
     if (selectedIndex === index) setSelectedIndex(targetIndex)
     else if (selectedIndex === targetIndex) setSelectedIndex(index)
@@ -79,6 +132,7 @@ export function ImageUploader() {
 
   const handleRemove = (event: React.MouseEvent, index: number) => {
     event.stopPropagation()
+    invalidateUpload(index)
     removeImageAt(index)
     setSelectedIndex((current) => Math.max(0, Math.min(current, images.length - 2)))
   }
@@ -177,7 +231,7 @@ export function ImageUploader() {
               <Button variant="outline" size="sm" className="h-10 flex-1 rounded-md text-xs" onClick={() => swapImages(0, 1)} disabled={images.length < 2 || !images[0] || !images[1]}>
                 <ArrowLeftRight className="size-3.5" /> {t('swapOrder')}
               </Button>
-              <Button variant="outline" size="sm" className="h-10 flex-1 rounded-md text-xs hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive" onClick={() => { setImages([]); setSelectedIndex(0) }} disabled={imageCount === 0}>
+              <Button variant="outline" size="sm" className="h-10 flex-1 rounded-md text-xs hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive" onClick={() => { invalidateAllUploads(); setImages([]); setSelectedIndex(0) }} disabled={imageCount === 0}>
                 <Trash2 className="size-3.5" /> {t('clearAll')}
               </Button>
             </div>

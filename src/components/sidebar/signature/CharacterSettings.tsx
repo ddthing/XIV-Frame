@@ -23,10 +23,9 @@ import { EditorChoice, EditorFieldHeader, EditorSection } from '@/components/ui/
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { imageDataToDataUrl, dataUrlToImageData, prepareCharacterImage, removeImageBackground, warmBackgroundRemovalModel } from '@/lib/backgroundRemoval'
-import { MAX_UPLOAD_FILE_SIZE } from '@/lib/imageUpload'
+import { ImageUploadError } from '@/lib/imageUpload'
 import { useStore } from '@/store/useStore'
 
-const MAX_CHARACTER_FILE_SIZE = MAX_UPLOAD_FILE_SIZE
 const MAX_UNDO_STEPS = 8
 
 type BrushMode = 'erase' | 'restore'
@@ -93,6 +92,8 @@ export function CharacterSettings() {
   const paintingRef = useRef(false)
   const paintFrameRef = useRef<number | null>(null)
   const lastPointerRef = useRef<PointerPosition | null>(null)
+  const fileRequestRef = useRef(0)
+  const processingRequestRef = useRef(0)
   const sourcePreview = characterSourceUrl
   const [workingPixels, setWorkingPixels] = useState<PixelState | null>(null)
   const [editorOpen, setEditorOpen] = useState(false)
@@ -109,6 +110,8 @@ export function CharacterSettings() {
   }, [editorOpen, workingPixels])
 
   useEffect(() => () => {
+    fileRequestRef.current += 1
+    processingRequestRef.current += 1
     if (paintFrameRef.current !== null) {
       window.cancelAnimationFrame(paintFrameRef.current)
       paintFrameRef.current = null
@@ -143,19 +146,15 @@ export function CharacterSettings() {
     const file = event.currentTarget.files?.[0]
     event.currentTarget.value = ''
     if (!file) return
+    const requestId = ++fileRequestRef.current
+    processingRequestRef.current += 1
 
     setError(null)
-    if (!file.type.startsWith('image/')) {
-      setError(t('characterFileTypeError'))
-      return
-    }
-    if (file.size > MAX_CHARACTER_FILE_SIZE) {
-      setError(t('characterFileTooLarge'))
-      return
-    }
 
     try {
       const prepared = await prepareCharacterImage(file)
+      if (requestId !== fileRequestRef.current) return
+
       sourceBlobRef.current = prepared.blob
       void warmBackgroundRemovalModel().catch(() => undefined)
       setCharacterSourceUrl(prepared.dataUrl)
@@ -167,21 +166,39 @@ export function CharacterSettings() {
       setEditorOpen(false)
       undoStackRef.current = []
       setUndoCount(0)
-    } catch {
-      setError(t('characterEditorError'))
+    } catch (cause) {
+      if (requestId !== fileRequestRef.current) return
+      if (cause instanceof ImageUploadError && cause.code === 'invalid-type') {
+        setError(t('characterFileTypeError'))
+      } else if (cause instanceof ImageUploadError && cause.code === 'too-large') {
+        setError(t('characterFileTooLarge'))
+      } else {
+        setError(t('characterEditorError'))
+      }
     }
   }
 
   const handleRemoveBackground = async () => {
     if (!sourcePreview || isPreparing) return
+    const requestId = ++processingRequestRef.current
+    const sourceUrl = sourcePreview
+    const sourceBlob = sourceBlobRef.current
 
     setIsPreparing(true)
     setProgress(3)
     setError(null)
 
     try {
-      const blob = sourceBlobRef.current ?? await (await fetch(sourcePreview)).blob()
-      const result = await removeImageBackground(blob, setProgress)
+      const blob = sourceBlob ?? await (async () => {
+        const response = await fetch(sourceUrl)
+        if (!response.ok) throw new Error('이미지를 읽지 못했습니다.')
+        return response.blob()
+      })()
+      const result = await removeImageBackground(blob, (nextProgress) => {
+        if (requestId === processingRequestRef.current) setProgress(nextProgress)
+      })
+      if (requestId !== processingRequestRef.current) return
+
       const original = { data: result.data.slice(), width: result.width, height: result.height }
       originalPixelsRef.current = original
       undoStackRef.current = []
@@ -191,11 +208,14 @@ export function CharacterSettings() {
       setCharacterPosition(null)
       setEditorOpen(true)
     } catch (cause) {
+      if (requestId !== processingRequestRef.current) return
       console.error('Background removal failed', cause)
       setError(t('characterProcessingError'))
     } finally {
-      setIsPreparing(false)
-      setProgress(0)
+      if (requestId === processingRequestRef.current) {
+        setIsPreparing(false)
+        setProgress(0)
+      }
     }
   }
 
@@ -304,12 +324,16 @@ export function CharacterSettings() {
   }
 
   const handleClear = () => {
+    fileRequestRef.current += 1
+    processingRequestRef.current += 1
     setCharacterSourceUrl(null)
     setCharacterCutoutUrl(null)
     sourceBlobRef.current = null
     originalPixelsRef.current = null
     workingPixelsRef.current = null
     setWorkingPixels(null)
+    paintingRef.current = false
+    lastPointerRef.current = null
     setEditorOpen(false)
     setCharacterPosition(null)
     undoStackRef.current = []
