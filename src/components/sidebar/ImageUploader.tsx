@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ArrowLeftRight, ChevronLeft, ChevronRight, Lock, RefreshCw, Trash2, Unlock, Upload, UserRound, X } from 'lucide-react'
+import { AlertCircle, ArrowLeftRight, ChevronLeft, ChevronRight, Lock, RefreshCw, Trash2, Unlock, Upload, UserRound, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -42,6 +42,7 @@ export function ImageUploader() {
   })))
   const t = useTranslations('ImageUploader')
   const [selectedIndex, setSelectedIndex] = useState(0)
+  const [uploadError, setUploadError] = useState<string | null>(null)
   const uploadRequests = useRef(new Map<number, PendingUpload>())
   const mountedRef = useRef(true)
 
@@ -52,6 +53,16 @@ export function ImageUploader() {
       mountedRef.current = false
       requests.clear()
     }
+  }, [])
+
+  useEffect(() => {
+    const handleCanvasUploadError = (event: Event) => {
+      const message = (event as CustomEvent<string>).detail
+      if (typeof message === 'string' && message) setUploadError(message)
+    }
+
+    window.addEventListener('xiv-frame:upload-error', handleCanvasUploadError)
+    return () => window.removeEventListener('xiv-frame:upload-error', handleCanvasUploadError)
   }, [])
 
   useEffect(() => {
@@ -89,6 +100,7 @@ export function ImageUploader() {
   const activeScale = activeIndex >= 0 ? imageScales[activeIndex] || 1 : 1
 
   const handleFileUpload = (index: number) => {
+    setUploadError(null)
     const input = document.createElement('input')
     input.type = 'file'
     input.accept = 'image/*'
@@ -108,11 +120,12 @@ export function ImageUploader() {
           setImageScale(index, 1)
           setImagePosition(index, { x: 0, y: 0 })
           setSelectedIndex(index)
+          setUploadError(null)
           uploadRequests.current.delete(index)
         })
         .catch((error: unknown) => {
           if (!mountedRef.current || uploadRequests.current.get(index)?.requestId !== requestId) return
-          alert(error instanceof ImageUploadError && error.code === 'too-large' ? t('uploadLimit') : t('uploadError'))
+          setUploadError(error instanceof ImageUploadError && error.code === 'too-large' ? t('uploadLimit') : t('uploadError'))
           uploadRequests.current.delete(index)
         })
     }
@@ -144,6 +157,15 @@ export function ImageUploader() {
 
   return (
     <div className="space-y-6">
+      {uploadError && (
+        <div role="alert" className="flex items-start gap-2 rounded-md border border-destructive/25 bg-destructive/5 px-3 py-2.5 text-xs leading-4 text-destructive">
+          <AlertCircle className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
+          <span className="min-w-0 flex-1">{uploadError}</span>
+          <button type="button" className="shrink-0 rounded-sm p-0.5 transition-colors hover:bg-destructive/10" onClick={() => setUploadError(null)} aria-label={t('dismissError')}>
+            <X className="size-3.5" aria-hidden="true" />
+          </button>
+        </div>
+      )}
       <Tabs defaultValue="frames" className="w-full">
         <SketchbookTabsList className="h-11">
           <SketchbookTabsTrigger value="frames" className="gap-2">
@@ -212,7 +234,7 @@ export function ImageUploader() {
                       )}
                     </div>
                     <span className="absolute left-2 top-2 grid size-6 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 font-mono text-[10px] font-bold tabular-nums text-foreground shadow-subtle">{String(index + 1).padStart(2, '0')}</span>
-                    <button type="button" aria-label={t('deleteImage')} onClick={(event) => handleRemove(event, index)} className="absolute right-2 top-2 grid size-7 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 text-foreground opacity-0 shadow-subtle transition-all hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100 group-focus-within:opacity-100">
+                    <button type="button" aria-label={t('deleteImage')} onClick={(event) => handleRemove(event, index)} className={`absolute right-2 top-2 grid size-7 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 text-foreground shadow-subtle transition-all hover:bg-destructive/10 hover:text-destructive ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'}`}>
                       <X className="size-3.5" />
                     </button>
                   </>
@@ -231,7 +253,7 @@ export function ImageUploader() {
               <Button variant="outline" size="sm" className="h-10 flex-1 rounded-md text-xs" onClick={() => swapImages(0, 1)} disabled={images.length < 2 || !images[0] || !images[1]}>
                 <ArrowLeftRight className="size-3.5" /> {t('swapOrder')}
               </Button>
-              <Button variant="outline" size="sm" className="h-10 flex-1 rounded-md text-xs hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive" onClick={() => { invalidateAllUploads(); setImages([]); setSelectedIndex(0) }} disabled={imageCount === 0}>
+              <Button variant="outline" size="sm" className="h-10 flex-1 rounded-md text-xs hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive" onClick={() => { if (!window.confirm(t('clearConfirm'))) return; invalidateAllUploads(); setImages([]); setSelectedIndex(0) }} disabled={imageCount === 0}>
                 <Trash2 className="size-3.5" /> {t('clearAll')}
               </Button>
             </div>

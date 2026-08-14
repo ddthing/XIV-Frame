@@ -1,4 +1,5 @@
-import { BookOpen, Download, RefreshCw } from 'lucide-react'
+import { useState } from 'react'
+import { AlertCircle, BookOpen, Download, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 
@@ -15,10 +16,20 @@ interface DesktopToolbarProps {
 }
 
 export function DesktopToolbar({ stageRef, className = '' }: DesktopToolbarProps) {
-  const { handleReset, handleExport } = useCanvasActions()
+  const { handleReset, handleExport, isExporting, hasImages } = useCanvasActions()
   const t = useTranslations('DesktopToolbar')
   const tNav = useTranslations('Navigation')
   const locale = useLocale()
+  const [exportError, setExportError] = useState<string | null>(null)
+
+  const handleSave = async () => {
+    setExportError(null)
+    try {
+      await handleExport(stageRef, 'png')
+    } catch {
+      setExportError(t('exportError'))
+    }
+  }
 
   return (
     <header className={`app-header flex items-center gap-5 border-b border-primary-foreground/15 bg-primary px-5 text-primary-foreground ${className}`}>
@@ -33,6 +44,12 @@ export function DesktopToolbar({ stageRef, className = '' }: DesktopToolbarProps
       </div>
 
       <div className="ml-auto flex items-center gap-2">
+        {exportError && (
+          <span role="alert" className="hidden items-center gap-1 text-[11px] text-accent lg:inline-flex">
+            <AlertCircle className="size-3.5" aria-hidden="true" />
+            {exportError}
+          </span>
+        )}
         <LanguageSwitcher inverse />
         <Link
           href={`/${locale}/blog`}
@@ -42,13 +59,16 @@ export function DesktopToolbar({ stageRef, className = '' }: DesktopToolbarProps
           <BookOpen className="size-4" />
           <span className="hidden lg:inline">{tNav('blog')}</span>
         </Link>
-        <Button
-          variant="ghost"
-          size="sm"
-          aria-label={t('reset')}
-          onClick={handleReset}
-          className="h-9 rounded-md px-3 text-xs font-semibold text-primary-foreground/75 hover:bg-primary-foreground/10 hover:text-primary-foreground"
-        >
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-label={t('reset')}
+            onClick={() => {
+              if (hasImages && !window.confirm(t('resetConfirm'))) return
+              handleReset()
+            }}
+            className="h-9 rounded-md px-3 text-xs font-semibold text-primary-foreground/75 hover:bg-primary-foreground/10 hover:text-primary-foreground"
+          >
           <RefreshCw className="size-3.5" />
           <span className="hidden xl:inline">{t('reset')}</span>
         </Button>
@@ -56,11 +76,12 @@ export function DesktopToolbar({ stageRef, className = '' }: DesktopToolbarProps
           variant="default"
           size="sm"
           aria-label={`${t('export')} PNG`}
+          disabled={!hasImages || isExporting}
           className="h-9 rounded-md border-0 bg-accent px-3 text-xs font-bold text-accent-foreground shadow-subtle hover:bg-accent/90"
-          onClick={() => handleExport(stageRef, 'png')}
+          onClick={() => void handleSave()}
         >
-          <Download className="size-3.5" />
-          <span>{t('export')}<span className="hidden sm:inline"> PNG</span></span>
+          {isExporting ? <RefreshCw className="size-3.5 animate-spin" aria-hidden="true" /> : <Download className="size-3.5" aria-hidden="true" />}
+          <span>{isExporting ? t('exporting') : t('export')}<span className="hidden sm:inline">{isExporting ? '' : ' PNG'}</span></span>
         </Button>
       </div>
     </header>

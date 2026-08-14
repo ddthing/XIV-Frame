@@ -11,11 +11,15 @@ export interface UseCanvasActionsReturn {
   handleZoomChange: (value: number | readonly number[]) => void;
   handleRatioChange: (ratio: CanvasRatio) => void;
   handleReset: () => void;
-  handleExport: (stageRef: React.MutableRefObject<Konva.Stage | null>, format?: 'png' | 'jpeg') => void;
+  handleExport: (stageRef: React.MutableRefObject<Konva.Stage | null>, format?: 'png' | 'jpeg') => Promise<void>;
+  isExporting: boolean;
+  hasImages: boolean;
 }
 
 export function useCanvasActions(): UseCanvasActionsReturn {
   const { zoom, setZoom, canvasRatio, setCanvasRatio, resetAll } = useStore()
+  const isExporting = useStore(state => state.isExporting)
+  const hasImages = useStore(state => state.images.length > 0)
 
   const handleZoomIn = useCallback(() => {
     setZoom(Math.min(200, zoom + 10))
@@ -33,8 +37,8 @@ export function useCanvasActions(): UseCanvasActionsReturn {
     setCanvasRatio(ratio)
   }, [setCanvasRatio])
 
-  const handleExport = useCallback((stageRef: React.MutableRefObject<Konva.Stage | null>, format: 'png' | 'jpeg' = 'png') => {
-    exportCanvas(stageRef, format)
+  const handleExport = useCallback(async (stageRef: React.MutableRefObject<Konva.Stage | null>, format: 'png' | 'jpeg' = 'png') => {
+    await exportCanvas(stageRef, format)
   }, [])
 
   return {
@@ -45,6 +49,8 @@ export function useCanvasActions(): UseCanvasActionsReturn {
     handleZoomChange,
     handleRatioChange,
     handleReset: resetAll,
-    handleExport
+    handleExport,
+    isExporting,
+    hasImages,
   }
 }

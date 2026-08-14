@@ -149,7 +149,7 @@ export function LogoUploadArea() {
             <button 
               aria-label={t('logoDelete')}
                onClick={handleDelete}
-              className="absolute right-2 top-2 grid size-7 place-items-center rounded-md border border-border bg-background text-foreground opacity-0 shadow-subtle transition-colors hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
+              className="absolute right-2 top-2 grid size-7 place-items-center rounded-md border border-border bg-background text-foreground shadow-subtle transition-colors hover:bg-destructive/10 hover:text-destructive"
             >
               <X className="size-3.5" />
             </button>
