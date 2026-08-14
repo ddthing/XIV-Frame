@@ -33,7 +33,7 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
               </div>
               <p className="mt-5 font-display text-lg font-bold tracking-[0.01em] text-foreground">Drop your FFXIV screenshots here</p>
               <p className="mt-2 text-sm leading-5 text-muted-foreground">Start with up to four frames. You can reorder and refine each one from Image.</p>
-              <span className="mt-5 editor-meta">PNG / JPG · MAX 10 MB</span>
+              <span className="mt-5 editor-meta">PNG / JPG · MAX 50 MB · AUTO OPTIMIZED</span>
             </div>
           </div>
         )}

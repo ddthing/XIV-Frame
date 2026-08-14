@@ -6,7 +6,8 @@
     "tabSignature": "Signature"
   },
   "ImageUploader": {
-    "uploadLimit": "Image files must be under 10MB.",
+    "uploadLimit": "Image files must be 50MB or smaller. Larger dimensions are optimized in your browser.",
+    "uploadError": "The image could not be read or optimized. Try a PNG, JPG, or WebP file again.",
     "change": "Change",
     "deleteImage": "Delete Image",
     "swapOrder": "Swap Order",
@@ -140,7 +141,7 @@
     "characterPrivacyTitle": "Processed in this page",
     "characterPrivacyDescription": "Your image is not uploaded to our server. The model is prepared in the browser on first use and cached for later edits.",
     "characterUploadLabel": "Add image to composite",
-    "characterUploadHint": "PNG/JPG/WebP · up to 10MB",
+    "characterUploadHint": "PNG/JPG/WebP · up to 50MB · optimized in browser",
     "characterOriginal": "Original",
     "characterResult": "Cutout result",
     "characterResultEmpty": "Background removal has not run yet.",
@@ -150,7 +151,7 @@
     "characterProcessingHint": "The first run may take longer while the model is prepared.",
     "characterEditorError": "The image could not be edited. Please try another image.",
     "characterFileTypeError": "Please add an image file.",
-    "characterFileTooLarge": "Images must be 10MB or smaller.",
+    "characterFileTooLarge": "Images must be 50MB or smaller.",
     "characterProcessingError": "Background removal failed. Try a smaller image or another file.",
     "characterRefineTitle": "Refine the edges",
     "characterRefineDescription": "For complex images, erase the areas you do not need and restore details with the brush.",

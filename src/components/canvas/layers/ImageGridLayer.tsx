@@ -1,6 +1,8 @@
 import React from 'react'
 import { Layer, Group, Image as KonvaImage, Rect } from 'react-konva'
+import { useTranslations } from 'next-intl'
 import { useStore } from '@/store/useStore'
+import { ImageUploadError, prepareImageForCanvas } from '@/lib/imageUpload'
 import type Konva from 'konva'
 
 function ImageGridLayerComponent({ 
@@ -28,6 +30,7 @@ function ImageGridLayerComponent({
   const setImagePosition = useStore(state => state.setImagePosition)
   const setImageAt = useStore(state => state.setImageAt)
   const setImageScale = useStore(state => state.setImageScale)
+  const t = useTranslations('ImageUploader')
 
   const isShiftPressed = React.useRef(false)
   const dragContexts = React.useRef<{ [key: number]: { startX: number, startY: number, axis: 'x' | 'y' | null, inverseTransform?: Konva.Transform, absoluteTransform?: Konva.Transform } }>({})
@@ -46,16 +49,17 @@ function ImageGridLayerComponent({
     input.accept = 'image/*'
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0]
-      if (file) {
-        if (file.size > 10 * 1024 * 1024) {
-          alert('File size exceeds 10MB limit.')
-          return
-        }
-        const url = URL.createObjectURL(file)
-        setImageAt(index, url)
-        setImageScale(index, 1)
-        setImagePosition(index, { x: 0, y: 0 })
-      }
+      if (!file) return
+
+      void prepareImageForCanvas(file)
+        .then((url) => {
+          setImageAt(index, url)
+          setImageScale(index, 1)
+          setImagePosition(index, { x: 0, y: 0 })
+        })
+        .catch((error: unknown) => {
+          alert(error instanceof ImageUploadError && error.code === 'too-large' ? t('uploadLimit') : t('uploadError'))
+        })
     }
     input.click()
   }

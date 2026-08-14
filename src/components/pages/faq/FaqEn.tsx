@@ -19,7 +19,7 @@ export function FaqEn() {
             },
             {
               question: 'How many images can I add, and what is the limit?',
-              answer: <p>You can add up to four image files from the image panel. Each file must be 10 MB or smaller and should be a format your browser can read, such as PNG or JPG.</p>,
+              answer: <p>You can add up to four image files from the image panel. Each file can be up to 50 MB; after selection, the browser optimizes its dimensions and format for editing. Use a browser-readable image such as PNG, JPG, or WebP.</p>,
             },
             {
               question: 'Are uploaded screenshots stored on a server?',
@@ -55,7 +55,7 @@ export function FaqEn() {
             },
             {
               question: 'I selected an image, but it is not visible.',
-              answer: <p>Check that the file is an image and is under 10 MB. Confirm that the image card is selected, then refresh and choose the file again. Browser permissions or a file that was moved or deleted can also require a new selection.</p>,
+              answer: <p>Check that the file is an image and is under 50 MB. The browser optimizes larger dimensions after selection. Confirm that the image card is selected, then refresh and choose the file again. Browser permissions or a file that was moved or deleted can also require a new selection.</p>,
             },
             {
               question: 'Will my settings be available next time?',

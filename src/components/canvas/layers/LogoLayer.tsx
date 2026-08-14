@@ -66,6 +66,7 @@ function LogoLayerComponent({ contentWidth, contentHeight }: { contentWidth: num
       width={width}
       height={height}
       opacity={logoOpacity / 100}
+      listening={false}
     />
   )
 }

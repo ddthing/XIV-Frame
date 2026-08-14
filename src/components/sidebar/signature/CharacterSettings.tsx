@@ -23,9 +23,10 @@ import { EditorChoice, EditorFieldHeader, EditorSection } from '@/components/ui/
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { imageDataToDataUrl, dataUrlToImageData, prepareCharacterImage, removeImageBackground, warmBackgroundRemovalModel } from '@/lib/backgroundRemoval'
+import { MAX_UPLOAD_FILE_SIZE } from '@/lib/imageUpload'
 import { useStore } from '@/store/useStore'
 
-const MAX_CHARACTER_FILE_SIZE = 10 * 1024 * 1024
+const MAX_CHARACTER_FILE_SIZE = MAX_UPLOAD_FILE_SIZE
 const MAX_UNDO_STEPS = 8
 
 type BrushMode = 'erase' | 'restore'
