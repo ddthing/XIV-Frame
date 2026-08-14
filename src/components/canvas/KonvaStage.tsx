@@ -4,6 +4,7 @@ import { useStore } from '@/store/useStore'
 import { useShallow } from 'zustand/react/shallow'
 import { BackgroundLayer } from './layers/BackgroundLayer'
 import { ImageGridLayer } from './layers/ImageGridLayer'
+import { CharacterLayer } from './layers/CharacterLayer'
 import { SignatureLayer } from './layers/SignatureLayer'
 import { LogoLayer } from './layers/LogoLayer'
 import { CopyrightLayer } from './layers/CopyrightLayer'
@@ -185,6 +186,10 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
 
         {imagesData.length > 0 && (
           <Layer x={borderWidth} y={borderWidth}>
+            <CharacterLayer
+              contentWidth={logicalWidth}
+              contentHeight={logicalHeight}
+            />
             <SignatureLayer 
               contentWidth={logicalWidth}
               contentHeight={logicalHeight}

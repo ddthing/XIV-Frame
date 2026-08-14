@@ -26,14 +26,15 @@ export function SignatureSettings() {
 
         <TabsContent value="text" className="mt-5 space-y-4 focus-visible:outline-none">
           <TextSettingsGroup />
+          <CopyrightSettings />
         </TabsContent>
 
         <TabsContent value="logo" className="mt-5 space-y-4 focus-visible:outline-none">
           <LogoUploadArea />
         </TabsContent>
+
       </Tabs>
 
-      <CopyrightSettings />
     </div>
   )
 }

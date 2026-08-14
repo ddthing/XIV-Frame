@@ -6,8 +6,7 @@ import { CloudCheck, Images, LayoutTemplate, Type } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { ImageUploader } from './ImageUploader'
-import { LayoutSettings } from './LayoutSettings'
-import { SignatureSettings } from './SignatureSettings'
+import { LazyLayoutSettings, LazySignatureSettings } from './LazySettings'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 type SettingsTab = 'image' | 'signature' | 'layout'
@@ -100,11 +99,11 @@ export function SettingsPanel() {
             </TabsContent>
 
             <TabsContent value="signature" className="mt-0 focus-visible:outline-none">
-              <SignatureSettings />
+              <LazySignatureSettings />
             </TabsContent>
 
             <TabsContent value="layout" className="mt-0 focus-visible:outline-none">
-              <LayoutSettings />
+              <LazyLayoutSettings />
             </TabsContent>
           </div>
         </div>
