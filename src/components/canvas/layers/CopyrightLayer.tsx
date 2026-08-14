@@ -6,6 +6,25 @@ import { DEFAULT_SIGNATURE_FONT } from '@/constants/signature'
 
 import { useTranslations } from 'next-intl'
 
+const COPYRIGHT_MIN_FONT_SIZE = 24
+const COPYRIGHT_MAX_FONT_SIZE = 96
+const COPYRIGHT_BASE_RATIO = 0.018
+const COPYRIGHT_REFERENCE_ASPECT = 16 / 9
+
+function getCopyrightMetrics(contentWidth: number, contentHeight: number) {
+  const shortSide = Math.min(contentWidth, contentHeight)
+  const aspectRatio = contentWidth / contentHeight
+  const aspectMultiplier = Math.min(1.45, Math.max(0.85, Math.sqrt(aspectRatio / COPYRIGHT_REFERENCE_ASPECT)))
+  const fontSize = Math.min(
+    COPYRIGHT_MAX_FONT_SIZE,
+    Math.max(COPYRIGHT_MIN_FONT_SIZE, shortSide * COPYRIGHT_BASE_RATIO * aspectMultiplier),
+  )
+  const padding = Math.min(96, Math.max(24, fontSize * 1.35))
+  const textHeight = fontSize * 1.25
+
+  return { fontSize, padding, textHeight }
+}
+
 function CopyrightLayerComponent({ contentWidth, contentHeight }: { contentWidth: number, contentHeight: number }) {
   const { showCopyright, copyrightColor, copyrightPosition } = useStore(useShallow(state => ({
     showCopyright: state.showCopyright,
@@ -16,16 +35,21 @@ function CopyrightLayerComponent({ contentWidth, contentHeight }: { contentWidth
 
   if (!showCopyright) return null
 
+  const { fontSize, padding, textHeight } = getCopyrightMetrics(contentWidth, contentHeight)
+
   return (
     <Text
       text={t('text')}
       fontFamily={DEFAULT_SIGNATURE_FONT}
-      fontSize={16}
+      fontSize={fontSize}
       fill={copyrightColor === 'black' ? '#000000' : copyrightColor === 'white' ? '#FFFFFF' : '#888888'}
       align={copyrightPosition === 'bottom-left' ? 'left' : copyrightPosition === 'bottom-right' ? 'right' : 'center'}
-      width={contentWidth - 60}
-      x={30}
-      y={contentHeight - 30}
+      verticalAlign="bottom"
+      wrap="word"
+      height={textHeight}
+      width={Math.max(0, contentWidth - padding * 2)}
+      x={padding}
+      y={contentHeight - padding - textHeight}
     />
   )
 }

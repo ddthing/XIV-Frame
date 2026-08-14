@@ -83,7 +83,7 @@
     "finishDescription": "Set the canvas surface and the final texture layer.",
     "creditTitle": "Copyright overlay",
     "creditDescription": "Keep the credit with the overlay controls, separate from composition.",
-    "creditHint": "This setting is saved with your frame preferences."
+    "creditHint": "It scales with the canvas size and ratio, while this setting is saved with your frame preferences."
   },
   "SignatureSettings": {
     "sheetTitle": "Signature Settings",

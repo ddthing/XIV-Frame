@@ -47,7 +47,7 @@
     "finishDescription": "캔버스 배경과 최종 질감 레이어를 설정합니다.",
     "creditTitle": "저작권 오버레이",
     "creditDescription": "저작권 표기는 구성과 분리된 오버레이 설정에서 관리합니다.",
-    "creditHint": "이 설정은 프레임 환경설정에 저장됩니다.",
+    "creditHint": "캔버스 크기와 비율에 맞춰 자동으로 조정되며, 이 설정은 프레임 환경설정에 저장됩니다.",
     "layoutPreset": "레이아웃",
     "presetSplit": "가로 분할",
     "presetVertical": "세로 분할",
