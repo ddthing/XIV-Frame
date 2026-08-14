@@ -47,7 +47,7 @@
     "finishDescription": "キャンバスの背景と最終的な質感レイヤーを設定します。",
     "creditTitle": "著作権オーバーレイ",
     "creditDescription": "著作権表示は構成と分けてオーバーレイ設定で管理します。",
-    "creditHint": "この設定はフレームの環境設定に保存されます。",
+    "creditHint": "キャンバスのサイズと比率に合わせて自動調整され、この設定はフレームの環境設定に保存されます。",
     "layoutPreset": "レイアウト",
     "presetSplit": "横分割",
     "presetVertical": "縦分割",
