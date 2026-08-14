@@ -16,6 +16,7 @@
 # next.js
 /.next/
 /out/
+/public/vendor/transformers.web.min.js
 
 # production
 /build

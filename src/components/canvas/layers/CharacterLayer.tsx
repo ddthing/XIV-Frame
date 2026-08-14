@@ -1,11 +1,18 @@
-import { useMemo, useRef, useState } from 'react'
-import { Group, Image as KonvaImage, Rect, Text } from 'react-konva'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Group, Image as KonvaImage, Rect } from 'react-konva'
 import useImage from 'use-image'
 import { useShallow } from 'zustand/react/shallow'
 
 import { useStore } from '@/store/useStore'
 
 type CanvasPosition = { x: number; y: number }
+type ResizeHandle = 'nw' | 'ne' | 'sw' | 'se'
+
+const RESIZE_HANDLES: ResizeHandle[] = ['nw', 'ne', 'sw', 'se']
+
+function getResizeCursor(handle: ResizeHandle) {
+  return handle === 'nw' || handle === 'se' ? 'nwse-resize' : 'nesw-resize'
+}
 
 function createAlphaOutline(image: HTMLImageElement) {
   if (typeof document === 'undefined') return null
@@ -59,11 +66,12 @@ function CharacterGuide({
   imageWidth,
   imageHeight,
   flipped,
-  contentWidth,
   contentHeight,
   onResizeStart,
   onResizePreview,
   onResizeEnd,
+  onHandleEnter,
+  onHandleLeave,
 }: {
   outlineImage: HTMLCanvasElement | null
   position: CanvasPosition
@@ -73,33 +81,23 @@ function CharacterGuide({
   imageWidth: number
   imageHeight: number
   flipped: boolean
-  contentWidth: number
   contentHeight: number
   onResizeStart: () => void
-  onResizePreview: (handleX: number) => void
+  onResizePreview: (handle: ResizeHandle, pointer: CanvasPosition) => void
   onResizeEnd: () => void
+  onHandleEnter: () => void
+  onHandleLeave: () => void
 }) {
-  const inset = Math.max(8, Math.min(16, contentHeight * 0.012))
   const visualX = flipped ? position.x - width : position.x
   const visualY = position.y
-  const labelFontSize = Math.max(22, Math.min(34, contentHeight * 0.03))
-  const labelHeight = labelFontSize + 18
-  const labelText = `X ${Math.round(visualX)}   Y ${Math.round(visualY)}   W ${Math.round(width)}   H ${Math.round(height)}`
-  const labelWidth = Math.min(
-    Math.max(220, contentWidth - 24),
-    labelText.length * labelFontSize * 0.58 + 28,
-  )
-  const maxLabelX = Math.max(12, contentWidth - labelWidth - 12)
-  const labelX = Math.min(Math.max(visualX, 12), maxLabelX)
-  const labelAboveY = visualY - labelHeight - 12
-  const labelBelowY = visualY + height + 12
-  const maxLabelY = Math.max(12, contentHeight - labelHeight - 12)
-  const labelY = labelAboveY >= 12
-    ? labelAboveY
-    : Math.min(labelBelowY, maxLabelY)
   const handleSize = Math.max(18, Math.min(32, contentHeight * 0.024))
-  const handleX = visualX + width - handleSize / 2
-  const handleY = visualY + height - handleSize / 2
+  const handleStrokeWidth = Math.max(2, handleSize * 0.1)
+  const handlePositions: Record<ResizeHandle, CanvasPosition> = {
+    nw: { x: visualX, y: visualY },
+    ne: { x: visualX + width, y: visualY },
+    sw: { x: visualX, y: visualY + height },
+    se: { x: visualX + width, y: visualY + height },
+  }
 
   return (
     <Group>
@@ -117,58 +115,47 @@ function CharacterGuide({
           listening={false}
         />
       )}
-      <Rect
-        x={labelX}
-        y={labelY}
-        width={labelWidth}
-        height={labelHeight}
-        fill="#173806"
-        opacity={0.94}
-        cornerRadius={6}
-        listening={false}
-      />
-      <Text
-        x={labelX + 14}
-        y={labelY + 9}
-        width={Math.max(0, labelWidth - 28)}
-        height={labelFontSize}
-        text={labelText}
-        fontFamily="monospace"
-        fontSize={labelFontSize}
-        fill="#f4f7dd"
-        verticalAlign="middle"
-        ellipsis
-        listening={false}
-      />
-      <Rect
-        x={handleX}
-        y={handleY}
-        width={handleSize}
-        height={handleSize}
-        fill="#e7f5a5"
-        stroke="#173806"
-        strokeWidth={Math.max(2, inset * 0.35)}
-        cornerRadius={Math.max(3, handleSize * 0.2)}
-        draggable
-        onMouseEnter={(event) => {
-          event.target.getStage()?.container().style.setProperty('cursor', 'nwse-resize')
-        }}
-        onMouseLeave={(event) => {
-          event.target.getStage()?.container().style.setProperty('cursor', 'default')
-        }}
-        onDragStart={(event) => {
-          event.cancelBubble = true
-          onResizeStart()
-        }}
-        onDragMove={(event) => {
-          event.cancelBubble = true
-          onResizePreview(event.target.x() + handleSize / 2)
-        }}
-        onDragEnd={(event) => {
-          event.cancelBubble = true
-          onResizeEnd()
-        }}
-      />
+      {RESIZE_HANDLES.map((handle) => {
+        const { x, y } = handlePositions[handle]
+        return (
+          <Rect
+            key={handle}
+            x={x - handleSize / 2}
+            y={y - handleSize / 2}
+            width={handleSize}
+            height={handleSize}
+            fill="#e7f5a5"
+            stroke="#173806"
+            strokeWidth={handleStrokeWidth}
+            cornerRadius={Math.max(3, handleSize * 0.2)}
+            hitStrokeWidth={Math.max(10, handleSize * 0.5)}
+            draggable
+            onMouseEnter={(event) => {
+              onHandleEnter()
+              event.target.getStage()?.container().style.setProperty('cursor', getResizeCursor(handle))
+            }}
+            onMouseLeave={(event) => {
+              onHandleLeave()
+              event.target.getStage()?.container().style.setProperty('cursor', 'default')
+            }}
+            onDragStart={(event) => {
+              event.cancelBubble = true
+              onResizeStart()
+            }}
+            onDragMove={(event) => {
+              event.cancelBubble = true
+              onResizePreview(handle, {
+                x: event.target.x() + handleSize / 2,
+                y: event.target.y() + handleSize / 2,
+              })
+            }}
+            onDragEnd={(event) => {
+              event.cancelBubble = true
+              onResizeEnd()
+            }}
+          />
+        )
+      })}
     </Group>
   )
 }
@@ -203,10 +190,20 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
   const [livePosition, setLivePosition] = useState<CanvasPosition | null>(null)
   const [liveScale, setLiveScale] = useState<number | null>(null)
   const resizePreviewRef = useRef<{ scale: number; position: CanvasPosition } | null>(null)
+  const pendingResizePreviewRef = useRef<{ scale: number; position: CanvasPosition } | null>(null)
+  const resizeFrameRef = useRef<number | null>(null)
+  const guideHideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const outlineImage = useMemo(
     () => characterImg ? createAlphaOutline(characterImg) : null,
     [characterImg],
   )
+
+  useEffect(() => {
+    return () => {
+      if (guideHideTimeoutRef.current) clearTimeout(guideHideTimeoutRef.current)
+      if (resizeFrameRef.current !== null) window.cancelAnimationFrame(resizeFrameRef.current)
+    }
+  }, [])
 
   if (!characterImg || !characterImg.width || !characterImg.height) return null
 
@@ -226,20 +223,67 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
   }
   const showGuide = !isExporting && (isHovered || isDragging || isResizing)
 
-  const handleResizePreview = (handleX: number) => {
-    const visualX = characterFlipX ? position.x - width : position.x
-    const nextWidth = Math.max(80, handleX - visualX)
-    const nextScale = Math.max(0.25, Math.min(2.4, nextWidth / (characterImg.width * baseScale)))
-    const nextPosition = characterFlipX
-      ? { x: visualX + characterImg.width * baseScale * nextScale, y: position.y }
-      : position
+  const cancelGuideHide = () => {
+    if (guideHideTimeoutRef.current) {
+      clearTimeout(guideHideTimeoutRef.current)
+      guideHideTimeoutRef.current = null
+    }
+    setIsHovered(true)
+  }
 
-    resizePreviewRef.current = { scale: nextScale, position: nextPosition }
-    setLiveScale(nextScale)
-    if (characterFlipX) setLivePosition(nextPosition)
+  const scheduleGuideHide = () => {
+    if (isDragging || isResizing) return
+    if (guideHideTimeoutRef.current) clearTimeout(guideHideTimeoutRef.current)
+    guideHideTimeoutRef.current = setTimeout(() => {
+      guideHideTimeoutRef.current = null
+      setIsHovered(false)
+    }, 180)
+  }
+
+  const handleResizePreview = (handle: ResizeHandle, pointer: CanvasPosition) => {
+    const visualX = characterFlipX ? position.x - width : position.x
+    const visualY = position.y
+    const anchor = {
+      x: handle.includes('w') ? visualX + width : visualX,
+      y: handle.includes('n') ? visualY + height : visualY,
+    }
+    const aspectRatio = width / height
+    const horizontalDistance = Math.max(0, handle.includes('w') ? anchor.x - pointer.x : pointer.x - anchor.x)
+    const verticalDistance = Math.max(0, handle.includes('n') ? anchor.y - pointer.y : pointer.y - anchor.y)
+    const minWidth = characterImg.width * baseScale * 0.25
+    const maxWidth = characterImg.width * baseScale * 2.4
+    const nextWidth = Math.max(
+      minWidth,
+      Math.min(maxWidth, Math.max(horizontalDistance, verticalDistance * aspectRatio)),
+    )
+    const nextHeight = nextWidth / aspectRatio
+    const nextX = handle.includes('w') ? anchor.x - nextWidth : anchor.x
+    const nextY = handle.includes('n') ? anchor.y - nextHeight : anchor.y
+    const nextScale = nextWidth / (characterImg.width * baseScale)
+    const nextPosition = characterFlipX
+      ? { x: nextX + nextWidth, y: nextY }
+      : { x: nextX, y: nextY }
+
+    const nextPreview = { scale: nextScale, position: nextPosition }
+    resizePreviewRef.current = nextPreview
+    pendingResizePreviewRef.current = nextPreview
+    if (resizeFrameRef.current === null) {
+      resizeFrameRef.current = window.requestAnimationFrame(() => {
+        resizeFrameRef.current = null
+        const preview = pendingResizePreviewRef.current
+        if (!preview) return
+        setLiveScale(preview.scale)
+        setLivePosition(preview.position)
+      })
+    }
   }
 
   const handleResizeEnd = () => {
+    if (resizeFrameRef.current !== null) {
+      window.cancelAnimationFrame(resizeFrameRef.current)
+      resizeFrameRef.current = null
+    }
+    pendingResizePreviewRef.current = null
     const preview = resizePreviewRef.current
     if (preview) {
       setCharacterScale(preview.scale)
@@ -269,13 +313,17 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
         shadowOpacity={characterShadow ? 0.24 : 0}
         onMouseEnter={(event) => {
           setIsHovered(true)
+          cancelGuideHide()
           event.target.getStage()?.container().style.setProperty('cursor', 'move')
         }}
         onMouseLeave={(event) => {
-          if (!isDragging) setIsHovered(false)
+          scheduleGuideHide()
           event.target.getStage()?.container().style.setProperty('cursor', 'default')
         }}
+        onClick={cancelGuideHide}
+        onTap={cancelGuideHide}
         onDragStart={(event) => {
+          cancelGuideHide()
           setIsDragging(true)
           setLivePosition({ x: event.target.x(), y: event.target.y() })
         }}
@@ -299,14 +347,17 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
           imageWidth={characterImg.width}
           imageHeight={characterImg.height}
           flipped={characterFlipX}
-          contentWidth={contentWidth}
           contentHeight={contentHeight}
-          onResizeStart={() => {
-            setIsResizing(true)
-            resizePreviewRef.current = null
-          }}
+           onResizeStart={() => {
+             cancelGuideHide()
+             setIsResizing(true)
+              resizePreviewRef.current = null
+              pendingResizePreviewRef.current = null
+            }}
           onResizePreview={handleResizePreview}
           onResizeEnd={handleResizeEnd}
+          onHandleEnter={cancelGuideHide}
+          onHandleLeave={scheduleGuideHide}
         />
       )}
     </>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import { Button } from '@/components/ui/button'
 import { AlertCircle, Download, RefreshCw, ZoomIn, ZoomOut } from 'lucide-react'
@@ -21,11 +22,18 @@ import { MobileSheetBody } from './MobileSheetBody'
     onOpenChange: (open: boolean) => void;
     stageRef: React.MutableRefObject<Konva.Stage | null>;
   }) {
-  const { canvasRatio, setCanvasRatio, zoom, setZoom, resetAll, isExporting, images } = useStore()
+  const { canvasRatio, setCanvasRatio, zoom, setZoom, resetAll, isExporting, hasImages } = useStore(useShallow(state => ({
+    canvasRatio: state.canvasRatio,
+    setCanvasRatio: state.setCanvasRatio,
+    zoom: state.zoom,
+    setZoom: state.setZoom,
+    resetAll: state.resetAll,
+    isExporting: state.isExporting,
+    hasImages: state.images.length > 0,
+  })))
   const t = useTranslations('MobileLayout')
   const layoutT = useTranslations('LayoutSettings')
   const [exportError, setExportError] = useState<string | null>(null)
-  const hasImages = images.length > 0
 
   const handleSave = async () => {
     if (!hasImages || isExporting) return

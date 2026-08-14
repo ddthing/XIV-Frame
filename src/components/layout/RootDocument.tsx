@@ -1,4 +1,3 @@
-import Script from 'next/script'
 import { siteName, siteUrl } from '@/lib/site'
 
 export function RootDocument({ children, locale }: { children: React.ReactNode; locale: 'ko' | 'en' | 'ja' }) {
@@ -21,12 +20,11 @@ export function RootDocument({ children, locale }: { children: React.ReactNode; 
           }}
         />
         {children}
-        <Script
+        <script
           id="adsbygoogle-script"
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2169729065542563"
           crossOrigin="anonymous"
-          strategy="afterInteractive"
         />
       </body>
     </html>

@@ -1,4 +1,5 @@
 import { useCallback } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 import { useStore, CanvasRatio } from '@/store/useStore'
 import { exportCanvas } from '@/lib/export'
 import type Konva from 'konva'
@@ -17,9 +18,15 @@ export interface UseCanvasActionsReturn {
 }
 
 export function useCanvasActions(): UseCanvasActionsReturn {
-  const { zoom, setZoom, canvasRatio, setCanvasRatio, resetAll } = useStore()
-  const isExporting = useStore(state => state.isExporting)
-  const hasImages = useStore(state => state.images.length > 0)
+  const { zoom, setZoom, canvasRatio, setCanvasRatio, resetAll, isExporting, hasImages } = useStore(useShallow(state => ({
+    zoom: state.zoom,
+    setZoom: state.setZoom,
+    canvasRatio: state.canvasRatio,
+    setCanvasRatio: state.setCanvasRatio,
+    resetAll: state.resetAll,
+    isExporting: state.isExporting,
+    hasImages: state.images.length > 0,
+  })))
 
   const handleZoomIn = useCallback(() => {
     setZoom(Math.min(200, zoom + 10))

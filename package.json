@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "predev": "node scripts/sync-transformers-worker.mjs",
     "build": "next build",
+    "prebuild": "node scripts/sync-transformers-worker.mjs",
     "start": "next start",
     "lint": "eslint"
   },

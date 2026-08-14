@@ -23,7 +23,7 @@ import { EditorChoice, EditorFieldHeader, EditorSection } from '@/components/ui/
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { imageDataToDataUrl, dataUrlToImageData, prepareCharacterImage, removeImageBackground, warmBackgroundRemovalModel } from '@/lib/backgroundRemoval'
-import { ImageUploadError } from '@/lib/imageUpload'
+import { ImageUploadError, revokeObjectUrl } from '@/lib/imageUpload'
 import { useStore } from '@/store/useStore'
 
 const MAX_UNDO_STEPS = 8
@@ -44,12 +44,57 @@ function drawPixels(canvas: HTMLCanvasElement | null, pixels: PixelState | null)
   context.putImageData(imageData, 0, 0)
 }
 
+function resizePixelState(pixels: PixelState, width: number, height: number): PixelState {
+  if (pixels.width === width && pixels.height === height) {
+    return { data: pixels.data.slice(), width, height }
+  }
+
+  const sourceCanvas = document.createElement('canvas')
+  sourceCanvas.width = pixels.width
+  sourceCanvas.height = pixels.height
+  const sourceContext = sourceCanvas.getContext('2d')
+  if (!sourceContext) throw new Error('Canvas context unavailable')
+
+  const sourceImageData = new ImageData(pixels.width, pixels.height)
+  sourceImageData.data.set(pixels.data)
+  sourceContext.putImageData(sourceImageData, 0, 0)
+
+  const targetCanvas = document.createElement('canvas')
+  targetCanvas.width = width
+  targetCanvas.height = height
+  const targetContext = targetCanvas.getContext('2d')
+  if (!targetContext) throw new Error('Canvas context unavailable')
+  targetContext.imageSmoothingEnabled = true
+  targetContext.imageSmoothingQuality = 'high'
+  targetContext.drawImage(sourceCanvas, 0, 0, width, height)
+
+  return {
+    data: targetContext.getImageData(0, 0, width, height).data,
+    width,
+    height,
+  }
+}
+
 function drawPixelsRegion(canvas: HTMLCanvasElement | null, pixels: PixelState, x: number, y: number, width: number, height: number) {
   if (!canvas || width <= 0 || height <= 0) return
   const context = canvas.getContext('2d')
   if (!context) return
-  const imageData = new ImageData(pixels.data as unknown as Uint8ClampedArray<ArrayBuffer>, pixels.width, pixels.height)
-  context.putImageData(imageData, 0, 0, x, y, width, height)
+
+  const startX = Math.max(0, Math.min(pixels.width - 1, x))
+  const startY = Math.max(0, Math.min(pixels.height - 1, y))
+  const regionWidth = Math.min(width, pixels.width - startX)
+  const regionHeight = Math.min(height, pixels.height - startY)
+  if (regionWidth <= 0 || regionHeight <= 0) return
+
+  // Only allocate the dirty brush region. Creating a full-size ImageData here
+  // on every animation frame caused a ~9MB allocation for a 1536px image.
+  const imageData = new ImageData(regionWidth, regionHeight)
+  const rowBytes = regionWidth * 4
+  for (let row = 0; row < regionHeight; row += 1) {
+    const sourceStart = ((startY + row) * pixels.width + startX) * 4
+    imageData.data.set(pixels.data.subarray(sourceStart, sourceStart + rowBytes), row * rowBytes)
+  }
+  context.putImageData(imageData, startX, startY)
 }
 
 export function CharacterSettings() {
@@ -86,6 +131,8 @@ export function CharacterSettings() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const sourceBlobRef = useRef<Blob | null>(null)
+  const sourceUrlRef = useRef<string | null>(characterSourceUrl)
+  const sourcePixelsRef = useRef<PixelState | null>(null)
   const originalPixelsRef = useRef<PixelState | null>(null)
   const workingPixelsRef = useRef<PixelState | null>(null)
   const undoStackRef = useRef<Uint8ClampedArray[]>([])
@@ -94,12 +141,15 @@ export function CharacterSettings() {
   const lastPointerRef = useRef<PointerPosition | null>(null)
   const fileRequestRef = useRef(0)
   const processingRequestRef = useRef(0)
+  const modelWarmupRef = useRef<Promise<void> | null>(null)
+  const mountedRef = useRef(true)
   const sourcePreview = characterSourceUrl
   const [workingPixels, setWorkingPixels] = useState<PixelState | null>(null)
   const [editorOpen, setEditorOpen] = useState(false)
   const [brushMode, setBrushMode] = useState<BrushMode>('erase')
   const [brushSize, setBrushSize] = useState(72)
   const [isPreparing, setIsPreparing] = useState(false)
+  const [isModelWarming, setIsModelWarming] = useState(false)
   const [progress, setProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [undoCount, setUndoCount] = useState(0)
@@ -110,6 +160,9 @@ export function CharacterSettings() {
   }, [editorOpen, workingPixels])
 
   useEffect(() => () => {
+    mountedRef.current = false
+    revokeObjectUrl(sourceUrlRef.current)
+    sourceUrlRef.current = null
     fileRequestRef.current += 1
     processingRequestRef.current += 1
     if (paintFrameRef.current !== null) {
@@ -124,6 +177,25 @@ export function CharacterSettings() {
     drawPixels(canvasRef.current, next)
   }
 
+  const startModelWarmup = () => {
+    if (modelWarmupRef.current) return modelWarmupRef.current
+
+    setIsModelWarming(true)
+    const warmup = warmBackgroundRemovalModel((nextProgress) => {
+      if (mountedRef.current) setProgress(nextProgress)
+    })
+    modelWarmupRef.current = warmup
+    void warmup.catch(() => undefined).then(() => {
+      if (modelWarmupRef.current !== warmup) return
+      modelWarmupRef.current = null
+      if (mountedRef.current) {
+        setIsModelWarming(false)
+        setProgress(0)
+      }
+    })
+    return warmup
+  }
+
   const openEditorFromCutout = async () => {
     if (workingPixelsRef.current || !characterCutoutUrl) {
       setEditorOpen(true)
@@ -133,7 +205,17 @@ export function CharacterSettings() {
     try {
       const pixels = await dataUrlToImageData(characterCutoutUrl)
       const next = { data: pixels.data.slice(), width: pixels.width, height: pixels.height }
+      let sourcePixels: PixelState | null = null
+      if (characterSourceUrl) {
+        try {
+          const source = await dataUrlToImageData(characterSourceUrl)
+          sourcePixels = resizePixelState({ data: source.data, width: source.width, height: source.height }, pixels.width, pixels.height)
+        } catch {
+          sourcePixels = null
+        }
+      }
       originalPixelsRef.current = next
+      sourcePixelsRef.current = sourcePixels
       undoStackRef.current = []
       syncWorkingPixels(next)
       setEditorOpen(true)
@@ -153,13 +235,19 @@ export function CharacterSettings() {
 
     try {
       const prepared = await prepareCharacterImage(file)
-      if (requestId !== fileRequestRef.current) return
+      if (requestId !== fileRequestRef.current) {
+        revokeObjectUrl(prepared.dataUrl)
+        return
+      }
 
+      revokeObjectUrl(sourceUrlRef.current)
+      sourceUrlRef.current = prepared.dataUrl
       sourceBlobRef.current = prepared.blob
-      void warmBackgroundRemovalModel().catch(() => undefined)
+      void startModelWarmup().catch(() => undefined)
       setCharacterSourceUrl(prepared.dataUrl)
       setCharacterCutoutUrl(null)
       setCharacterPosition(null)
+      sourcePixelsRef.current = null
       originalPixelsRef.current = null
       workingPixelsRef.current = null
       setWorkingPixels(null)
@@ -189,18 +277,25 @@ export function CharacterSettings() {
     setError(null)
 
     try {
+      // If the upload-triggered warm-up is still running, reuse it instead of
+      // starting a second model initialization when the user clicks quickly.
+      await modelWarmupRef.current?.catch(() => undefined)
       const blob = sourceBlob ?? await (async () => {
         const response = await fetch(sourceUrl)
         if (!response.ok) throw new Error('이미지를 읽지 못했습니다.')
         return response.blob()
       })()
+      const source = await dataUrlToImageData(sourceUrl)
+      if (requestId !== processingRequestRef.current) return
       const result = await removeImageBackground(blob, (nextProgress) => {
         if (requestId === processingRequestRef.current) setProgress(nextProgress)
       })
       if (requestId !== processingRequestRef.current) return
 
       const original = { data: result.data.slice(), width: result.width, height: result.height }
+      const sourcePixels = resizePixelState({ data: source.data, width: source.width, height: source.height }, result.width, result.height)
       originalPixelsRef.current = original
+      sourcePixelsRef.current = sourcePixels
       undoStackRef.current = []
       setUndoCount(0)
       syncWorkingPixels({ data: result.data.slice(), width: result.width, height: result.height })
@@ -228,7 +323,8 @@ export function CharacterSettings() {
     const canvas = canvasRef.current
     const working = workingPixelsRef.current
     const original = originalPixelsRef.current
-    if (!canvas || !working || !original) return
+    const source = sourcePixelsRef.current ?? original
+    if (!canvas || !working || !original || !source) return
 
     const rect = canvas.getBoundingClientRect()
     const scaleX = canvas.width / Math.max(1, rect.width)
@@ -243,22 +339,37 @@ export function CharacterSettings() {
     const minY = Math.max(0, Math.floor(centerY - radius))
     const maxY = Math.min(canvas.height - 1, Math.ceil(centerY + radius))
     const workingData = working.data
-    const originalData = original.data
+    const sourceData = source.data
     const mode = brushMode
 
     for (let y = minY; y <= maxY; y += 1) {
+      const deltaY = y - centerY
+      const rowDistanceSquared = deltaY * deltaY
+      let pixelIndex = (y * canvas.width + minX) * 4
       for (let x = minX; x <= maxX; x += 1) {
         const deltaX = x - centerX
-        const deltaY = y - centerY
-        const distanceSquared = (deltaX * deltaX) + (deltaY * deltaY)
-        if (distanceSquared > radiusSquared) continue
+        const distanceSquared = (deltaX * deltaX) + rowDistanceSquared
+        if (distanceSquared > radiusSquared) {
+          pixelIndex += 4
+          continue
+        }
         const influence = Math.max(0, 1 - Math.sqrt(distanceSquared) * inverseRadius)
-        const alphaIndex = (y * canvas.width + x) * 4 + 3
+        const alphaIndex = pixelIndex + 3
         const currentAlpha = workingData[alphaIndex]
-        const originalAlpha = originalData[alphaIndex]
-        workingData[alphaIndex] = mode === 'erase'
-          ? Math.round(currentAlpha * (1 - influence))
-          : Math.max(currentAlpha, Math.round(originalAlpha * influence))
+        if (mode === 'erase') {
+          workingData[alphaIndex] = Math.round(currentAlpha * (1 - influence))
+          pixelIndex += 4
+          continue
+        }
+
+        const sourceAlpha = sourceData[alphaIndex]
+        if (sourceAlpha > 0 && influence > 0) {
+          workingData[pixelIndex] = sourceData[pixelIndex]
+          workingData[pixelIndex + 1] = sourceData[pixelIndex + 1]
+          workingData[pixelIndex + 2] = sourceData[pixelIndex + 2]
+        }
+        workingData[alphaIndex] = Math.max(currentAlpha, Math.round(sourceAlpha * influence))
+        pixelIndex += 4
       }
     }
 
@@ -328,7 +439,10 @@ export function CharacterSettings() {
     processingRequestRef.current += 1
     setCharacterSourceUrl(null)
     setCharacterCutoutUrl(null)
+    revokeObjectUrl(sourceUrlRef.current)
+    sourceUrlRef.current = null
     sourceBlobRef.current = null
+    sourcePixelsRef.current = null
     originalPixelsRef.current = null
     workingPixelsRef.current = null
     setWorkingPixels(null)
@@ -385,11 +499,21 @@ export function CharacterSettings() {
                 <Button type="button" variant="outline" size="sm" className="h-10 rounded-md" onClick={() => fileInputRef.current?.click()} disabled={isPreparing}>
                   <Upload className="size-3.5" aria-hidden="true" /> {t('characterChange')}
                 </Button>
-                <Button type="button" size="sm" className="h-10 rounded-md" onClick={handleRemoveBackground} disabled={isPreparing}>
-                  {isPreparing ? <Loader2 className="size-3.5 animate-spin" aria-hidden="true" /> : <WandSparkles className="size-3.5" aria-hidden="true" />}
-                  {isPreparing ? t('characterProcessing') : t('characterRemoveBackground')}
+                <Button type="button" size="sm" className="h-10 rounded-md" onClick={handleRemoveBackground} disabled={isPreparing || isModelWarming}>
+                  {isPreparing || isModelWarming ? <Loader2 className="size-3.5 animate-spin" aria-hidden="true" /> : <WandSparkles className="size-3.5" aria-hidden="true" />}
+                  {isPreparing ? t('characterProcessing') : isModelWarming ? t('characterModelPreparing') : t('characterRemoveBackground')}
                 </Button>
               </div>
+
+              {isModelWarming && !isPreparing && (
+                <div role="status" aria-live="polite" className="space-y-2 rounded-lg border border-border bg-card px-3 py-3">
+                  <div className="flex items-center justify-between gap-3 font-body text-[11px] text-muted-foreground">
+                    <span>{t('characterModelPreparingHint')}</span>
+                    <span className="font-mono tabular-nums">{progress}%</span>
+                  </div>
+                  <div className="h-1 overflow-hidden rounded-full bg-muted"><div className="h-full bg-primary transition-[width]" style={{ width: `${Math.max(4, progress)}%` }} /></div>
+                </div>
+              )}
 
               {isPreparing && (
                 <div className="space-y-2 rounded-lg border border-border bg-card px-3 py-3">

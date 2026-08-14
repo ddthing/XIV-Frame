@@ -13,9 +13,27 @@ type BackgroundRemovalResult = {
 
 type BackgroundRemovalPipeline = (input: Blob) => Promise<BackgroundRemovalResult>
 type ProgressListener = (progress: number) => void
+type WorkerRequest =
+  | { type: 'warmup' }
+  | { type: 'remove'; blob: Blob }
+type WorkerResponse =
+  | { type: 'progress'; progress: number }
+  | { type: 'ready'; requestId: number }
+  | { type: 'result'; requestId: number; data: ArrayBuffer; width: number; height: number; channels: number }
+  | { type: 'error'; requestId: number; message: string }
+type PendingWorkerRequest = {
+  resolve: (value: unknown) => void
+  reject: (reason?: unknown) => void
+  onProgress?: ProgressListener
+}
 
 let pipelinePromise: Promise<BackgroundRemovalPipeline> | null = null
 const progressListeners = new Set<ProgressListener>()
+let backgroundRemovalWorker: Worker | null = null
+let workerUnavailable = false
+let workerRequestId = 0
+const pendingWorkerRequests = new Map<number, PendingWorkerRequest>()
+const WORKER_REQUEST_TIMEOUT_MS = 20_000
 
 function emitProgress(progress: number) {
   progressListeners.forEach((listener) => listener(progress))
@@ -25,6 +43,116 @@ function subscribeToProgress(listener?: ProgressListener) {
   if (!listener) return () => undefined
   progressListeners.add(listener)
   return () => progressListeners.delete(listener)
+}
+
+function toError(error: unknown) {
+  return error instanceof Error ? error : new Error('배경 제거 Worker를 사용할 수 없습니다.')
+}
+
+function disableBackgroundRemovalWorker(error: unknown) {
+  workerUnavailable = true
+  const workerError = toError(error)
+  pendingWorkerRequests.forEach(({ reject }) => reject(workerError))
+  pendingWorkerRequests.clear()
+  backgroundRemovalWorker?.terminate()
+  backgroundRemovalWorker = null
+}
+
+function handleWorkerMessage(event: MessageEvent<WorkerResponse>) {
+  const response = event.data
+  if (response.type === 'progress') {
+    pendingWorkerRequests.forEach(({ onProgress }) => onProgress?.(response.progress))
+    return
+  }
+
+  const pending = pendingWorkerRequests.get(response.requestId)
+  if (!pending) return
+  pendingWorkerRequests.delete(response.requestId)
+
+  if (response.type === 'error') {
+    pending.reject(new Error(response.message))
+    return
+  }
+
+  if (response.type === 'ready') {
+    pending.resolve(undefined)
+    return
+  }
+
+  pending.resolve({
+    data: new Uint8ClampedArray(response.data),
+    width: response.width,
+    height: response.height,
+    channels: response.channels,
+  })
+}
+
+function getBackgroundRemovalWorker(): Worker | null {
+  if (workerUnavailable || typeof Worker === 'undefined') return null
+  if (backgroundRemovalWorker) return backgroundRemovalWorker
+
+  try {
+    const worker = new Worker(new URL('./backgroundRemoval.worker.js', import.meta.url), { type: 'module' })
+    worker.addEventListener('message', handleWorkerMessage)
+    worker.addEventListener('error', (event) => disableBackgroundRemovalWorker(event.error ?? new Error(event.message)))
+    worker.addEventListener('messageerror', (event) => disableBackgroundRemovalWorker(event))
+    backgroundRemovalWorker = worker
+    return worker
+  } catch (error) {
+    disableBackgroundRemovalWorker(error)
+    return null
+  }
+}
+
+function postWorkerRequest(request: WorkerRequest, onProgress?: ProgressListener): Promise<unknown> {
+  const worker = getBackgroundRemovalWorker()
+  if (!worker) return Promise.reject(new Error('배경 제거 Worker를 사용할 수 없습니다.'))
+
+  const requestId = ++workerRequestId
+  return new Promise((resolve, reject) => {
+    pendingWorkerRequests.set(requestId, { resolve, reject, onProgress })
+    try {
+      worker.postMessage({ ...request, requestId })
+    } catch (error) {
+      pendingWorkerRequests.delete(requestId)
+      disableBackgroundRemovalWorker(error)
+      reject(error)
+    }
+  })
+}
+
+function withWorkerTimeout<T>(promise: Promise<T>): Promise<T> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined
+  const timeout = new Promise<T>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error('배경 제거 Worker 응답 시간이 초과되었습니다.')), WORKER_REQUEST_TIMEOUT_MS)
+  })
+
+  return Promise.race([promise, timeout]).finally(() => {
+    if (timeoutId) clearTimeout(timeoutId)
+  })
+}
+
+async function warmWithWorker(onProgress?: ProgressListener) {
+  if (!getBackgroundRemovalWorker()) return false
+
+  try {
+    await withWorkerTimeout(postWorkerRequest({ type: 'warmup' }, onProgress))
+    return true
+  } catch {
+    disableBackgroundRemovalWorker(new Error('배경 제거 Worker 초기화에 실패했습니다.'))
+    return false
+  }
+}
+
+async function removeWithWorker(blob: Blob, onProgress?: ProgressListener): Promise<BackgroundRemovalResult | null> {
+  if (!getBackgroundRemovalWorker()) return null
+
+  try {
+    return await withWorkerTimeout(postWorkerRequest({ type: 'remove', blob }, onProgress)) as BackgroundRemovalResult
+  } catch {
+    disableBackgroundRemovalWorker(new Error('배경 제거 Worker 실행에 실패했습니다.'))
+    return null
+  }
 }
 
 function loadImage(src: string): Promise<HTMLImageElement> {
@@ -92,9 +220,12 @@ export async function prepareCharacterImage(file: File): Promise<{ blob: Blob; d
     context.imageSmoothingQuality = 'high'
     context.drawImage(image, 0, 0, width, height)
 
+    const blob = await canvasToBlob(canvas)
     return {
-      blob: await canvasToBlob(canvas),
-      dataUrl: canvas.toDataURL('image/png'),
+      blob,
+      // Keep the upload as a Blob URL. Converting the same pixels to a
+      // Base64 data URL blocks the main thread and adds roughly 33% memory.
+      dataUrl: URL.createObjectURL(blob),
     }
   } catch (error) {
     if (error instanceof ImageUploadError) throw error
@@ -143,6 +274,8 @@ async function getBackgroundRemovalPipeline(): Promise<BackgroundRemovalPipeline
 }
 
 export async function warmBackgroundRemovalModel(onProgress?: ProgressListener): Promise<void> {
+  if (await warmWithWorker(onProgress)) return
+
   const unsubscribe = subscribeToProgress(onProgress)
 
   try {
@@ -156,24 +289,33 @@ export async function removeImageBackground(
   blob: Blob,
   onProgress?: (progress: number) => void,
 ): Promise<{ data: Uint8ClampedArray; width: number; height: number }> {
+  const workerOutput = await removeWithWorker(blob, onProgress)
+  if (workerOutput) {
+    return normalizeBackgroundRemovalResult(workerOutput)
+  }
+
   const unsubscribe = subscribeToProgress(onProgress)
 
   try {
     const segmenter = await getBackgroundRemovalPipeline()
     onProgress?.(100)
     const output = await segmenter(blob)
-    const data = output.data instanceof Uint8ClampedArray
-      ? output.data
-      : new Uint8ClampedArray(output.data)
-
-    if (!isValidDimension(output.width) || !isValidDimension(output.height) || output.channels !== 4 || data.length !== output.width * output.height * 4) {
-      throw new Error('배경 제거 결과 형식이 올바르지 않습니다.')
-    }
-
-    return { data, width: output.width, height: output.height }
+    return normalizeBackgroundRemovalResult(output)
   } finally {
     unsubscribe()
   }
+}
+
+function normalizeBackgroundRemovalResult(output: BackgroundRemovalResult) {
+  const data = output.data instanceof Uint8ClampedArray
+    ? output.data
+    : new Uint8ClampedArray(output.data)
+
+  if (!isValidDimension(output.width) || !isValidDimension(output.height) || output.channels !== 4 || data.length !== output.width * output.height * 4) {
+    throw new Error('배경 제거 결과 형식이 올바르지 않습니다.')
+  }
+
+  return { data, width: output.width, height: output.height }
 }
 
 export function imageDataToDataUrl(data: Uint8ClampedArray, width: number, height: number): string {

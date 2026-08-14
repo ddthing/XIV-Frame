@@ -1,6 +1,7 @@
 import React from 'react'
 import { Layer, Group, Image as KonvaImage, Rect } from 'react-konva'
 import { useTranslations } from 'next-intl'
+import { useShallow } from 'zustand/react/shallow'
 import { useStore } from '@/store/useStore'
 import { ImageUploadError, prepareImageForCanvas, revokeObjectUrl } from '@/lib/imageUpload'
 import type Konva from 'konva'
@@ -26,13 +27,15 @@ function ImageGridLayerComponent({
   blendWidth?: number,
   layoutPreset?: string
 }) {
-  const imagePositions = useStore(state => state.imagePositions)
-  const imageScales = useStore(state => state.imageScales)
-  const imageUrls = useStore(state => state.images)
-  const isImageLocked = useStore(state => state.isImageLocked)
-  const setImagePosition = useStore(state => state.setImagePosition)
-  const setImageAt = useStore(state => state.setImageAt)
-  const setImageScale = useStore(state => state.setImageScale)
+  const { imagePositions, imageScales, imageUrls, isImageLocked, setImagePosition, setImageAt, setImageScale } = useStore(useShallow(state => ({
+    imagePositions: state.imagePositions,
+    imageScales: state.imageScales,
+    imageUrls: state.images,
+    isImageLocked: state.isImageLocked,
+    setImagePosition: state.setImagePosition,
+    setImageAt: state.setImageAt,
+    setImageScale: state.setImageScale,
+  })))
   const t = useTranslations('ImageUploader')
 
   const isShiftPressed = React.useRef(false)
