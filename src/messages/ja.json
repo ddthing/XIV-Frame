@@ -170,7 +170,7 @@
     "characterDragHint": "プレビューキャンバス上でキャラクターをドラッグします。",
     "characterResetPosition": "位置をリセット",
     "characterDelete": "キャラクター合成を削除",
-    "characterModelNote": "背景削除はブラウザ上でBEN2モデルを使って実行します。複雑な背景や複数の人物はブラシ補正が必要な場合があります。"
+    "characterModelNote": "背景削除はブラウザ上で軽量なORMBGモデルを使って実行します。複雑な背景や複数の人物はブラシ補正が必要な場合があります。"
   },
   "DesktopToolbar": {
     "zoom": "ズーム",

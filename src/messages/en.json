@@ -170,7 +170,7 @@
     "characterDragHint": "Drag the character directly on the preview canvas.",
     "characterResetPosition": "Reset position",
     "characterDelete": "Remove composite",
-    "characterModelNote": "Background removal runs in your browser with the BEN2 model. Complex backgrounds or multiple subjects may need brush refinement."
+    "characterModelNote": "Background removal runs in your browser with the lightweight ORMBG model. Complex backgrounds or multiple subjects may need brush refinement."
   },
   "DesktopToolbar": {
     "ratio": "Ratio",

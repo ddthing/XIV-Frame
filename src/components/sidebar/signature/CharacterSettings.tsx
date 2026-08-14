@@ -22,7 +22,7 @@ import { Button } from '@/components/ui/button'
 import { EditorChoice, EditorFieldHeader, EditorSection } from '@/components/ui/editor'
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
-import { imageDataToDataUrl, dataUrlToImageData, prepareCharacterImage, removeImageBackground } from '@/lib/backgroundRemoval'
+import { imageDataToDataUrl, dataUrlToImageData, prepareCharacterImage, removeImageBackground, warmBackgroundRemovalModel } from '@/lib/backgroundRemoval'
 import { useStore } from '@/store/useStore'
 
 const MAX_CHARACTER_FILE_SIZE = 10 * 1024 * 1024
@@ -156,6 +156,7 @@ export function CharacterSettings() {
     try {
       const prepared = await prepareCharacterImage(file)
       sourceBlobRef.current = prepared.blob
+      void warmBackgroundRemovalModel().catch(() => undefined)
       setCharacterSourceUrl(prepared.dataUrl)
       setCharacterCutoutUrl(null)
       setCharacterPosition(null)

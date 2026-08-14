@@ -170,7 +170,7 @@
     "characterDragHint": "미리보기 캔버스에서 캐릭터를 드래그하세요.",
     "characterResetPosition": "위치 초기화",
     "characterDelete": "캐릭터 합성 제거",
-    "characterModelNote": "배경 제거는 BEN2 모델을 사용하며 브라우저에서 실행됩니다. 복잡한 배경이나 여러 인물은 브러시 보정이 필요할 수 있습니다."
+    "characterModelNote": "배경 제거는 브라우저에서 실행되는 ORMBG 모델을 사용합니다. 복잡한 배경이나 여러 인물은 브러시 보정이 필요할 수 있습니다."
   },
   "DesktopToolbar": {
     "zoom": "확대/축소",
