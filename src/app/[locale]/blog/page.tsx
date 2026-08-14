@@ -6,7 +6,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { ContentPage } from '@/components/layout/ContentPage'
 import { locales } from '@/i18n/request'
 import { Metadata } from 'next'
-import { Download, ImagePlus, LayoutGrid, Type } from 'lucide-react'
+import { Download, ImagePlus, LayoutGrid, Type, WandSparkles } from 'lucide-react'
 import { GuideWorkflow } from '@/components/content/GuideWorkflow'
 import { localizedAlternates, localizedUrl } from '@/lib/site'
 
@@ -103,13 +103,20 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
           },
           {
             number: '03',
+            label: t('flowStepComposite'),
+            description: t('flowStepCompositeDescription'),
+            href: `/${locale}/blog/edit-ffxiv-screenshots-without-photoshop`,
+            icon: WandSparkles,
+          },
+          {
+            number: '04',
             label: t('flowStepStyle'),
             description: t('flowStepStyleDescription'),
             href: `/${locale}/blog/ffxiv-screenshot-character-signature`,
             icon: Type,
           },
           {
-            number: '04',
+            number: '05',
             label: t('flowStepExport'),
             description: t('flowStepExportDescription'),
             href: `/${locale}/blog/edit-ffxiv-screenshots-without-photoshop`,
