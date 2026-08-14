@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowLeftRight, ChevronLeft, ChevronRight, Lock, RefreshCw, Trash2, Unlock, Upload, X } from 'lucide-react'
+import { ArrowLeftRight, ChevronLeft, ChevronRight, Lock, RefreshCw, Trash2, Unlock, Upload, UserRound, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -7,8 +7,11 @@ import { useStore } from '@/store/useStore'
 import { Button } from '@/components/ui/button'
 import { EditorFieldHeader, EditorSection } from '@/components/ui/editor'
 import { Input } from '@/components/ui/input'
+import { Tabs, TabsContent } from '@/components/ui/tabs'
+import { SketchbookTabsList, SketchbookTabsTrigger } from '@/components/ui/SketchbookTabs'
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
+import { LazyCharacterSettings } from './LazySettings'
 
 export function ImageUploader() {
   const {
@@ -85,15 +88,28 @@ export function ImageUploader() {
 
   return (
     <div className="space-y-6">
-      <EditorSection title={t('sourceTitle')} description={t('sourceDescription')}>
-        <div className="flex items-center justify-between rounded-md border border-border bg-surface-inset/60 px-3 py-2.5">
-          <span className="text-[13px] font-semibold text-foreground">{t('imageCount')}</span>
-          <span className="font-mono text-[11px] font-semibold tabular-nums text-muted-foreground">{String(imageCount).padStart(2, '0')} / 04</span>
-        </div>
-      </EditorSection>
+      <Tabs defaultValue="frames" className="w-full">
+        <SketchbookTabsList className="h-11">
+          <SketchbookTabsTrigger value="frames" className="gap-2">
+            <Upload className="size-3.5" aria-hidden="true" />
+            {t('tabFrames')}
+          </SketchbookTabsTrigger>
+          <SketchbookTabsTrigger value="character" className="gap-2">
+            <UserRound className="size-3.5" aria-hidden="true" />
+            {t('tabCharacter')}
+          </SketchbookTabsTrigger>
+        </SketchbookTabsList>
 
-      <EditorSection title={t('uploadTitle')} description={t('uploadDescription')}>
-        <div className="grid grid-cols-2 gap-3">
+        <TabsContent value="frames" className="mt-5 space-y-6 focus-visible:outline-none">
+          <EditorSection title={t('sourceTitle')} description={t('sourceDescription')}>
+            <div className="flex items-center justify-between rounded-md border border-border bg-surface-inset/60 px-3 py-2.5">
+              <span className="text-[13px] font-semibold text-foreground">{t('imageCount')}</span>
+              <span className="font-mono text-[11px] font-semibold tabular-nums text-muted-foreground">{String(imageCount).padStart(2, '0')} / 04</span>
+            </div>
+          </EditorSection>
+
+          <EditorSection title={t('uploadTitle')} description={t('uploadDescription')}>
+            <div className="grid grid-cols-2 gap-3">
           {[0, 1, 2, 3].map((index) => {
             const image = images[index]
             if (index > 1 && !images[index - 1] && !image) return null
@@ -153,21 +169,21 @@ export function ImageUploader() {
               </div>
             )
           })}
-        </div>
+            </div>
 
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="h-10 flex-1 rounded-md text-xs" onClick={() => swapImages(0, 1)} disabled={images.length < 2 || !images[0] || !images[1]}>
-            <ArrowLeftRight className="size-3.5" /> {t('swapOrder')}
-          </Button>
-          <Button variant="outline" size="sm" className="h-10 flex-1 rounded-md text-xs hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive" onClick={() => { setImages([]); setSelectedIndex(0) }} disabled={imageCount === 0}>
-            <Trash2 className="size-3.5" /> {t('clearAll')}
-          </Button>
-        </div>
-      </EditorSection>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" className="h-10 flex-1 rounded-md text-xs" onClick={() => swapImages(0, 1)} disabled={images.length < 2 || !images[0] || !images[1]}>
+                <ArrowLeftRight className="size-3.5" /> {t('swapOrder')}
+              </Button>
+              <Button variant="outline" size="sm" className="h-10 flex-1 rounded-md text-xs hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive" onClick={() => { setImages([]); setSelectedIndex(0) }} disabled={imageCount === 0}>
+                <Trash2 className="size-3.5" /> {t('clearAll')}
+              </Button>
+            </div>
+          </EditorSection>
 
-      {activeImage && activeIndex >= 0 && (
-        <EditorSection title={t('selectedImage', { index: activeIndex + 1 })} description={t('selectedImageDescription')} className="border-t border-border pt-5">
-          <div className="editor-control-surface space-y-4 p-4">
+          {activeImage && activeIndex >= 0 && (
+            <EditorSection title={t('selectedImage', { index: activeIndex + 1 })} description={t('selectedImageDescription')} className="border-t border-border pt-5">
+              <div className="editor-control-surface space-y-4 p-4">
             <EditorFieldHeader label={t('imageSize', { index: activeIndex + 1 })} value={`${Math.round(activeScale * 100)}%`} htmlFor="selected-image-scale-input" />
             <div className="flex items-center gap-3">
               <Slider
@@ -209,9 +225,15 @@ export function ImageUploader() {
             <button type="button" onClick={() => { setImageScale(activeIndex, 1); setImagePosition(activeIndex, { x: 0, y: 0 }) }} className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:text-foreground">
               <RefreshCw className="size-3.5" /> {t('reset')}
             </button>
-          </div>
-        </EditorSection>
-      )}
+              </div>
+            </EditorSection>
+          )}
+        </TabsContent>
+
+        <TabsContent value="character" className="mt-5 space-y-4 focus-visible:outline-none">
+          <LazyCharacterSettings />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

@@ -4,11 +4,12 @@ import { createJSONStorage, persist, type StateStorage } from 'zustand/middlewar
 import { ImageSlice, createImageSlice, initialImageState } from './slices/imageSlice'
 import { LayoutSlice, createLayoutSlice, initialLayoutState, CanvasRatio, BackgroundColor, CopyrightPosition, CopyrightColor } from './slices/layoutSlice'
 import { SignatureSlice, createSignatureSlice, initialSignatureState, SignaturePosition, SignatureAlign } from './slices/signatureSlice'
+import { CharacterSlice, createCharacterSlice, initialCharacterState } from './slices/characterSlice'
 
 // Re-export types so we don't break existing imports
 export type { CanvasRatio, BackgroundColor, CopyrightPosition, CopyrightColor, SignaturePosition, SignatureAlign }
 
-export interface AppState extends ImageSlice, LayoutSlice, SignatureSlice {
+export interface AppState extends ImageSlice, LayoutSlice, SignatureSlice, CharacterSlice {
   resetAll: () => void
 }
 
@@ -50,6 +51,7 @@ export const useStore = create<AppState>()(
       ...createImageSlice(set, get, api),
       ...createLayoutSlice(set, get, api),
       ...createSignatureSlice(set, get, api),
+      ...createCharacterSlice(set, get, api),
       
       resetAll: () => {
         // Revoke all existing blob URLs before resetting
@@ -62,6 +64,7 @@ export const useStore = create<AppState>()(
           ...initialImageState,
           ...initialLayoutState,
           ...initialSignatureState,
+          ...initialCharacterState,
         })
       },
     }),
@@ -90,6 +93,8 @@ export const useStore = create<AppState>()(
         delete persistedState.imagePositions
         delete persistedState.imageScales
         delete persistedState.isImageLocked
+        delete persistedState.characterSourceUrl
+        delete persistedState.characterCutoutUrl
         return persistedState
       }
     }

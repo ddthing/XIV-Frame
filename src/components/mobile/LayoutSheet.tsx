@@ -1,6 +1,6 @@
 import React from 'react'
 import { Drawer, DrawerContent } from '@/components/ui/drawer'
-import { LayoutSettings } from '@/components/sidebar/LayoutSettings'
+import { LazyLayoutSettings } from '@/components/sidebar/LazySettings'
 import { useTranslations } from 'next-intl'
 import { MobileSheetHeader } from './MobileSheetHeader'
 import { MobileSheetBody } from './MobileSheetBody'
@@ -12,7 +12,7 @@ export function LayoutSheet({ open, onOpenChange }: { open: boolean; onOpenChang
       <DrawerContent className="max-h-[88vh] rounded-t-2xl bg-background">
         <MobileSheetHeader eyebrow="02 / Inspector" title={t('layoutSheetTitle')} description={t('layoutSheetDescription')} role={t('layoutSheetRole')} />
         <MobileSheetBody open={open} className="custom-scrollbar overflow-y-auto px-5 pb-[calc(env(safe-area-inset-bottom,1rem)+1.25rem)] pt-5">
-          <LayoutSettings />
+          <LazyLayoutSettings />
         </MobileSheetBody>
       </DrawerContent>
     </Drawer>
