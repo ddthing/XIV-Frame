@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button'
 import { EditorChoice, EditorFieldHeader, EditorSection } from '@/components/ui/editor'
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
+import { CharacterPositionControls } from './CharacterPositionControls'
 import { imageDataToDataUrl, dataUrlToImageData, prepareCharacterImage, removeImageBackground, warmBackgroundRemovalModel } from '@/lib/backgroundRemoval'
 import { ImageUploadError, revokeObjectUrl } from '@/lib/imageUpload'
 import { useStore } from '@/store/useStore'
@@ -618,6 +619,7 @@ export function CharacterSettings() {
                 <RotateCcw className="size-3.5" aria-hidden="true" /> {t('characterResetPosition')}
               </button>
             </div>
+            <CharacterPositionControls />
           </div>
         </EditorSection>
       )}

@@ -2,8 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Group, Image as KonvaImage, Rect } from 'react-konva'
 import useImage from 'use-image'
 import { useShallow } from 'zustand/react/shallow'
+import type Konva from 'konva'
 
 import { useStore } from '@/store/useStore'
+import { CHARACTER_NUDGE_EVENT, nudgeCharacterPosition, type CharacterNudgeDetail } from '@/lib/characterPosition'
 
 type CanvasPosition = { x: number; y: number }
 type ResizeHandle = 'nw' | 'ne' | 'sw' | 'se'
@@ -12,6 +14,10 @@ const RESIZE_HANDLES: ResizeHandle[] = ['nw', 'ne', 'sw', 'se']
 
 function getResizeCursor(handle: ResizeHandle) {
   return handle === 'nw' || handle === 'se' ? 'nwse-resize' : 'nesw-resize'
+}
+
+function isInteractiveElement(element: Element | null) {
+  return Boolean(element?.matches('input, textarea, select, button, [contenteditable="true"]'))
 }
 
 function createAlphaOutline(image: HTMLImageElement) {
@@ -82,7 +88,7 @@ function CharacterGuide({
   imageHeight: number
   flipped: boolean
   contentHeight: number
-  onResizeStart: () => void
+  onResizeStart: (stage?: Konva.Stage | null) => void
   onResizePreview: (handle: ResizeHandle, pointer: CanvasPosition) => void
   onResizeEnd: () => void
   onHandleEnter: () => void
@@ -140,7 +146,7 @@ function CharacterGuide({
             }}
             onDragStart={(event) => {
               event.cancelBubble = true
-              onResizeStart()
+              onResizeStart(event.target.getStage())
             }}
             onDragMove={(event) => {
               event.cancelBubble = true
@@ -185,6 +191,7 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
 
   const [characterImg] = useImage(characterCutoutUrl ?? '', 'anonymous')
   const [isHovered, setIsHovered] = useState(false)
+  const [selectedCharacterUrl, setSelectedCharacterUrl] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [isResizing, setIsResizing] = useState(false)
   const [livePosition, setLivePosition] = useState<CanvasPosition | null>(null)
@@ -193,6 +200,7 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
   const pendingResizePreviewRef = useRef<{ scale: number; position: CanvasPosition } | null>(null)
   const resizeFrameRef = useRef<number | null>(null)
   const guideHideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const characterPositionRef = useRef<CanvasPosition | null>(null)
   const outlineImage = useMemo(
     () => characterImg ? createAlphaOutline(characterImg) : null,
     [characterImg],
@@ -205,23 +213,92 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
     }
   }, [])
 
-  if (!characterImg || !characterImg.width || !characterImg.height) return null
+  useEffect(() => {
+    const handleCharacterNudge = (event: Event) => {
+      const detail = (event as CustomEvent<CharacterNudgeDetail>).detail
+      if (!detail || !Number.isFinite(detail.dx) || !Number.isFinite(detail.dy)) return
+      const currentPosition = characterPositionRef.current
+      if (!currentPosition || !characterCutoutUrl) return
+
+      const nextPosition = nudgeCharacterPosition(currentPosition, detail)
+      characterPositionRef.current = nextPosition
+      setCharacterPosition(nextPosition)
+      setSelectedCharacterUrl(characterCutoutUrl)
+      setIsHovered(true)
+    }
+
+    window.addEventListener(CHARACTER_NUDGE_EVENT, handleCharacterNudge)
+    return () => window.removeEventListener(CHARACTER_NUDGE_EVENT, handleCharacterNudge)
+  }, [characterCutoutUrl, setCharacterPosition])
+
+  useEffect(() => {
+    const handleKeyboardNudge = (event: KeyboardEvent) => {
+      if (isExporting || !characterCutoutUrl || selectedCharacterUrl !== characterCutoutUrl) return
+      if (!(document.activeElement instanceof HTMLElement) || document.activeElement.dataset.xivFrameCanvas !== 'true') return
+      if (isInteractiveElement(document.activeElement) || isInteractiveElement(event.target instanceof Element ? event.target : null)) return
+
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        setSelectedCharacterUrl(null)
+        setIsHovered(false)
+        return
+      }
+
+      const direction = {
+        ArrowUp: { dx: 0, dy: -1 },
+        ArrowLeft: { dx: -1, dy: 0 },
+        ArrowRight: { dx: 1, dy: 0 },
+        ArrowDown: { dx: 0, dy: 1 },
+      }[event.key]
+      if (!direction || !characterPositionRef.current) return
+
+      event.preventDefault()
+      event.stopPropagation()
+      const step = event.shiftKey ? 10 : 1
+      const nextPosition = nudgeCharacterPosition(characterPositionRef.current, {
+        dx: direction.dx * step,
+        dy: direction.dy * step,
+      })
+      characterPositionRef.current = nextPosition
+      setCharacterPosition(nextPosition)
+      setIsHovered(true)
+    }
+
+    window.addEventListener('keydown', handleKeyboardNudge)
+    return () => window.removeEventListener('keydown', handleKeyboardNudge)
+  }, [characterCutoutUrl, isExporting, selectedCharacterUrl, setCharacterPosition])
 
   // The default footprint is intentionally portrait-friendly for full-body
   // characters, while the user can enlarge it beyond that base size.
-  const baseScale = Math.min(
-    (contentWidth * 0.58) / characterImg.width,
-    (contentHeight * 0.86) / characterImg.height,
-  )
+  const hasCharacterImage = Boolean(characterImg?.width && characterImg?.height)
+  const imageWidth = characterImg?.width ?? 0
+  const imageHeight = characterImg?.height ?? 0
+  const baseScale = hasCharacterImage ? Math.min(
+    (contentWidth * 0.58) / imageWidth,
+    (contentHeight * 0.86) / imageHeight,
+  ) : 0
   const renderedCharacterScale = liveScale ?? characterScale
   const scale = baseScale * renderedCharacterScale
-  const width = characterImg.width * scale
-  const height = characterImg.height * scale
-  const position = livePosition ?? characterPosition ?? {
-    x: Math.max(0, (contentWidth - width) / 2),
-    y: Math.max(0, contentHeight - height - Math.max(24, contentHeight * 0.06)),
-  }
-  const showGuide = !isExporting && (isHovered || isDragging || isResizing)
+  const width = imageWidth * scale
+  const height = imageHeight * scale
+  const position = useMemo(
+    () => hasCharacterImage
+      ? livePosition ?? characterPosition ?? {
+        x: Math.max(0, (contentWidth - width) / 2),
+        y: Math.max(0, contentHeight - height - Math.max(24, contentHeight * 0.06)),
+      }
+      : null,
+    [characterPosition, contentHeight, contentWidth, hasCharacterImage, height, livePosition, width],
+  )
+
+  useEffect(() => {
+    characterPositionRef.current = position
+  }, [position])
+
+  if (!characterImg || !position) return null
+
+  const isCharacterSelected = Boolean(characterCutoutUrl && selectedCharacterUrl === characterCutoutUrl)
+  const showGuide = !isExporting && (isHovered || isDragging || isResizing || isCharacterSelected)
 
   const cancelGuideHide = () => {
     if (guideHideTimeoutRef.current) {
@@ -238,6 +315,21 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
       guideHideTimeoutRef.current = null
       setIsHovered(false)
     }, 180)
+  }
+
+  const focusStage = (stage?: Konva.Stage | null) => {
+    const container = stage?.container()
+    if (!container) return
+    container.dataset.xivFrameCanvas = 'true'
+    container.tabIndex = 0
+    container.style.outline = 'none'
+    container.focus({ preventScroll: true })
+  }
+
+  const selectCharacter = (stage?: Konva.Stage | null) => {
+    if (characterCutoutUrl) setSelectedCharacterUrl(characterCutoutUrl)
+    cancelGuideHide()
+    focusStage(stage)
   }
 
   const handleResizePreview = (handle: ResizeHandle, pointer: CanvasPosition) => {
@@ -320,10 +412,17 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
           scheduleGuideHide()
           event.target.getStage()?.container().style.setProperty('cursor', 'default')
         }}
-        onClick={cancelGuideHide}
-        onTap={cancelGuideHide}
+        onClick={(event) => {
+          event.cancelBubble = true
+          selectCharacter(event.target.getStage())
+        }}
+        onTap={(event) => {
+          event.cancelBubble = true
+          selectCharacter(event.target.getStage())
+        }}
         onDragStart={(event) => {
-          cancelGuideHide()
+          event.cancelBubble = true
+          selectCharacter(event.target.getStage())
           setIsDragging(true)
           setLivePosition({ x: event.target.x(), y: event.target.y() })
         }}
@@ -348,9 +447,9 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
           imageHeight={characterImg.height}
           flipped={characterFlipX}
           contentHeight={contentHeight}
-           onResizeStart={() => {
-             cancelGuideHide()
-             setIsResizing(true)
+          onResizeStart={(stage) => {
+            selectCharacter(stage)
+            setIsResizing(true)
               resizePreviewRef.current = null
               pendingResizePreviewRef.current = null
             }}

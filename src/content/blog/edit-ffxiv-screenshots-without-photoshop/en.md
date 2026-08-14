@@ -28,8 +28,9 @@ XIV Frame is a browser-based tool for arranging screenshots and exporting the fi
 2. Click **Add image to composite** and choose a PNG, JPG, or WebP file. Transparent PNGs can be used as they are; images with a background can be cleaned up in the next step.
 3. Review the original and **Cutout result** previews, then click **Remove background**. The first run may take longer while the model is prepared in your browser.
 4. If unwanted areas remain, open **Refine the edges**, choose **Erase**, and drag over the preview. Use **Restore** to bring back details that were removed.
-5. In **Canvas placement**, drag the image directly on the canvas and adjust **Image size**, opacity, horizontal flip, and the natural shadow.
-6. To remove the composite image, click **Remove composite**. Your photo sources and signature settings stay unchanged.
+5. In **Canvas placement**, drag the image directly on the canvas and adjust **Image size**, opacity, horizontal flip, and the natural shadow. On desktop, click the composite image and use the arrow keys to move it by 1px; hold Shift with an arrow key to move it by 10px.
+6. On mobile, use the **Fine position** pad. Tap the center button to switch between 1px and 10px, or hold an arrow to keep moving.
+7. To remove the composite image, click **Remove composite**. Your photo sources and signature settings stay unchanged.
 
 ## 3. Choose a composition
 
