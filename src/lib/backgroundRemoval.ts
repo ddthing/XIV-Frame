@@ -1,4 +1,5 @@
-export const CHARACTER_MODEL_ID = 'onnx-community/BEN2-ONNX'
+export const CHARACTER_MODEL_ID = 'onnx-community/ormbg-ONNX'
+export const CHARACTER_MODEL_DTYPE = 'q8'
 export const CHARACTER_MAX_DIMENSION = 1536
 
 type BackgroundRemovalResult = {
@@ -9,8 +10,20 @@ type BackgroundRemovalResult = {
 }
 
 type BackgroundRemovalPipeline = (input: Blob) => Promise<BackgroundRemovalResult>
+type ProgressListener = (progress: number) => void
 
 let pipelinePromise: Promise<BackgroundRemovalPipeline> | null = null
+const progressListeners = new Set<ProgressListener>()
+
+function emitProgress(progress: number) {
+  progressListeners.forEach((listener) => listener(progress))
+}
+
+function subscribeToProgress(listener?: ProgressListener) {
+  if (!listener) return () => undefined
+  progressListeners.add(listener)
+  return () => progressListeners.delete(listener)
+}
 
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -75,7 +88,7 @@ export async function prepareCharacterImage(file: File): Promise<{ blob: Blob; d
   }
 }
 
-async function getBackgroundRemovalPipeline(onProgress?: (progress: number) => void): Promise<BackgroundRemovalPipeline> {
+async function getBackgroundRemovalPipeline(): Promise<BackgroundRemovalPipeline> {
   if (!pipelinePromise) {
     pipelinePromise = (async () => {
       const { env, pipeline } = await import('@huggingface/transformers')
@@ -86,11 +99,12 @@ async function getBackgroundRemovalPipeline(onProgress?: (progress: number) => v
       const supportsWebGPU = typeof navigator !== 'undefined' && 'gpu' in navigator
       const createPipeline = (device: 'webgpu' | 'wasm') => pipeline('background-removal', CHARACTER_MODEL_ID, {
         device,
-        // BEN2 currently publishes an fp16 ONNX weight for this browser-ready mirror.
-        dtype: 'fp16',
+        // ORMBG's quantized ONNX weight keeps first-run downloads much smaller
+        // while remaining suitable for foregrounds with more than one subject.
+        dtype: CHARACTER_MODEL_DTYPE,
         progress_callback: (info) => {
           if ('progress' in info && typeof info.progress === 'number') {
-            onProgress?.(Math.round(info.progress))
+            emitProgress(Math.round(info.progress))
           }
         },
       }) as unknown as BackgroundRemovalPipeline
@@ -112,21 +126,38 @@ async function getBackgroundRemovalPipeline(onProgress?: (progress: number) => v
   return pipelinePromise
 }
 
+export async function warmBackgroundRemovalModel(onProgress?: ProgressListener): Promise<void> {
+  const unsubscribe = subscribeToProgress(onProgress)
+
+  try {
+    await getBackgroundRemovalPipeline()
+  } finally {
+    unsubscribe()
+  }
+}
+
 export async function removeImageBackground(
   blob: Blob,
   onProgress?: (progress: number) => void,
 ): Promise<{ data: Uint8ClampedArray; width: number; height: number }> {
-  const segmenter = await getBackgroundRemovalPipeline(onProgress)
-  const output = await segmenter(blob)
-  const data = output.data instanceof Uint8ClampedArray
-    ? output.data
-    : new Uint8ClampedArray(output.data)
+  const unsubscribe = subscribeToProgress(onProgress)
 
-  if (output.channels !== 4 || data.length !== output.width * output.height * 4) {
-    throw new Error('배경 제거 결과 형식이 올바르지 않습니다.')
+  try {
+    const segmenter = await getBackgroundRemovalPipeline()
+    onProgress?.(100)
+    const output = await segmenter(blob)
+    const data = output.data instanceof Uint8ClampedArray
+      ? output.data
+      : new Uint8ClampedArray(output.data)
+
+    if (output.channels !== 4 || data.length !== output.width * output.height * 4) {
+      throw new Error('배경 제거 결과 형식이 올바르지 않습니다.')
+    }
+
+    return { data, width: output.width, height: output.height }
+  } finally {
+    unsubscribe()
   }
-
-  return { data, width: output.width, height: output.height }
 }
 
 export function imageDataToDataUrl(data: Uint8ClampedArray, width: number, height: number): string {
