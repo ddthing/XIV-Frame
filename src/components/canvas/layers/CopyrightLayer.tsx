@@ -6,10 +6,14 @@ import { DEFAULT_SIGNATURE_FONT } from '@/constants/signature'
 
 import { useTranslations } from 'next-intl'
 
-const COPYRIGHT_MIN_FONT_SIZE = 24
+const COPYRIGHT_MIN_FONT_SIZE = 16
 const COPYRIGHT_MAX_FONT_SIZE = 96
-const COPYRIGHT_BASE_RATIO = 0.018
+const COPYRIGHT_BASE_RATIO = 0.014
 const COPYRIGHT_REFERENCE_ASPECT = 16 / 9
+const COPYRIGHT_MIN_OPACITY = 0.18
+const COPYRIGHT_MAX_OPACITY = 0.68
+const COPYRIGHT_FADE_START_SIDE = 720
+const COPYRIGHT_FULL_OPACITY_SIDE = 2160
 
 export function getCopyrightMetrics(contentWidth: number, contentHeight: number) {
   const shortSide = Math.min(contentWidth, contentHeight)
@@ -21,8 +25,18 @@ export function getCopyrightMetrics(contentWidth: number, contentHeight: number)
   )
   const padding = Math.min(96, Math.max(24, fontSize * 1.35))
   const textHeight = fontSize * 1.25
+  const opacityProgress = Math.min(
+    1,
+    Math.max(
+      0,
+      (shortSide - COPYRIGHT_FADE_START_SIDE) /
+        (COPYRIGHT_FULL_OPACITY_SIDE - COPYRIGHT_FADE_START_SIDE),
+    ),
+  )
+  const opacity = COPYRIGHT_MIN_OPACITY +
+    ((COPYRIGHT_MAX_OPACITY - COPYRIGHT_MIN_OPACITY) * opacityProgress)
 
-  return { fontSize, padding, textHeight }
+  return { fontSize, padding, textHeight, opacity }
 }
 
 function CopyrightLayerComponent({ contentWidth, contentHeight }: { contentWidth: number, contentHeight: number }) {
@@ -35,13 +49,14 @@ function CopyrightLayerComponent({ contentWidth, contentHeight }: { contentWidth
 
   if (!showCopyright) return null
 
-  const { fontSize, padding, textHeight } = getCopyrightMetrics(contentWidth, contentHeight)
+  const { fontSize, padding, textHeight, opacity } = getCopyrightMetrics(contentWidth, contentHeight)
 
   return (
     <Text
       text={t('text')}
       fontFamily={DEFAULT_SIGNATURE_FONT}
       fontSize={fontSize}
+      opacity={opacity}
       fill={copyrightColor === 'black' ? '#000000' : copyrightColor === 'white' ? '#FFFFFF' : '#888888'}
       align={copyrightPosition === 'bottom-left' ? 'left' : copyrightPosition === 'bottom-right' ? 'right' : 'center'}
       verticalAlign="bottom"
