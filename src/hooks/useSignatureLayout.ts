@@ -20,6 +20,7 @@ interface UseSignatureLayoutProps {
   lowerBold: boolean
   lowerItalic: boolean
   signatureSize: number
+  bottomOffset: number
 }
 
 export function useSignatureLayout(props: UseSignatureLayoutProps) {
@@ -78,7 +79,8 @@ export function useSignatureLayout(props: UseSignatureLayoutProps) {
     fontLoaded, props.fontFamily,
     props.upperLetterSpacing, props.upperBold, props.upperItalic,
     props.lowerLetterSpacing, props.lowerBold, props.lowerItalic,
-    props.signatureSize
+    props.signatureSize,
+    props.bottomOffset
   ])
 
   let groupX = 0
@@ -89,7 +91,7 @@ export function useSignatureLayout(props: UseSignatureLayoutProps) {
   else groupX = props.contentWidth / 2
 
   if (props.signaturePosition.includes('top')) groupY = SIGNATURE_PADDING
-  else if (props.signaturePosition.includes('bottom')) groupY = props.contentHeight - SIGNATURE_PADDING
+  else if (props.signaturePosition.includes('bottom')) groupY = props.contentHeight - SIGNATURE_PADDING - props.bottomOffset
   else groupY = props.contentHeight / 2
 
   return {

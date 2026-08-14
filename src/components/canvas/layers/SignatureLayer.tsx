@@ -3,13 +3,16 @@ import { Text, Group } from 'react-konva'
 import { useStore } from '@/store/useStore'
 import { useShallow } from 'zustand/react/shallow'
 import { useSignatureLayout } from '@/hooks/useSignatureLayout'
-import { resolveSignatureFont } from '@/constants/signature'
+import { resolveSignatureFont, SIGNATURE_PADDING } from '@/constants/signature'
+import { getCopyrightMetrics } from './CopyrightLayer'
+
+const SIGNATURE_COPYRIGHT_GAP = 32
 
 function SignatureLayerComponent({ contentWidth, contentHeight }: { contentWidth: number, contentHeight: number }) {
   const {
     signatureSize, signaturePosition, signatureAlign, characterName, serverName, fontFamily,
     upperLetterSpacing, upperBold, upperItalic, lowerLetterSpacing, lowerBold, lowerItalic,
-    signatureColor, signatureOpacity
+    signatureColor, signatureOpacity, showCopyright
   } = useStore(useShallow(state => ({
     signatureSize: state.signatureSize,
     signaturePosition: state.signaturePosition,
@@ -24,12 +27,18 @@ function SignatureLayerComponent({ contentWidth, contentHeight }: { contentWidth
     lowerBold: state.lowerBold,
     lowerItalic: state.lowerItalic,
     signatureColor: state.signatureColor,
-    signatureOpacity: state.signatureOpacity
+    signatureOpacity: state.signatureOpacity,
+    showCopyright: state.showCopyright,
   })))
 
   const upperFontSize = (signatureSize / 100) * 40
   const lowerFontSize = (signatureSize / 100) * 24
   const resolvedFontFamily = resolveSignatureFont(fontFamily)
+  const { fontSize: copyrightFontSize, padding: copyrightPadding, textHeight: copyrightTextHeight } = getCopyrightMetrics(contentWidth, contentHeight)
+  const copyrightGap = Math.max(SIGNATURE_COPYRIGHT_GAP, copyrightFontSize * 0.75)
+  const signatureBottomOffset = showCopyright && signaturePosition.includes('bottom')
+    ? Math.max(0, copyrightPadding + copyrightTextHeight + copyrightGap - SIGNATURE_PADDING)
+    : 0
 
   const { groupRef, upperRef, lowerRef, groupX, groupY } = useSignatureLayout({
     contentWidth,
@@ -47,7 +56,8 @@ function SignatureLayerComponent({ contentWidth, contentHeight }: { contentWidth
     lowerLetterSpacing,
     lowerBold,
     lowerItalic,
-    signatureSize
+    signatureSize,
+    bottomOffset: signatureBottomOffset
   })
 
   if (!characterName && !serverName) return null
