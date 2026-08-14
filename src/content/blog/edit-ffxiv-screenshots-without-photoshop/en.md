@@ -10,7 +10,7 @@ XIV Frame is a browser-based tool for arranging screenshots and exporting the fi
 ## Before you start
 
 - You can use up to **four images** in one canvas.
-- Each image must be **10MB or smaller**.
+- Each image can be **up to 50MB**. Larger originals are optimized in the browser after upload.
 - Your images are processed in the browser; the original files are not uploaded to a server.
 - Preview zoom changes how large the canvas looks on screen. It does not change the exported image size.
 

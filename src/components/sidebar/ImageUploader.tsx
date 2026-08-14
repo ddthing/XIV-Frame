@@ -11,6 +11,7 @@ import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { SketchbookTabsList, SketchbookTabsTrigger } from '@/components/ui/SketchbookTabs'
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
+import { ImageUploadError, prepareImageForCanvas } from '@/lib/imageUpload'
 import { LazyCharacterSettings } from './LazySettings'
 
 export function ImageUploader() {
@@ -52,16 +53,17 @@ export function ImageUploader() {
     input.onchange = (event) => {
       const file = (event.target as HTMLInputElement).files?.[0]
       if (!file) return
-      if (file.size > 10 * 1024 * 1024) {
-        alert(t('uploadLimit'))
-        return
-      }
 
-      const url = URL.createObjectURL(file)
-      setImageAt(index, url)
-      setImageScale(index, 1)
-      setImagePosition(index, { x: 0, y: 0 })
-      setSelectedIndex(index)
+      void prepareImageForCanvas(file)
+        .then((url) => {
+          setImageAt(index, url)
+          setImageScale(index, 1)
+          setImagePosition(index, { x: 0, y: 0 })
+          setSelectedIndex(index)
+        })
+        .catch((error: unknown) => {
+          alert(error instanceof ImageUploadError && error.code === 'too-large' ? t('uploadLimit') : t('uploadError'))
+        })
     }
     input.click()
   }

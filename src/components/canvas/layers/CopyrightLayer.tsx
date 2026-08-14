@@ -57,6 +57,7 @@ function CopyrightLayerComponent({ contentWidth, contentHeight }: { contentWidth
       fontFamily={DEFAULT_SIGNATURE_FONT}
       fontSize={fontSize}
       opacity={opacity}
+      listening={false}
       fill={copyrightColor === 'black' ? '#000000' : copyrightColor === 'white' ? '#FFFFFF' : '#888888'}
       align={copyrightPosition === 'bottom-left' ? 'left' : copyrightPosition === 'bottom-right' ? 'right' : 'center'}
       verticalAlign="bottom"

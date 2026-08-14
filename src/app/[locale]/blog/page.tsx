@@ -57,9 +57,9 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
     <Link
       key={post.slug}
       href={`/${locale}/blog/${post.slug}`}
-      className="group block h-full rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+      className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-background"
     >
-      <article className={`flex h-full flex-col rounded-xl border border-border p-5 shadow-subtle transition-[transform,box-shadow,border-color] duration-200 group-hover:-translate-y-1 group-hover:border-primary/40 group-hover:shadow-md sm:p-6 ${isFeatured ? 'bg-sticky-note-mint lg:min-h-[20rem]' : 'bg-card'}`}>
+      <article className={`flex flex-col rounded-xl border border-border p-5 shadow-subtle transition-[transform,box-shadow,border-color] duration-200 group-hover:-translate-y-1 group-hover:border-primary/40 group-hover:shadow-md sm:p-6 ${isFeatured ? 'bg-sticky-note-mint' : 'bg-card'}`}>
         <div className="flex items-center justify-between gap-3">
           <p className="editor-meta">{isFeatured ? 'FEATURED' : `GUIDE ${String(index + 1).padStart(2, '0')}`}</p>
           <time dateTime={post.metadata.date} className="font-body text-xs font-medium text-muted-foreground">
@@ -69,7 +69,7 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
         <h2 className={`mt-6 font-display font-bold leading-tight tracking-[0.01em] text-foreground transition-colors group-hover:text-primary ${isFeatured ? 'text-2xl' : 'text-xl'}`}>
           {post.metadata.title}
         </h2>
-        <p className="mt-3 flex-1 font-body text-[13px] leading-5 text-foreground/75">
+        <p className="mt-3 font-body text-[13px] leading-5 text-foreground/75">
           {post.metadata.description}
         </p>
         <div className="mt-6 inline-flex items-center gap-2 font-body text-xs font-bold text-foreground">
@@ -125,11 +125,9 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
         ]}
       />
       {featured ? (
-        <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
+        <div className="grid items-start gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {renderPost(featured, 0, true)}
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-1">
-            {rest.map((post, index) => renderPost(post, index + 1))}
-          </div>
+          {rest.map((post, index) => renderPost(post, index + 1))}
         </div>
       ) : (
         <p className="rounded-xl border border-dashed border-border bg-card p-8 text-center font-body text-muted-foreground">{t('description')}</p>

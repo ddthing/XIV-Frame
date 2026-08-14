@@ -10,7 +10,7 @@ XIV Frame treats a logo as an overlay layer. A transparent PNG is the best choic
 ## 1. Prepare the logo
 
 1. Use a transparent PNG when possible.
-2. The selected file must be 10MB or smaller.
+2. Keep logo files at 10MB or smaller. Logos use a separate storage optimization, so a lightweight transparent PNG is recommended instead of a large photo.
 3. Crop unnecessary empty space around the artwork before uploading. Extra padding makes the logo appear farther from the canvas edge.
 
 ## 2. Open Logo Upload
@@ -19,7 +19,7 @@ XIV Frame treats a logo as an overlay layer. A transparent PNG is the best choic
 2. Open **Signature** on desktop or **Signature** in the mobile bottom navigation.
 3. Select the **Logo Upload** tab.
 4. Click **Upload Logo Image** and choose the file.
-5. If the file cannot be read, choose a PNG or JPG again and check the file size.
+5. If the file cannot be read, choose a PNG or JPG again and check that the logo file is 10MB or smaller.
 
 ## 3. Choose a position
 

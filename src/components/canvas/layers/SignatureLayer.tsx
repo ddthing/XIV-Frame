@@ -63,7 +63,7 @@ function SignatureLayerComponent({ contentWidth, contentHeight }: { contentWidth
   if (!characterName && !serverName) return null
 
   return (
-    <Group ref={groupRef} x={groupX} y={groupY}>
+    <Group ref={groupRef} x={groupX} y={groupY} listening={false}>
       {characterName && (
         <Text
           ref={upperRef}
