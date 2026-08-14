@@ -93,7 +93,7 @@ export function SettingsPanel() {
         </header>
 
         <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
-          <div className="min-h-full space-y-6 p-5 pb-10">
+          <div className="min-h-full space-y-6 p-5 pb-14">
             <TabsContent value="image" className="mt-0 focus-visible:outline-none">
               <ImageUploader />
             </TabsContent>

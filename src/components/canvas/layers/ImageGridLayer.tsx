@@ -94,7 +94,8 @@ function ImageGridLayerComponent({
         })
         .catch((error: unknown) => {
           if (!mountedRef.current || uploadRequests.current.get(index)?.requestId !== requestId) return
-          alert(error instanceof ImageUploadError && error.code === 'too-large' ? t('uploadLimit') : t('uploadError'))
+          const message = error instanceof ImageUploadError && error.code === 'too-large' ? t('uploadLimit') : t('uploadError')
+          window.dispatchEvent(new CustomEvent('xiv-frame:upload-error', { detail: message }))
           uploadRequests.current.delete(index)
         })
     }

@@ -343,7 +343,7 @@ export function CharacterSettings() {
   return (
     <div className="space-y-6 font-sans">
       <EditorSection title={t('characterTitle')} description={t('characterDescription')}>
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="rounded-xl border border-primary/15 bg-sticky-note-mint/35 px-4 py-3">
             <div className="flex gap-3">
               <span className="grid size-8 shrink-0 place-items-center rounded-md bg-card text-primary shadow-subtle">
@@ -357,8 +357,8 @@ export function CharacterSettings() {
           </div>
 
           {!sourcePreview ? (
-            <label htmlFor="character-file-input" className="relative flex min-h-32 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-primary/25 bg-card px-4 text-center transition-colors hover:bg-surface-inset/70 focus-within:ring-2 focus-within:ring-ring/50">
-              <span className="grid size-10 place-items-center rounded-md bg-surface-inset text-foreground"><Upload className="size-4" aria-hidden="true" /></span>
+            <label htmlFor="character-file-input" className="relative flex min-h-20 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-primary/25 bg-card px-4 text-center transition-colors hover:bg-surface-inset/70 focus-within:ring-2 focus-within:ring-ring/50">
+              <span className="grid size-8 place-items-center rounded-md bg-surface-inset text-foreground"><Upload className="size-3.5" aria-hidden="true" /></span>
               <span className="text-xs font-semibold text-foreground">{t('characterUploadLabel')}</span>
               <span className="font-body text-[11px] text-muted-foreground">{t('characterUploadHint')}</span>
               <input ref={fileInputRef} id="character-file-input" type="file" accept="image/*" onChange={handleFileChange} className="absolute inset-0 z-10 size-full cursor-pointer opacity-0" aria-label={t('characterUploadLabel')} />

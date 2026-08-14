@@ -49,7 +49,7 @@ export function TextOptionControl({
         <div className="flex shrink-0 items-center gap-2">
           <button 
             type="button" 
-            aria-label={bold ? 'Remove bold' : 'Make text bold'}
+            aria-label={bold ? t('removeBold') : t('makeBold')}
             className={`flex size-9 items-center justify-center rounded-md border transition-colors shadow-subtle ${bold ? 'border-primary bg-sticky-note-mint text-primary font-semibold' : 'border-border bg-card text-muted-foreground hover:bg-muted/50'}`}
             onClick={() => onChangeBold(!bold)}
           >
@@ -57,7 +57,7 @@ export function TextOptionControl({
           </button>
           <button 
             type="button" 
-            aria-label={italic ? 'Remove italic' : 'Make text italic'}
+            aria-label={italic ? t('removeItalic') : t('makeItalic')}
             className={`flex size-9 items-center justify-center rounded-md border transition-colors shadow-subtle ${italic ? 'border-primary bg-sticky-note-mint text-primary font-semibold' : 'border-border bg-card text-muted-foreground hover:bg-muted/50'}`}
             onClick={() => onChangeItalic(!italic)}
           >
