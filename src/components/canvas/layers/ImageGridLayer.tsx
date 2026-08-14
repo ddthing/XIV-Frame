@@ -2,8 +2,10 @@ import React from 'react'
 import { Layer, Group, Image as KonvaImage, Rect } from 'react-konva'
 import { useTranslations } from 'next-intl'
 import { useStore } from '@/store/useStore'
-import { ImageUploadError, prepareImageForCanvas } from '@/lib/imageUpload'
+import { ImageUploadError, prepareImageForCanvas, revokeObjectUrl } from '@/lib/imageUpload'
 import type Konva from 'konva'
+
+type PendingUpload = { requestId: number; sourceUrl: string | undefined }
 
 function ImageGridLayerComponent({ 
   images, 
@@ -26,6 +28,7 @@ function ImageGridLayerComponent({
 }) {
   const imagePositions = useStore(state => state.imagePositions)
   const imageScales = useStore(state => state.imageScales)
+  const imageUrls = useStore(state => state.images)
   const isImageLocked = useStore(state => state.isImageLocked)
   const setImagePosition = useStore(state => state.setImagePosition)
   const setImageAt = useStore(state => state.setImageAt)
@@ -34,6 +37,8 @@ function ImageGridLayerComponent({
 
   const isShiftPressed = React.useRef(false)
   const dragContexts = React.useRef<{ [key: number]: { startX: number, startY: number, axis: 'x' | 'y' | null, inverseTransform?: Konva.Transform, absoluteTransform?: Konva.Transform } }>({})
+  const uploadRequests = React.useRef(new Map<number, PendingUpload>())
+  const mountedRef = React.useRef(true)
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => { if (e.key === 'Shift') isShiftPressed.current = true }
@@ -43,6 +48,29 @@ function ImageGridLayerComponent({
     return () => { window.removeEventListener('keydown', down); window.removeEventListener('keyup', up) }
   }, [])
 
+  React.useEffect(() => {
+    const requests = uploadRequests.current
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+      requests.clear()
+    }
+  }, [])
+
+  React.useEffect(() => {
+    uploadRequests.current.forEach((pending, index) => {
+      if (imageUrls[index] !== pending.sourceUrl) {
+        uploadRequests.current.set(index, { ...pending, requestId: pending.requestId + 1 })
+      }
+    })
+  }, [imageUrls])
+
+  const beginUpload = (index: number) => {
+    const requestId = (uploadRequests.current.get(index)?.requestId ?? 0) + 1
+    uploadRequests.current.set(index, { requestId, sourceUrl: imageUrls[index] })
+    return requestId
+  }
+
   const handleFileUpload = (index: number) => {
     const input = document.createElement('input')
     input.type = 'file'
@@ -50,15 +78,24 @@ function ImageGridLayerComponent({
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0]
       if (!file) return
+      const requestId = beginUpload(index)
 
       void prepareImageForCanvas(file)
         .then((url) => {
+          if (!mountedRef.current || uploadRequests.current.get(index)?.requestId !== requestId) {
+            revokeObjectUrl(url)
+            return
+          }
+
           setImageAt(index, url)
           setImageScale(index, 1)
           setImagePosition(index, { x: 0, y: 0 })
+          uploadRequests.current.delete(index)
         })
         .catch((error: unknown) => {
+          if (!mountedRef.current || uploadRequests.current.get(index)?.requestId !== requestId) return
           alert(error instanceof ImageUploadError && error.code === 'too-large' ? t('uploadLimit') : t('uploadError'))
+          uploadRequests.current.delete(index)
         })
     }
     input.click()

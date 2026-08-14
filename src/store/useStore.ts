@@ -5,6 +5,7 @@ import { ImageSlice, createImageSlice, initialImageState } from './slices/imageS
 import { LayoutSlice, createLayoutSlice, initialLayoutState, CanvasRatio, BackgroundColor, CopyrightPosition, CopyrightColor } from './slices/layoutSlice'
 import { SignatureSlice, createSignatureSlice, initialSignatureState, SignaturePosition, SignatureAlign } from './slices/signatureSlice'
 import { CharacterSlice, createCharacterSlice, initialCharacterState } from './slices/characterSlice'
+import { revokeObjectUrl } from '@/lib/imageUpload'
 
 // Re-export types so we don't break existing imports
 export type { CanvasRatio, BackgroundColor, CopyrightPosition, CopyrightColor, SignaturePosition, SignatureAlign }
@@ -55,11 +56,7 @@ export const useStore = create<AppState>()(
       
       resetAll: () => {
         // Revoke all existing blob URLs before resetting
-        get().images.forEach(url => {
-          if (url && url.startsWith('blob:')) {
-            URL.revokeObjectURL(url)
-          }
-        })
+        get().images.forEach(revokeObjectUrl)
         set({
           ...initialImageState,
           ...initialLayoutState,
@@ -93,6 +90,7 @@ export const useStore = create<AppState>()(
         delete persistedState.imagePositions
         delete persistedState.imageScales
         delete persistedState.isImageLocked
+        delete persistedState.isExporting
         delete persistedState.characterSourceUrl
         delete persistedState.characterCutoutUrl
         return persistedState

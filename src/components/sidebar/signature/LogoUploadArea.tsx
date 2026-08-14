@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useStore } from '@/store/useStore'
 import { useShallow } from 'zustand/react/shallow'
 import { Label } from '@/components/ui/label'
@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl'
 import { PositionGrid } from '@/components/ui/PositionGrid'
 import { LOGO_POSITION_OPTIONS } from '@/constants/signature'
 import { EditorFieldHeader } from '@/components/ui/editor'
+import { ImageUploadError, validateImageFile } from '@/lib/imageUpload'
 
 const MAX_LOGO_FILE_SIZE = 10 * 1024 * 1024
 const MAX_LOGO_DIMENSION = 512
@@ -31,6 +32,11 @@ export function LogoUploadArea() {
   })))
   const t = useTranslations('SignatureSettings')
   const [uploadError, setUploadError] = useState<string | null>(null)
+  const uploadRequestRef = useRef(0)
+
+  useEffect(() => () => {
+    uploadRequestRef.current += 1
+  }, [])
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.currentTarget.files?.[0]
@@ -38,15 +44,23 @@ export function LogoUploadArea() {
     event.currentTarget.value = ''
     if (!file) return
 
+    const requestId = ++uploadRequestRef.current
     setUploadError(null)
-    if (file.size > MAX_LOGO_FILE_SIZE) {
-      setUploadError(t('logoUploadTooLarge'))
+
+    try {
+      validateImageFile(file, MAX_LOGO_FILE_SIZE)
+    } catch (cause) {
+      if (requestId !== uploadRequestRef.current) return
+      setUploadError(cause instanceof ImageUploadError && cause.code === 'too-large' ? t('logoUploadTooLarge') : t('logoUploadError'))
       return
     }
 
     const reader = new FileReader()
-    reader.onerror = () => setUploadError(t('logoUploadError'))
+    reader.onerror = () => {
+      if (requestId === uploadRequestRef.current) setUploadError(t('logoUploadError'))
+    }
     reader.onload = () => {
+      if (requestId !== uploadRequestRef.current) return
       const dataUrl = typeof reader.result === 'string' ? reader.result : null
       if (!dataUrl) {
         setUploadError(t('logoUploadError'))
@@ -54,8 +68,11 @@ export function LogoUploadArea() {
       }
 
       const img = new Image()
-      img.onerror = () => setUploadError(t('logoUploadError'))
+      img.onerror = () => {
+        if (requestId === uploadRequestRef.current) setUploadError(t('logoUploadError'))
+      }
       img.onload = () => {
+        if (requestId !== uploadRequestRef.current) return
         try {
           const canvas = document.createElement('canvas')
           const sourceWidth = img.naturalWidth || img.width
@@ -97,8 +114,14 @@ export function LogoUploadArea() {
     try {
       reader.readAsDataURL(file)
     } catch {
-      setUploadError(t('logoUploadError'))
+      if (requestId === uploadRequestRef.current) setUploadError(t('logoUploadError'))
     }
+  }
+
+  const handleDelete = () => {
+    uploadRequestRef.current += 1
+    setLogoUrl(null)
+    setUploadError(null)
   }
 
   return (
@@ -125,7 +148,7 @@ export function LogoUploadArea() {
             <img src={logoUrl} alt="Logo" className="max-w-[80%] max-h-[80%] object-contain" />
             <button 
               aria-label={t('logoDelete')}
-              onClick={() => setLogoUrl(null)}
+               onClick={handleDelete}
               className="absolute right-2 top-2 grid size-7 place-items-center rounded-md border border-border bg-background text-foreground opacity-0 shadow-subtle transition-colors hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
             >
               <X className="size-3.5" />
