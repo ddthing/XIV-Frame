@@ -11,7 +11,7 @@ const COPYRIGHT_MAX_FONT_SIZE = 96
 const COPYRIGHT_BASE_RATIO = 0.018
 const COPYRIGHT_REFERENCE_ASPECT = 16 / 9
 
-function getCopyrightMetrics(contentWidth: number, contentHeight: number) {
+export function getCopyrightMetrics(contentWidth: number, contentHeight: number) {
   const shortSide = Math.min(contentWidth, contentHeight)
   const aspectRatio = contentWidth / contentHeight
   const aspectMultiplier = Math.min(1.45, Math.max(0.85, Math.sqrt(aspectRatio / COPYRIGHT_REFERENCE_ASPECT)))
