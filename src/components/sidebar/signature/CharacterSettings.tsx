@@ -32,6 +32,7 @@ const MAX_UNDO_STEPS = 8
 type BrushMode = 'erase' | 'restore'
 type PixelState = { data: Uint8ClampedArray; width: number; height: number }
 type PointerPosition = { clientX: number; clientY: number }
+type BrushCursor = { x: number; y: number }
 
 function drawPixels(canvas: HTMLCanvasElement | null, pixels: PixelState | null) {
   if (!canvas || !pixels) return
@@ -131,6 +132,7 @@ export function CharacterSettings() {
   const t = useTranslations('SignatureSettings')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const brushViewportRef = useRef<HTMLDivElement>(null)
   const sourceBlobRef = useRef<Blob | null>(null)
   const sourceUrlRef = useRef<string | null>(characterSourceUrl)
   const sourcePixelsRef = useRef<PixelState | null>(null)
@@ -139,6 +141,7 @@ export function CharacterSettings() {
   const undoStackRef = useRef<Uint8ClampedArray[]>([])
   const paintingRef = useRef(false)
   const paintFrameRef = useRef<number | null>(null)
+  const brushCursorHideTimeoutRef = useRef<number | null>(null)
   const lastPointerRef = useRef<PointerPosition | null>(null)
   const fileRequestRef = useRef(0)
   const processingRequestRef = useRef(0)
@@ -146,6 +149,7 @@ export function CharacterSettings() {
   const mountedRef = useRef(true)
   const sourcePreview = characterSourceUrl
   const [workingPixels, setWorkingPixels] = useState<PixelState | null>(null)
+  const [brushCursor, setBrushCursor] = useState<BrushCursor | null>(null)
   const [editorOpen, setEditorOpen] = useState(false)
   const [brushMode, setBrushMode] = useState<BrushMode>('erase')
   const [brushSize, setBrushSize] = useState(72)
@@ -170,7 +174,47 @@ export function CharacterSettings() {
       window.cancelAnimationFrame(paintFrameRef.current)
       paintFrameRef.current = null
     }
+    if (brushCursorHideTimeoutRef.current !== null) {
+      window.clearTimeout(brushCursorHideTimeoutRef.current)
+      brushCursorHideTimeoutRef.current = null
+    }
   }, [])
+
+  const clearBrushCursorHide = () => {
+    if (brushCursorHideTimeoutRef.current === null) return
+    window.clearTimeout(brushCursorHideTimeoutRef.current)
+    brushCursorHideTimeoutRef.current = null
+  }
+
+  const hideBrushCursor = (delay = 0) => {
+    clearBrushCursorHide()
+    if (delay <= 0) {
+      setBrushCursor(null)
+      return
+    }
+
+    brushCursorHideTimeoutRef.current = window.setTimeout(() => {
+      brushCursorHideTimeoutRef.current = null
+      if (mountedRef.current) setBrushCursor(null)
+    }, delay)
+  }
+
+  const updateBrushCursor = (event: PointerEvent<HTMLCanvasElement>) => {
+    const viewport = brushViewportRef.current
+    const canvas = event.currentTarget
+    if (!viewport) return
+
+    const canvasRect = canvas.getBoundingClientRect()
+    const viewportRect = viewport.getBoundingClientRect()
+    if (canvasRect.width <= 0 || canvasRect.height <= 0) return
+
+    const canvasX = Math.max(0, Math.min(canvasRect.width, event.clientX - canvasRect.left))
+    const canvasY = Math.max(0, Math.min(canvasRect.height, event.clientY - canvasRect.top))
+    setBrushCursor({
+      x: canvasRect.left - viewportRect.left + canvasX,
+      y: canvasRect.top - viewportRect.top + canvasY,
+    })
+  }
 
   const syncWorkingPixels = (next: PixelState) => {
     workingPixelsRef.current = next
@@ -199,6 +243,7 @@ export function CharacterSettings() {
 
   const openEditorFromCutout = async () => {
     if (workingPixelsRef.current || !characterCutoutUrl) {
+      setBrushCursor(null)
       setEditorOpen(true)
       return
     }
@@ -219,6 +264,7 @@ export function CharacterSettings() {
       sourcePixelsRef.current = sourcePixels
       undoStackRef.current = []
       syncWorkingPixels(next)
+      setBrushCursor(null)
       setEditorOpen(true)
     } catch {
       setError(t('characterEditorError'))
@@ -252,6 +298,7 @@ export function CharacterSettings() {
       originalPixelsRef.current = null
       workingPixelsRef.current = null
       setWorkingPixels(null)
+      setBrushCursor(null)
       setEditorOpen(false)
       undoStackRef.current = []
       setUndoCount(0)
@@ -302,6 +349,7 @@ export function CharacterSettings() {
       syncWorkingPixels({ data: result.data.slice(), width: result.width, height: result.height })
       setCharacterCutoutUrl(imageDataToDataUrl(result.data, result.width, result.height))
       setCharacterPosition(null)
+      setBrushCursor(null)
       setEditorOpen(true)
     } catch (cause) {
       if (requestId !== processingRequestRef.current) return
@@ -389,6 +437,8 @@ export function CharacterSettings() {
   }
 
   const handlePointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
+    clearBrushCursorHide()
+    updateBrushCursor(event)
     const working = workingPixelsRef.current
     if (!working) return
     event.currentTarget.setPointerCapture(event.pointerId)
@@ -399,10 +449,21 @@ export function CharacterSettings() {
   }
 
   const handlePointerMove = (event: PointerEvent<HTMLCanvasElement>) => {
+    clearBrushCursorHide()
+    updateBrushCursor(event)
     if (paintingRef.current) schedulePaint(event)
   }
 
-  const handlePointerUp = () => {
+  const handlePointerEnter = (event: PointerEvent<HTMLCanvasElement>) => {
+    clearBrushCursorHide()
+    updateBrushCursor(event)
+  }
+
+  const handlePointerLeave = () => {
+    if (!paintingRef.current) hideBrushCursor()
+  }
+
+  const handlePointerUp = (event: PointerEvent<HTMLCanvasElement>) => {
     if (!paintingRef.current) return
     const pendingFrame = paintFrameRef.current
     if (pendingFrame !== null) {
@@ -414,6 +475,7 @@ export function CharacterSettings() {
     paintingRef.current = false
     lastPointerRef.current = null
     saveWorkingPixels(workingPixelsRef.current)
+    if (event.pointerType === 'touch') hideBrushCursor(450)
   }
 
   const handleUndo = () => {
@@ -447,6 +509,7 @@ export function CharacterSettings() {
     originalPixelsRef.current = null
     workingPixelsRef.current = null
     setWorkingPixels(null)
+    setBrushCursor(null)
     paintingRef.current = false
     lastPointerRef.current = null
     setEditorOpen(false)
@@ -544,17 +607,34 @@ export function CharacterSettings() {
       {characterCutoutUrl && (
         <EditorSection title={t('characterRefineTitle')} description={t('characterRefineDescription')} className="border-t border-border pt-5">
           <div className="space-y-3">
-            <div className="checkerboard overflow-hidden rounded-xl border border-border bg-card p-3">
+            <div ref={brushViewportRef} className="checkerboard relative overflow-hidden rounded-xl border border-border bg-card p-3">
               {editorOpen ? (
-                <canvas
-                  ref={canvasRef}
-                  aria-label={t('characterEditorLabel')}
-                  className="mx-auto block max-h-[360px] w-full max-w-full cursor-crosshair touch-none object-contain"
-                  onPointerDown={handlePointerDown}
-                  onPointerMove={handlePointerMove}
-                  onPointerUp={handlePointerUp}
-                  onPointerCancel={handlePointerUp}
-                />
+                <>
+                  <canvas
+                    ref={canvasRef}
+                    aria-label={t('characterEditorLabel')}
+                    className="mx-auto block max-h-[360px] w-full max-w-full cursor-none touch-none object-contain"
+                    onPointerEnter={handlePointerEnter}
+                    onPointerLeave={handlePointerLeave}
+                    onPointerDown={handlePointerDown}
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
+                    onPointerCancel={handlePointerUp}
+                  />
+                  {brushCursor && (
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute z-10 rounded-full border-2 border-primary bg-primary/5 shadow-[0_0_0_1px_var(--color-background)]"
+                      style={{
+                        left: brushCursor.x,
+                        top: brushCursor.y,
+                        width: brushSize,
+                        height: brushSize,
+                        transform: 'translate(-50%, -50%)',
+                      }}
+                    />
+                  )}
+                </>
               ) : (
                 <img src={characterCutoutUrl} alt={t('characterResult')} className="mx-auto block max-h-[360px] w-full object-contain" />
               )}

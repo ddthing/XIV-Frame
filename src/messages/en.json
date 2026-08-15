@@ -176,7 +176,7 @@
     "characterErase": "Erase",
     "characterRestore": "Restore",
     "characterBrushSize": "Brush size",
-    "characterBrushHint": "Choose Restore to bring back details from the original, or Erase to remove them, then drag over the preview.",
+    "characterBrushHint": "The ring shows the active brush area. Choose Restore or Erase, then drag over the preview.",
     "characterUndo": "Undo",
     "characterResetMask": "Reset mask",
     "characterOpenEditor": "Refine with brush",

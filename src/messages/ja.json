@@ -176,7 +176,7 @@
     "characterErase": "消す",
     "characterRestore": "戻す",
     "characterBrushSize": "ブラシサイズ",
-    "characterBrushHint": "元画像から戻す部分は「戻す」、消す部分は「消す」を選び、プレビューをドラッグします。",
+    "characterBrushHint": "キャンバス上の円がブラシ範囲です。「戻す」または「消す」を選び、プレビューをドラッグします。",
     "characterUndo": "元に戻す",
     "characterResetMask": "補正をリセット",
     "characterOpenEditor": "ブラシで補正",

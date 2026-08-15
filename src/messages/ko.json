@@ -176,7 +176,7 @@
     "characterErase": "지우기",
     "characterRestore": "복원",
     "characterBrushSize": "브러시 크기",
-    "characterBrushHint": "원본에서 되살릴 부분은 복원, 없앨 부분은 지우기를 선택한 뒤 미리보기를 드래그하세요.",
+    "characterBrushHint": "캔버스 위 원이 실제 브러시 범위입니다. 복원 또는 지우기를 선택한 뒤 미리보기를 드래그하세요.",
     "characterUndo": "되돌리기",
     "characterResetMask": "보정 초기화",
     "characterOpenEditor": "브러시로 보정",
