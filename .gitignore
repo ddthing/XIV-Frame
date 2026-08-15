@@ -25,6 +25,29 @@
 .DS_Store
 *.pem
 
+# local agent/workbench files
+/AGENTS.md
+/CLAUDE.md
+/SKILL.md
+/.agent/
+/.agents/
+/.pnpm-store/
+/docs/superpowers/
+/scratch/
+
+# local credentials and runtime state
+.npmrc
+.dev.vars*
+.wrangler/
+*.key
+*.p12
+*.pfx
+credentials*.json
+service-account*.json
+*.sqlite
+*.sqlite3
+*.db
+
 # debug
 npm-debug.log*
 yarn-debug.log*
