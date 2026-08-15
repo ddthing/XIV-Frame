@@ -14,6 +14,12 @@ function getTransformers() {
 const CHARACTER_MODEL_ID = 'onnx-community/ormbg-ONNX'
 const CHARACTER_MODEL_DTYPE = 'q8'
 
+function isLikelyMobileBrowser() {
+  if (typeof navigator === 'undefined') return false
+  return /Android|iPhone|iPad|iPod|Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+}
+
 const workerScope = self
 let pipelinePromise = null
 
@@ -29,7 +35,7 @@ async function getBackgroundRemovalPipeline() {
       env.allowLocalModels = false
       env.useBrowserCache = true
 
-      const supportsWebGPU = typeof navigator !== 'undefined' && 'gpu' in navigator
+      const supportsWebGPU = typeof navigator !== 'undefined' && 'gpu' in navigator && !isLikelyMobileBrowser()
       const createPipeline = (device) => pipeline('background-removal', CHARACTER_MODEL_ID, {
         device,
         dtype: CHARACTER_MODEL_DTYPE,

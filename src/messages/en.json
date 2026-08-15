@@ -165,7 +165,7 @@
   "characterProcessing": "Processing",
   "characterModelPreparing": "Preparing model",
   "characterModelPreparingHint": "The background-removal model is being prepared in your browser. It will be ready to run when this finishes.",
-  "characterProcessingHint": "The first run may take longer while the model is prepared.",
+  "characterProcessingHint": "The first run may take longer while the model is prepared. Keep this page open until it finishes.",
     "characterEditorError": "The image could not be edited. Please try another image.",
     "characterFileTypeError": "Please add an image file.",
     "characterFileTooLarge": "Images must be 50MB or smaller.",

@@ -3,6 +3,9 @@ import { ImageUploadError, revokeObjectUrl, validateImageFile } from './imageUpl
 export const CHARACTER_MODEL_ID = 'onnx-community/ormbg-ONNX'
 export const CHARACTER_MODEL_DTYPE = 'q8'
 export const CHARACTER_MAX_DIMENSION = 1536
+const MOBILE_CHARACTER_MAX_DIMENSION = 1024
+
+type WorkerOperation = 'warmup' | 'remove'
 
 type BackgroundRemovalResult = {
   data: Uint8Array | Uint8ClampedArray
@@ -33,7 +36,23 @@ let backgroundRemovalWorker: Worker | null = null
 let workerUnavailable = false
 let workerRequestId = 0
 const pendingWorkerRequests = new Map<number, PendingWorkerRequest>()
-const WORKER_REQUEST_TIMEOUT_MS = 20_000
+
+function isLikelyMobileBrowser() {
+  if (typeof navigator === 'undefined') return false
+  return /Android|iPhone|iPad|iPod|Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+}
+
+function getCharacterMaxDimension() {
+  return isLikelyMobileBrowser() ? MOBILE_CHARACTER_MAX_DIMENSION : CHARACTER_MAX_DIMENSION
+}
+
+function getWorkerTimeoutMs(operation: WorkerOperation) {
+  if (isLikelyMobileBrowser()) {
+    return operation === 'warmup' ? 180_000 : 120_000
+  }
+  return operation === 'warmup' ? 90_000 : 60_000
+}
 
 function emitProgress(progress: number) {
   progressListeners.forEach((listener) => listener(progress))
@@ -121,10 +140,10 @@ function postWorkerRequest(request: WorkerRequest, onProgress?: ProgressListener
   })
 }
 
-function withWorkerTimeout<T>(promise: Promise<T>): Promise<T> {
+function withWorkerTimeout<T>(promise: Promise<T>, operation: WorkerOperation): Promise<T> {
   let timeoutId: ReturnType<typeof setTimeout> | undefined
   const timeout = new Promise<T>((_, reject) => {
-    timeoutId = setTimeout(() => reject(new Error('배경 제거 Worker 응답 시간이 초과되었습니다.')), WORKER_REQUEST_TIMEOUT_MS)
+    timeoutId = setTimeout(() => reject(new Error('배경 제거 Worker 응답 시간이 초과되었습니다.')), getWorkerTimeoutMs(operation))
   })
 
   return Promise.race([promise, timeout]).finally(() => {
@@ -136,7 +155,7 @@ async function warmWithWorker(onProgress?: ProgressListener) {
   if (!getBackgroundRemovalWorker()) return false
 
   try {
-    await withWorkerTimeout(postWorkerRequest({ type: 'warmup' }, onProgress))
+    await withWorkerTimeout(postWorkerRequest({ type: 'warmup' }, onProgress), 'warmup')
     return true
   } catch {
     disableBackgroundRemovalWorker(new Error('배경 제거 Worker 초기화에 실패했습니다.'))
@@ -148,7 +167,7 @@ async function removeWithWorker(blob: Blob, onProgress?: ProgressListener): Prom
   if (!getBackgroundRemovalWorker()) return null
 
   try {
-    return await withWorkerTimeout(postWorkerRequest({ type: 'remove', blob }, onProgress)) as BackgroundRemovalResult
+    return await withWorkerTimeout(postWorkerRequest({ type: 'remove', blob }, onProgress), 'remove') as BackgroundRemovalResult
   } catch {
     disableBackgroundRemovalWorker(new Error('배경 제거 Worker 실행에 실패했습니다.'))
     return null
@@ -206,7 +225,7 @@ export async function prepareCharacterImage(file: File): Promise<{ blob: Blob; d
       throw new ImageUploadError('decode', '이미지를 읽지 못했습니다.')
     }
 
-    const scale = Math.min(1, CHARACTER_MAX_DIMENSION / Math.max(sourceWidth, sourceHeight))
+    const scale = Math.min(1, getCharacterMaxDimension() / Math.max(sourceWidth, sourceHeight))
     const width = Math.max(1, Math.round(sourceWidth * scale))
     const height = Math.max(1, Math.round(sourceHeight * scale))
     const canvas = document.createElement('canvas')
@@ -243,7 +262,7 @@ async function getBackgroundRemovalPipeline(): Promise<BackgroundRemovalPipeline
       env.allowLocalModels = false
       env.useBrowserCache = true
 
-      const supportsWebGPU = typeof navigator !== 'undefined' && 'gpu' in navigator
+      const supportsWebGPU = typeof navigator !== 'undefined' && 'gpu' in navigator && !isLikelyMobileBrowser()
       const createPipeline = (device: 'webgpu' | 'wasm') => pipeline('background-removal', CHARACTER_MODEL_ID, {
         device,
         // ORMBG's quantized ONNX weight keeps first-run downloads much smaller

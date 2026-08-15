@@ -165,7 +165,7 @@
   "characterProcessing": "처리 중",
   "characterModelPreparing": "모델 준비 중",
   "characterModelPreparingHint": "배경 제거 모델을 브라우저에 준비하고 있습니다. 준비가 끝나면 바로 실행할 수 있습니다.",
-  "characterProcessingHint": "첫 실행은 모델 준비로 시간이 걸릴 수 있습니다.",
+  "characterProcessingHint": "첫 실행은 모델 준비로 시간이 걸릴 수 있습니다. 화면을 닫지 말고 완료될 때까지 기다려주세요.",
     "characterEditorError": "이미지를 편집할 수 없습니다. 다른 이미지로 다시 시도해주세요.",
     "characterFileTypeError": "이미지 파일만 추가할 수 있습니다.",
     "characterFileTooLarge": "이미지는 50MB 이하만 추가할 수 있습니다.",
