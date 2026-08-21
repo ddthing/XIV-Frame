@@ -6,6 +6,7 @@ import type Konva from 'konva'
 
 import { useStore } from '@/store/useStore'
 import { CHARACTER_NUDGE_EVENT, nudgeCharacterPosition, type CharacterNudgeDetail } from '@/lib/characterPosition'
+import { getCharacterScaleBounds } from '@/lib/characterScale'
 
 type CanvasPosition = { x: number; y: number }
 type ResizeHandle = 'nw' | 'ne' | 'sw' | 'se'
@@ -342,8 +343,7 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
     const aspectRatio = width / height
     const horizontalDistance = Math.max(0, handle.includes('w') ? anchor.x - pointer.x : pointer.x - anchor.x)
     const verticalDistance = Math.max(0, handle.includes('n') ? anchor.y - pointer.y : pointer.y - anchor.y)
-    const minWidth = characterImg.width * baseScale * 0.25
-    const maxWidth = characterImg.width * baseScale * 2.4
+    const { minWidth, maxWidth } = getCharacterScaleBounds(characterImg.width * baseScale)
     const nextWidth = Math.max(
       minWidth,
       Math.min(maxWidth, Math.max(horizontalDistance, verticalDistance * aspectRatio)),

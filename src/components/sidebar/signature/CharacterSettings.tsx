@@ -24,6 +24,7 @@ import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { CharacterPositionControls } from './CharacterPositionControls'
 import { imageDataToDataUrl, dataUrlToImageData, prepareCharacterImage, removeImageBackground, warmBackgroundRemovalModel } from '@/lib/backgroundRemoval'
+import { CHARACTER_SCALE_MAX, CHARACTER_SCALE_MIN } from '@/lib/characterScale'
 import { ImageUploadError, revokeObjectUrl } from '@/lib/imageUpload'
 import { useStore } from '@/store/useStore'
 
@@ -678,7 +679,7 @@ export function CharacterSettings() {
           <div className="space-y-4">
             <div className="space-y-2">
               <EditorFieldHeader label={t('characterScale')} value={`${Math.round(characterScale * 100)}%`} htmlFor="character-scale" />
-              <Slider id="character-scale" value={[characterScale]} min={0.25} max={2.4} step={0.01} onValueChange={(values) => setCharacterScale(Array.isArray(values) ? values[0] : values)} />
+              <Slider id="character-scale" value={[characterScale]} min={CHARACTER_SCALE_MIN} max={CHARACTER_SCALE_MAX} step={0.01} onValueChange={(values) => setCharacterScale(Array.isArray(values) ? values[0] : values)} />
             </div>
             <div className="space-y-2">
               <EditorFieldHeader label={t('opacity')} value={`${characterOpacity}%`} htmlFor="character-opacity" />
