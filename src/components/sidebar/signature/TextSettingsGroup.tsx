@@ -71,6 +71,7 @@ export function TextSettingsGroup() {
         onChangeItalic={setUpperItalic}
         letterSpacing={upperLetterSpacing}
         onChangeLetterSpacing={setUpperLetterSpacing}
+        inputId="signature-upper-text"
       />
 
       <TextOptionControl
@@ -84,6 +85,7 @@ export function TextSettingsGroup() {
         onChangeItalic={setLowerItalic}
         letterSpacing={lowerLetterSpacing}
         onChangeLetterSpacing={setLowerLetterSpacing}
+        inputId="signature-lower-text"
       />
 
       <div className="space-y-5 border-t border-border pt-5">
@@ -102,9 +104,9 @@ export function TextSettingsGroup() {
         </div>
 
         <div className="space-y-2">
-          <Label className="block text-xs font-semibold text-foreground">{t('font')}</Label>
+          <Label htmlFor="signature-font" className="block text-xs font-semibold text-foreground">{t('font')}</Label>
           <Select value={fontFamily} onValueChange={(val) => val && setFontFamily(val)}>
-            <SelectTrigger className="h-10 w-full rounded-md border-border bg-background text-sm focus-visible:border-primary focus-visible:ring-primary">
+            <SelectTrigger id="signature-font" aria-label={t('font')} className="h-10 w-full rounded-md border-border bg-background text-sm focus-visible:border-primary focus-visible:ring-primary">
               <span className="flex flex-1 text-left truncate">{FONT_MAP[fontFamily]}</span>
             </SelectTrigger>
             <SelectContent className="rounded-xl">
@@ -136,9 +138,10 @@ export function TextSettingsGroup() {
         </div>
 
         <div className="space-y-2">
-          <Label className="block text-xs font-semibold text-foreground">{t('color')}</Label>
+          <Label htmlFor="signature-color" className="block text-xs font-semibold text-foreground">{t('color')}</Label>
           <div className="relative h-10 w-full cursor-pointer overflow-hidden rounded-md border border-border bg-background shadow-subtle transition-shadow focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-1">
             <input 
+              id="signature-color"
               type="color" 
               aria-label={t('color')}
               value={signatureColor} 

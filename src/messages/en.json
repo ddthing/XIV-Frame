@@ -40,15 +40,26 @@
     "uploadTitle": "Add your frames",
     "uploadDescription": "Select a frame to adjust its scale and canvas position.",
     "uploadImage": "Image",
+    "imagePreview": "Image preview",
     "selectImage": "Select image",
     "selected": "Selected",
     "selectedImage": "Selected image {index}",
-    "selectedImageDescription": "Scale the active frame. Drag it directly on the canvas to reposition.",
+    "selectedImageDescription": "Adjust scale and canvas position. Focus a card, then use arrow keys to move it by 1px.",
     "movePrevious": "Move image left",
     "moveNext": "Move image right",
     "lockPositionHint": "Prevent dragging on the canvas.",
     "sheetDescription": "Upload, reorder, and tune the screenshot frames in your canvas.",
-    "sheetRole": "Source"
+    "sheetRole": "Source",
+    "positionHint": "Move the selected image with the arrow buttons or keyboard.",
+    "positionStep": "Move step",
+    "positionStepToggle": "Toggle the move step between 1px and 10px",
+    "positionUp": "Move up",
+    "positionLeft": "Move left",
+    "positionRight": "Move right",
+    "positionDown": "Move down",
+    "positionLocked": "The image position is locked.",
+    "positionKeyboardHint": "Focus a card, then use arrows for 1px or Shift+arrows for 10px.",
+    "canvasKeyboardTarget": "Canvas editing area. Use arrow keys to move the selected composite element."
   },
   "LayoutSettings": {
     "layoutPreset": "Layout",
@@ -276,7 +287,11 @@
     "contact": "Contact",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
-    "donate": "Donate"
+    "donate": "Donate",
+    "skipToContent": "Skip to content",
+    "primaryNavigation": "Primary navigation",
+    "mobileNavigation": "Mobile navigation",
+    "toggleMenu": "Toggle menu"
   },
   "Blog": {
     "title": "Guide",

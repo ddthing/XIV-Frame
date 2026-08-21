@@ -16,6 +16,7 @@ interface TextOptionControlProps {
   onChangeItalic: (val: boolean) => void
   letterSpacing: number
   onChangeLetterSpacing: (val: number) => void
+  inputId: string
 }
 
 import { useTranslations } from 'next-intl'
@@ -31,13 +32,16 @@ export function TextOptionControl({
   onChangeItalic,
   letterSpacing,
   onChangeLetterSpacing,
+  inputId,
 }: TextOptionControlProps) {
   const t = useTranslations('SignatureSettings')
+  const letterSpacingId = `${inputId}-letter-spacing`
   return (
     <div className="editor-control-surface space-y-4 p-4">
       <div className="space-y-1.5">
-        <Label className="block text-xs font-semibold text-foreground">{label}</Label>
+        <Label htmlFor={inputId} className="block text-xs font-semibold text-foreground">{label}</Label>
         <Input 
+          id={inputId}
           value={value} 
           onChange={(e) => onChangeValue(e.target.value)}
           placeholder={placeholder}
@@ -65,11 +69,13 @@ export function TextOptionControl({
           </button>
         </div>
         <div className="flex w-full flex-1 flex-col gap-2">
-          <EditorFieldHeader label={t('letterSpacing')} value={`${letterSpacing}px`} />
+          <EditorFieldHeader label={t('letterSpacing')} value={`${letterSpacing}px`} htmlFor={letterSpacingId} />
           <Slider 
+            id={letterSpacingId}
             value={[letterSpacing]} 
             onValueChange={v => onChangeLetterSpacing(Array.isArray(v) ? v[0] : v)} 
             min={-10} max={20} step={1}
+            aria-label={t('letterSpacing')}
             className="flex-1"
           />
         </div>

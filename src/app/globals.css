@@ -137,7 +137,7 @@
   --color-forest-ink: #1a3300;
   --color-highlighter-yellow: #ffe95c;
   --color-cream-paper: #fcfaf5;
-  --color-pencil-gray: #b6b6b6;
+  --color-pencil-gray: #59664f;
   --color-whisper-gray: #f1f1f1;
   --color-sticky-note-teal: #a8e5e5;
   --color-sticky-note-mint: #d5f5c2;
@@ -247,6 +247,12 @@
 
   .editor-meta {
     @apply font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground;
+  }
+
+  [data-xiv-frame-canvas="true"]:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 4px;
+    border-radius: 6px;
   }
 
   /* Shared chrome for the editor and content pages. */

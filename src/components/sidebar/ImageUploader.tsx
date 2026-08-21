@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent as ReactMouseEvent } from 'react'
 import { AlertCircle, ArrowLeftRight, ChevronLeft, ChevronRight, Lock, RefreshCw, Trash2, Unlock, Upload, UserRound, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useShallow } from 'zustand/react/shallow'
@@ -12,7 +12,9 @@ import { SketchbookTabsList, SketchbookTabsTrigger } from '@/components/ui/Sketc
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { ImageUploadError, prepareImageForCanvas, revokeObjectUrl } from '@/lib/imageUpload'
+import { nudgeImagePosition, type ImageNudgeDirection } from '@/lib/imagePosition'
 import { LazyCharacterSettings } from './LazySettings'
+import { ImagePositionControls } from './ImagePositionControls'
 
 type PendingUpload = { requestId: number; sourceUrl: string | undefined }
 
@@ -23,6 +25,7 @@ export function ImageUploader() {
     setImageAt,
     removeImageAt,
     swapImages,
+    imagePositions,
     imageScales,
     setImageScale,
     setImagePosition,
@@ -34,6 +37,7 @@ export function ImageUploader() {
     setImageAt: state.setImageAt,
     removeImageAt: state.removeImageAt,
     swapImages: state.swapImages,
+    imagePositions: state.imagePositions,
     imageScales: state.imageScales,
     setImageScale: state.setImageScale,
     setImagePosition: state.setImagePosition,
@@ -97,6 +101,7 @@ export function ImageUploader() {
   const imageCount = images.filter(Boolean).length
   const activeIndex = images[selectedIndex] ? selectedIndex : images.findIndex(Boolean)
   const activeImage = activeIndex >= 0 ? images[activeIndex] : undefined
+  const activePosition = activeIndex >= 0 ? imagePositions[activeIndex] || { x: 0, y: 0 } : { x: 0, y: 0 }
   const activeScale = activeIndex >= 0 ? imageScales[activeIndex] || 1 : 1
 
   const handleFileUpload = (index: number) => {
@@ -132,7 +137,7 @@ export function ImageUploader() {
     input.click()
   }
 
-  const handleMove = (event: React.MouseEvent, index: number, direction: 'prev' | 'next') => {
+  const handleMove = (event: ReactMouseEvent, index: number, direction: 'prev' | 'next') => {
     event.stopPropagation()
     const targetIndex = direction === 'prev' ? index - 1 : index + 1
     if (targetIndex < 0 || targetIndex >= images.length || !images[targetIndex]) return
@@ -143,7 +148,7 @@ export function ImageUploader() {
     else if (selectedIndex === targetIndex) setSelectedIndex(index)
   }
 
-  const handleRemove = (event: React.MouseEvent, index: number) => {
+  const handleRemove = (event: ReactMouseEvent, index: number) => {
     event.stopPropagation()
     invalidateUpload(index)
     removeImageAt(index)
@@ -153,6 +158,31 @@ export function ImageUploader() {
   const handleSelect = (index: number) => {
     if (images[index]) setSelectedIndex(index)
     else handleFileUpload(index)
+  }
+
+  const handleImageKeyDown = (event: ReactKeyboardEvent<HTMLButtonElement>, index: number) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      handleSelect(index)
+      return
+    }
+
+    const directionByKey: Record<string, ImageNudgeDirection> = {
+      ArrowUp: 'up',
+      ArrowLeft: 'left',
+      ArrowRight: 'right',
+      ArrowDown: 'down',
+    }
+    const direction = directionByKey[event.key]
+
+    if (!direction || !images[index]) return
+
+    event.preventDefault()
+    setSelectedIndex(index)
+    if (isImageLocked) return
+
+    const position = imagePositions[index] || { x: 0, y: 0 }
+    setImagePosition(index, nudgeImagePosition(position, direction, event.shiftKey ? 10 : 1))
   }
 
   return (
@@ -196,53 +226,57 @@ export function ImageUploader() {
             return (
               <div
                 key={index}
-                role="button"
-                tabIndex={0}
-                aria-label={image ? `${t('selectImage')} ${index + 1}` : `${t('uploadImage')} ${index + 1}`}
-                aria-pressed={selected}
-                onClick={() => handleSelect(index)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault()
-                    handleSelect(index)
-                  }
-                }}
-                className={`group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-xl border bg-card transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 ${
+                className={`group relative aspect-[4/3] overflow-hidden rounded-xl border bg-card transition-all ${
                   selected
                     ? 'border-primary shadow-[inset_0_0_0_2px_var(--color-highlighter-yellow),var(--shadow-subtle)]'
                     : 'border-border hover:border-primary/30 hover:shadow-subtle'
                 }`}
               >
-                {image ? (
+                <button
+                  type="button"
+                  aria-label={image ? `${t('selectImage')} ${index + 1}` : `${t('uploadImage')} ${index + 1}`}
+                  aria-pressed={selected}
+                  aria-keyshortcuts={image ? 'ArrowUp ArrowDown ArrowLeft ArrowRight Shift+ArrowUp Shift+ArrowDown Shift+ArrowLeft Shift+ArrowRight' : undefined}
+                  onClick={() => handleSelect(index)}
+                  onKeyDown={(event) => handleImageKeyDown(event, index)}
+                  className="absolute inset-0 z-0 flex cursor-pointer overflow-hidden rounded-[inherit] text-left focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                >
+                  {image ? (
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={image} alt={`${t('imagePreview')} ${index + 1}`} className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" />
+                      <span className="pointer-events-none absolute inset-0 bg-primary/45 opacity-0 transition-opacity duration-200 group-hover:opacity-100" aria-hidden="true" />
+                    </>
+                  ) : (
+                    <span className="flex size-full flex-col items-center justify-center gap-2 border border-dashed border-primary/20 text-muted-foreground transition-colors group-hover:bg-surface-inset/60 group-hover:text-foreground">
+                      <span className="grid size-9 place-items-center rounded-md bg-surface-inset text-foreground"><Upload className="size-4" aria-hidden="true" /></span>
+                      <span className="text-[13px] font-semibold">{t('uploadImage')} {index + 1}</span>
+                    </span>
+                  )}
+                </button>
+
+                {image && (
                   <>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={image} alt={`${t('uploadImage')} ${index + 1}`} className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" />
-                    <div className="pointer-events-none absolute inset-0 bg-primary/45 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
-                    <div className={`absolute inset-x-2 bottom-2 flex min-w-0 items-center justify-center gap-1.5 transition-opacity duration-200 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'}`}>
+                    <div className={`absolute inset-x-2 bottom-2 z-20 flex min-w-0 items-center justify-center gap-1.5 transition-opacity duration-200 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'}`}>
                       {index > 0 && images[index - 1] && (
                         <button type="button" aria-label={t('movePrevious')} onClick={(event) => handleMove(event, index, 'prev')} className="grid size-[32px] shrink-0 place-items-center rounded-md border border-primary-foreground/20 bg-background/95 text-foreground shadow-subtle transition-colors hover:bg-background">
-                          <ChevronLeft className="size-4" />
+                          <ChevronLeft className="size-4" aria-hidden="true" />
                         </button>
                       )}
-                      <button type="button" aria-label={t('change')} onClick={(event) => { event.stopPropagation(); handleFileUpload(index) }} className="h-[32px] min-h-[32px] min-w-0 flex-1 truncate rounded-md border border-primary-foreground/20 bg-background/95 px-2 text-[11px] font-semibold leading-none whitespace-nowrap text-foreground shadow-subtle transition-colors hover:bg-background">
+                      <button type="button" aria-label={t('change')} onClick={() => handleFileUpload(index)} className="h-[32px] min-h-[32px] min-w-0 flex-1 truncate rounded-md border border-primary-foreground/20 bg-background/95 px-2 text-[11px] font-semibold leading-none whitespace-nowrap text-foreground shadow-subtle transition-colors hover:bg-background">
                         {t('change')}
                       </button>
                       {index < images.length - 1 && images[index + 1] && (
                         <button type="button" aria-label={t('moveNext')} onClick={(event) => handleMove(event, index, 'next')} className="grid size-[32px] shrink-0 place-items-center rounded-md border border-primary-foreground/20 bg-background/95 text-foreground shadow-subtle transition-colors hover:bg-background">
-                          <ChevronRight className="size-4" />
+                          <ChevronRight className="size-4" aria-hidden="true" />
                         </button>
                       )}
                     </div>
-                    <span className="absolute left-2 top-2 grid size-6 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 font-mono text-[10px] font-bold tabular-nums text-foreground shadow-subtle">{String(index + 1).padStart(2, '0')}</span>
-                    <button type="button" aria-label={t('deleteImage')} onClick={(event) => handleRemove(event, index)} className={`absolute right-2 top-2 grid size-7 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 text-foreground shadow-subtle transition-all hover:bg-destructive/10 hover:text-destructive ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'}`}>
-                      <X className="size-3.5" />
+                    <span className="pointer-events-none absolute left-2 top-2 z-10 grid size-6 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 font-mono text-[10px] font-bold tabular-nums text-foreground shadow-subtle" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                    <button type="button" aria-label={t('deleteImage')} onClick={(event) => handleRemove(event, index)} className={`absolute right-2 top-2 z-20 grid size-7 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 text-foreground shadow-subtle transition-all hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'}`}>
+                      <X className="size-3.5" aria-hidden="true" />
                     </button>
                   </>
-                ) : (
-                  <div className="flex size-full flex-col items-center justify-center gap-2 border border-dashed border-primary/20 text-muted-foreground transition-colors group-hover:bg-surface-inset/60 group-hover:text-foreground">
-                    <span className="grid size-9 place-items-center rounded-md bg-surface-inset text-foreground"><Upload className="size-4" /></span>
-                    <span className="text-[13px] font-semibold">{t('uploadImage')} {index + 1}</span>
-                  </div>
                 )}
               </div>
             )
@@ -290,6 +324,11 @@ export function ImageUploader() {
                 <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 font-mono text-[10px] text-muted-foreground">%</span>
               </div>
             </div>
+            <ImagePositionControls
+              position={activePosition}
+              onChange={(position) => setImagePosition(activeIndex, position)}
+              disabled={isImageLocked}
+            />
             <div className="flex items-center justify-between border-t border-border pt-3">
               <div className="flex items-center gap-2">
                 {isImageLocked ? <Lock className="size-4 text-primary" /> : <Unlock className="size-4 text-muted-foreground" />}

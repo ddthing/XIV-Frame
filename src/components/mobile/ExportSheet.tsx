@@ -51,6 +51,9 @@ import { MobileSheetBody } from './MobileSheetBody'
       <DrawerContent className="max-h-[88vh] rounded-t-2xl bg-background">
         <MobileSheetHeader eyebrow="03 / Export" title={t('exportTitle')} description={t('exportDescription')} role={t('exportRole')} />
         <MobileSheetBody open={open} className="flex flex-col gap-7 overflow-y-auto px-5 pb-[calc(env(safe-area-inset-bottom,1rem)+1.5rem)] pt-5">
+          <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+            {isExporting ? t('saving') : ''}
+          </p>
           
           {/* Canvas Ratio */}
           <div className="space-y-3">
@@ -81,9 +84,11 @@ import { MobileSheetBody } from './MobileSheetBody'
               </Button>
               <div className="flex-1 px-2">
                 <Slider 
+                  id="mobile-canvas-zoom"
                   value={[zoom]} 
                   onValueChange={(v) => setZoom(Array.isArray(v) ? v[0] : v)} 
                   min={10} max={200} step={1} 
+                  aria-label={t('zoomSettings')}
                 />
               </div>
               <Button variant="ghost" size="icon-sm" className="shrink-0 text-muted-foreground hover:bg-muted hover:text-foreground" aria-label={t('zoomIn')} onClick={() => setZoom(Math.min(200, zoom + 10))}>

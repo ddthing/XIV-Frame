@@ -581,12 +581,22 @@ export function CharacterSettings() {
               )}
 
               {isPreparing && (
-                <div className="space-y-2 rounded-lg border border-border bg-card px-3 py-3">
+                <div role="status" aria-live="polite" aria-atomic="true" className="space-y-2 rounded-lg border border-border bg-card px-3 py-3">
                   <div className="flex items-center justify-between gap-3 font-body text-[11px] text-muted-foreground">
                     <span>{t('characterProcessingHint')}</span>
                     <span className="font-mono tabular-nums">{progress}%</span>
                   </div>
-                  <div className="h-1 overflow-hidden rounded-full bg-muted"><div className="h-full bg-primary transition-[width]" style={{ width: `${Math.max(4, progress)}%` }} /></div>
+                  <div
+                    role="progressbar"
+                    aria-label={t('characterProcessing')}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={progress}
+                    aria-valuetext={`${progress}%`}
+                    className="h-1 overflow-hidden rounded-full bg-muted"
+                  >
+                    <div className="h-full bg-primary transition-[width]" style={{ width: `${Math.max(4, progress)}%` }} />
+                  </div>
                 </div>
               )}
 

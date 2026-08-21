@@ -22,7 +22,7 @@ export async function PageShell({ children, locale, hideFooter = false, hideHead
       <div className={`${fullViewport ? 'h-[100dvh] overflow-hidden' : 'min-h-[100dvh]'} bg-background flex flex-col font-sans selection:bg-primary/20`}>
       {!hideHeader && <SiteHeader locale={locale} hideBorder={hideHeaderBorder} className={headerClassName} />}
       
-      <main className={`min-h-0 flex flex-1 flex-col ${fullViewport ? 'overflow-hidden' : 'overflow-y-auto custom-scrollbar'}`}>
+      <main id="main-content" tabIndex={-1} className={`min-h-0 flex flex-1 flex-col focus-visible:outline-none ${fullViewport ? 'overflow-hidden' : 'overflow-y-auto custom-scrollbar'}`}>
         {children}
       </main>
       

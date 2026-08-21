@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Group, Image as KonvaImage, Rect } from 'react-konva'
 import useImage from 'use-image'
+import { useTranslations } from 'next-intl'
 import { useShallow } from 'zustand/react/shallow'
 import type Konva from 'konva'
 
@@ -191,6 +192,7 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
     setCharacterScale: state.setCharacterScale,
     isExporting: state.isExporting,
   })))
+  const t = useTranslations('ImageUploader')
 
   const [characterImg] = useImage(characterCutoutUrl ?? '', 'anonymous')
   const [isHovered, setIsHovered] = useState(false)
@@ -329,7 +331,8 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
     if (!container) return
     container.dataset.xivFrameCanvas = 'true'
     container.tabIndex = 0
-    container.style.outline = 'none'
+    container.setAttribute('aria-label', t('canvasKeyboardTarget'))
+    container.setAttribute('aria-keyshortcuts', 'ArrowUp ArrowDown ArrowLeft ArrowRight Shift+ArrowUp Shift+ArrowDown Shift+ArrowLeft Shift+ArrowRight')
     container.focus({ preventScroll: true })
   }
 

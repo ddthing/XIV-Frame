@@ -33,6 +33,9 @@ export function DesktopToolbar({ stageRef, className = '' }: DesktopToolbarProps
 
   return (
     <header className={`app-header flex items-center gap-5 border-b border-primary-foreground/15 bg-primary px-5 text-primary-foreground ${className}`}>
+      <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {isExporting ? t('exporting') : ''}
+      </span>
       <div className="flex min-w-0 items-center gap-3">
         <Logo size="md" inverse />
         <span className="hidden font-body text-[11px] text-primary-foreground/55 xl:inline">{t('appSubtitle')}</span>

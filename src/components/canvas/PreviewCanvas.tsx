@@ -105,6 +105,9 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
 
   return (
     <div className="flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden bg-background">
+      <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {isUploading ? t('uploading') : ''}
+      </p>
       <CanvasToolbar className="hidden md:flex" />
 
       <div

@@ -80,7 +80,7 @@ export function SettingsPanel() {
                   value={value}
                   className="group min-h-[62px] min-w-0 items-center justify-start gap-2 rounded-lg border border-transparent bg-transparent px-2 py-2 text-left text-muted-foreground shadow-none transition-[background-color,border-color,box-shadow,color] hover:bg-background/70 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 after:!hidden data-[state=active]:border-primary/25 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-subtle data-active:border-primary/25 data-active:bg-card data-active:text-foreground data-active:shadow-subtle"
                 >
-                  <span className="mt-0.5 font-mono text-[10px] font-semibold tabular-nums text-muted-foreground/80">{String(index + 1).padStart(2, '0')}</span>
+                  <span className="mt-0.5 font-mono text-[10px] font-semibold tabular-nums text-muted-foreground">{String(index + 1).padStart(2, '0')}</span>
                   <Icon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
                   <span className="flex min-w-0 flex-col items-start gap-0.5 leading-none">
                     <strong className="text-[13px] font-semibold leading-4">{label}</strong>

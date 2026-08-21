@@ -14,10 +14,11 @@
     "uploadTitle": "이미지 추가",
     "uploadDescription": "이미지를 선택하면 배율과 캔버스 위치를 조정할 수 있습니다.",
     "uploadImage": "이미지",
+    "imagePreview": "이미지 미리보기",
     "selectImage": "이미지 선택",
     "selected": "선택됨",
     "selectedImage": "선택한 이미지 {index}",
-    "selectedImageDescription": "선택한 프레임의 배율을 조정합니다. 캔버스에서 직접 드래그해 위치를 바꿀 수 있습니다.",
+    "selectedImageDescription": "배율과 캔버스 위치를 조정합니다. 카드에 포커스한 뒤 방향키로 1px씩 이동할 수 있습니다.",
     "movePrevious": "왼쪽으로 이동",
     "moveNext": "오른쪽으로 이동",
     "lockPositionHint": "캔버스에서 드래그할 수 없도록 잠급니다.",
@@ -48,7 +49,17 @@
     "guideMove": "드래그: 이미지 이동",
     "guideZoom": "스크롤: 확대/축소",
     "guideNotice": "결과물에는 영향을 주지 않습니다.",
-    "positionNudge": "위치 미세조정"
+    "positionNudge": "위치 미세조정",
+    "positionHint": "방향키 또는 버튼으로 선택한 이미지를 이동합니다.",
+    "positionStep": "이동 단위",
+    "positionStepToggle": "이동 단위 1px 또는 10px 전환",
+    "positionUp": "위로 이동",
+    "positionLeft": "왼쪽으로 이동",
+    "positionRight": "오른쪽으로 이동",
+    "positionDown": "아래로 이동",
+    "positionLocked": "이미지 위치가 잠겨 있어 이동할 수 없습니다.",
+    "positionKeyboardHint": "카드에 포커스한 뒤 방향키로 1px, Shift+방향키로 10px 이동합니다.",
+    "canvasKeyboardTarget": "캔버스 편집 영역. 선택한 합성 요소를 방향키로 이동할 수 있습니다."
   },
   "LayoutSettings": {
     "compositionTitle": "캔버스 구성",
@@ -275,7 +286,11 @@
     "contact": "문의",
     "privacy": "개인정보처리방침",
     "terms": "이용약관",
-    "donate": "후원하기"
+    "donate": "후원하기",
+    "skipToContent": "본문으로 바로가기",
+    "primaryNavigation": "주요 메뉴",
+    "mobileNavigation": "모바일 메뉴",
+    "toggleMenu": "메뉴 열기/닫기"
   },
   "Blog": {
     "title": "가이드",
