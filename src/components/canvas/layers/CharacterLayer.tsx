@@ -7,6 +7,8 @@ import type Konva from 'konva'
 import { useStore } from '@/store/useStore'
 import { CHARACTER_NUDGE_EVENT, nudgeCharacterPosition, type CharacterNudgeDetail } from '@/lib/characterPosition'
 import { getCharacterScaleBounds } from '@/lib/characterScale'
+import { shouldShowCharacterGuide } from '@/lib/characterGuide'
+import { drawCharacterHitArea } from '@/lib/characterHitArea'
 
 type CanvasPosition = { x: number; y: number }
 type ResizeHandle = 'nw' | 'ne' | 'sw' | 'se'
@@ -298,8 +300,12 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
 
   if (!characterImg || !position) return null
 
-  const isCharacterSelected = Boolean(characterCutoutUrl && selectedCharacterUrl === characterCutoutUrl)
-  const showGuide = !isExporting && (isHovered || isDragging || isResizing || isCharacterSelected)
+  const showGuide = shouldShowCharacterGuide({
+    isExporting,
+    isHovered,
+    isDragging,
+    isResizing,
+  })
 
   const cancelGuideHide = () => {
     if (guideHideTimeoutRef.current) {
@@ -397,6 +403,11 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
         scaleX={characterFlipX ? -scale : scale}
         scaleY={scale}
         offsetX={characterFlipX ? characterImg.width : 0}
+        // Konva's default Image hit area is rectangular; use the PNG alpha
+        // mask so transparent margins do not block the photos underneath.
+        hitFunc={(context, shape) => {
+          drawCharacterHitArea(context, shape, characterImg, characterImg.width, characterImg.height)
+        }}
         opacity={characterOpacity / 100}
         draggable
         shadowColor={characterShadow ? '#000000' : undefined}
