@@ -2,6 +2,7 @@
 title: "XIV Frameの使い方：SSの追加からPNG保存までの完全ガイド"
 description: "スクリーンショットの追加、レイアウト、画像合成、署名、背景設定、PNG保存までを実際の操作順に解説します。"
 date: "2026-06-03"
+category: "はじめに"
 tags: ["ffxiv", "screenshot", "tutorial"]
 ---
 

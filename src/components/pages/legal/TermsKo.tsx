@@ -8,7 +8,7 @@ export function TermsKo() {
       title="이용약관"
       description="XIV Frame을 안전하고 예측 가능하게 사용하기 위한 서비스 범위와 이용자 책임을 안내합니다."
       updatedLabel="시행일"
-      updated="2026년 8월 13일"
+      updated="2026년 8월 22일"
       asideLabel="목차"
       sections={[
         {
@@ -90,7 +90,7 @@ export function TermsKo() {
             <>
               <p>서비스 범위, 법령 또는 운영 방식이 변경되면 이 약관을 수정할 수 있습니다. 변경된 약관은 이 페이지에 게시하며 시행일을 갱신합니다.</p>
               <p>약관 또는 서비스에 대한 문의는 <Link href="/ko/contact">문의 페이지</Link>를 이용해 주세요.</p>
-              <p>최종 업데이트: 2026년 8월 13일</p>
+              <p>최종 업데이트: 2026년 8월 22일</p>
             </>
           ),
         },

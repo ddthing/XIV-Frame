@@ -35,7 +35,7 @@ export function DocumentPage({
         <article className="min-w-0 rounded-xl border border-border bg-card p-5 shadow-subtle sm:p-8">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-border pb-5 font-body text-xs text-muted-foreground">
             <span className="editor-meta">{updatedLabel}</span>
-            <time dateTime="2026-08-13">{updated}</time>
+            <time dateTime="2026-08-22">{updated}</time>
           </div>
 
           <div className="mt-1 divide-y divide-border">

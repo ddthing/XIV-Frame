@@ -8,6 +8,7 @@ import { locales } from '@/i18n/request'
 import { Metadata } from 'next'
 import { Download, ImagePlus, LayoutGrid, Type, WandSparkles } from 'lucide-react'
 import { GuideWorkflow } from '@/components/content/GuideWorkflow'
+import { GuideScenarios } from '@/components/content/GuideScenarios'
 import { localizedAlternates, localizedUrl } from '@/lib/site'
 
 export function generateStaticParams() {
@@ -51,7 +52,8 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
   setRequestLocale(locale)
   const posts = getAllPosts(locale)
   const t = await getTranslations({ locale, namespace: 'Blog' })
-  const [featured, ...rest] = posts
+  const featured = posts.find((post) => post.slug === 'edit-ffxiv-screenshots-without-photoshop') ?? posts[0]
+  const rest = featured ? posts.filter((post) => post.slug !== featured.slug) : []
 
   const renderPost = (post: (typeof posts)[number], index: number, isFeatured = false) => (
     <Link
@@ -62,9 +64,12 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
       <article className={`flex flex-col rounded-xl border border-border p-5 shadow-subtle transition-[transform,box-shadow,border-color] duration-200 group-hover:-translate-y-1 group-hover:border-primary/40 group-hover:shadow-md sm:p-6 ${isFeatured ? 'bg-sticky-note-mint' : 'bg-card'}`}>
         <div className="flex items-center justify-between gap-3">
           <p className="editor-meta">{isFeatured ? 'FEATURED' : `GUIDE ${String(index + 1).padStart(2, '0')}`}</p>
-          <time dateTime={post.metadata.date} className="font-body text-xs font-medium text-muted-foreground">
-            {new Date(post.metadata.date).toLocaleDateString(locale)}
-          </time>
+          <div className="flex items-center gap-2 font-body text-xs font-medium text-muted-foreground">
+            <span className="rounded-full border border-border bg-background/60 px-2 py-0.5 text-[10px] font-semibold text-foreground/70">{post.metadata.category ?? t('guideLabel')}</span>
+            <time dateTime={post.metadata.updated ?? post.metadata.date}>
+              {new Date(post.metadata.updated ?? post.metadata.date).toLocaleDateString(locale)}
+            </time>
+          </div>
         </div>
         <h2 className={`mt-6 font-display font-bold leading-tight tracking-[0.01em] text-foreground transition-colors group-hover:text-primary ${isFeatured ? 'text-2xl' : 'text-xl'}`}>
           {post.metadata.title}
@@ -105,7 +110,7 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
             number: '03',
             label: t('flowStepComposite'),
             description: t('flowStepCompositeDescription'),
-            href: `/${locale}/blog/edit-ffxiv-screenshots-without-photoshop`,
+            href: `/${locale}/blog/composite-elements-background-removal`,
             icon: WandSparkles,
           },
           {
@@ -121,6 +126,55 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
             description: t('flowStepExportDescription'),
             href: `/${locale}/blog/edit-ffxiv-screenshots-without-photoshop`,
             icon: Download,
+          },
+        ]}
+      />
+      <section className="mb-12 grid gap-5 rounded-xl border border-border bg-card p-5 shadow-subtle sm:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] sm:p-6" aria-labelledby="guide-editorial-note-title">
+        <div>
+          <p className="editor-meta">{t('contentNoteEyebrow')}</p>
+          <h2 id="guide-editorial-note-title" className="mt-2 font-display text-xl font-bold leading-7 tracking-[0.01em] text-foreground">{t('contentNoteTitle')}</h2>
+          <p className="mt-2 max-w-2xl font-body text-[13px] leading-6 text-foreground/75">{t('contentNoteDescription')}</p>
+        </div>
+        <ul className="grid content-start gap-2 font-body text-sm leading-6 text-foreground/80 sm:pl-4">
+          <li className="flex gap-2"><span className="font-mono text-xs font-bold text-primary">01</span>{t('contentNoteOriginal')}</li>
+          <li className="flex gap-2"><span className="font-mono text-xs font-bold text-primary">02</span>{t('contentNotePractical')}</li>
+          <li className="flex gap-2"><span className="font-mono text-xs font-bold text-primary">03</span>{t('contentNoteReviewed')}</li>
+        </ul>
+      </section>
+      <GuideScenarios
+        eyebrow={t('scenarioEyebrow')}
+        title={t('scenarioTitle')}
+        description={t('scenarioDescription')}
+        scenarios={[
+          {
+            kind: 'showcase',
+            eyebrow: t('scenarioShowcaseEyebrow'),
+            title: t('scenarioShowcaseTitle'),
+            description: t('scenarioShowcaseDescription'),
+            decisionLabel: t('scenarioDecisionLabel'),
+            decision: t('scenarioShowcaseDecision'),
+            href: `/${locale}/blog/creating-ffxiv-glamour-showcase`,
+            linkLabel: t('scenarioReadMore'),
+          },
+          {
+            kind: 'composite',
+            eyebrow: t('scenarioCompositeEyebrow'),
+            title: t('scenarioCompositeTitle'),
+            description: t('scenarioCompositeDescription'),
+            decisionLabel: t('scenarioDecisionLabel'),
+            decision: t('scenarioCompositeDecision'),
+            href: `/${locale}/blog/composite-elements-background-removal`,
+            linkLabel: t('scenarioReadMore'),
+          },
+          {
+            kind: 'publish',
+            eyebrow: t('scenarioPublishEyebrow'),
+            title: t('scenarioPublishTitle'),
+            description: t('scenarioPublishDescription'),
+            decisionLabel: t('scenarioDecisionLabel'),
+            decision: t('scenarioPublishDecision'),
+            href: `/${locale}/blog/ffxiv-screenshot-publishing-checklist`,
+            linkLabel: t('scenarioReadMore'),
           },
         ]}
       />

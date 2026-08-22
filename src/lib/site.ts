@@ -1,5 +1,7 @@
 export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://xiv-frame.pages.dev').replace(/\/$/, '')
 export const siteName = 'XIV Frame'
+export const operatorName = 'ddthing / XIV Frame'
+export const operatorUrl = 'https://github.com/ddthing/XIV-Frame'
 
 export function localizedUrl(locale: string, path = '') {
   const normalizedPath = path ? `/${path.replace(/^\//, '')}` : ''
@@ -18,8 +20,8 @@ export function localizedAlternates(path = '') {
 export function homeAlternates() {
   return {
     ko: siteUrl,
-    en: `${siteUrl}/en`,
-    ja: `${siteUrl}/ja`,
+    en: `${siteUrl}/en/landing`,
+    ja: `${siteUrl}/ja/landing`,
     'x-default': siteUrl,
   }
 }
@@ -43,6 +45,7 @@ export function articleJsonLd({
   datePublished,
   dateModified = datePublished,
   inLanguage,
+  articleSection,
 }: {
   url: string
   title: string
@@ -50,6 +53,7 @@ export function articleJsonLd({
   datePublished: string
   dateModified?: string
   inLanguage: string
+  articleSection?: string
 }) {
   return {
     '@type': 'Article',
@@ -59,15 +63,22 @@ export function articleJsonLd({
     datePublished,
     dateModified,
     inLanguage,
+    ...(articleSection ? { articleSection } : {}),
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': url,
+    },
     author: {
       '@type': 'Organization',
-      name: siteName,
-      url: siteUrl,
+      name: operatorName,
+      url: operatorUrl,
+      sameAs: [operatorUrl],
     },
     publisher: {
       '@type': 'Organization',
-      name: siteName,
-      url: siteUrl,
+      name: operatorName,
+      url: operatorUrl,
+      sameAs: [operatorUrl],
       logo: {
         '@type': 'ImageObject',
         url: `${siteUrl}/og-image.jpg`,

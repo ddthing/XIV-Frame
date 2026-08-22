@@ -116,9 +116,11 @@ XIV Frame은 계정, 로그인, 유료 플랜, 서버 기반 프로젝트 보관
     └─ store/               Zustand 상태와 로컬 저장소 정책
 
     scripts/
-    └─ sync-transformers-worker.mjs
+    ├─ sync-transformers-worker.mjs
+    ├─ validate-content.mjs
+    └─ validate-static-output.mjs
 
-sync-transformers-worker.mjs는 개발 서버와 빌드 전에 Transformers.js Worker 번들을 public/vendor에 동기화합니다. 생성된 번들은 저장소에 커밋하지 않습니다.
+`sync-transformers-worker.mjs`는 개발 서버와 빌드 전에 Transformers.js Worker 번들을 `public/vendor`에 동기화합니다. `validate-content.mjs`는 8개 가이드의 3개 언어 파일, front matter, 본문 구조와 번호 단계를 확인합니다. `validate-static-output.mjs`는 빌드 후 HTML의 색인 신호, 광고 태그, 사이트맵과 내부 링크를 확인합니다. 생성된 Worker 번들과 `out/`은 저장소에 커밋하지 않습니다.
 
 ## 로컬 개발
 
@@ -136,11 +138,12 @@ sync-transformers-worker.mjs는 개발 서버와 빌드 전에 Transformers.js W
 
 ### 검증 명령
 
+    npm run content:check
     npm run lint
     npx tsc --noEmit
     npm run build
 
-npm run build는 정적 결과물을 out/에 생성합니다.
+`npm run build`는 `prebuild`에서 Worker와 콘텐츠를 확인하고, 정적 결과물을 `out/`에 생성한 뒤 `postbuild` 검사를 실행합니다. 현재 기준으로 정적 페이지 54개, HTML 51개, 사이트맵 URL 45개를 검사합니다.
 
 ## 정적 배포
 
@@ -162,7 +165,9 @@ NEXT_PUBLIC_SITE_URL은 canonical URL, sitemap, robots, RSS, 구조화 데이터
 
 ## 콘텐츠와 검색 노출
 
-- /, /en, /ja: 편집기
+- /: 한국어 공개 랜딩
+- /en/landing, /ja/landing: 영어·일본어 공개 랜딩
+- /ko, /en, /ja: 기존 편집기 진입점(`noindex`, 사용자 설정·북마크 보존)
 - /{locale}/blog: 사용 가이드
 - /{locale}/faq: 자주 묻는 질문
 - /{locale}/about: 서비스 소개
@@ -172,6 +177,93 @@ NEXT_PUBLIC_SITE_URL은 canonical URL, sitemap, robots, RSS, 구조화 데이터
 - /sitemap.xml, /robots.txt, /rss.xml: 검색 및 피드 엔드포인트
 
 각 언어 페이지는 canonical URL과 언어별 alternate URL을 생성합니다. 가이드 글은 Markdown front matter의 제목, 설명, 날짜, 태그를 기준으로 정적 생성됩니다.
+
+한국어 공개 랜딩의 정식 주소는 `/`이며 `/ko/landing`은 생성하지 않습니다. 편집기 루트와 검색용 콘텐츠를 분리하는 이유와 점검 결과는 [`docs/adsense-content-research.md`](docs/adsense-content-research.md)에 기록합니다.
+
+## 유지보수 계약
+
+### 설정값 보존
+
+편집 설정은 Zustand `persist`로 `localStorage`에 저장됩니다. 저장소 키는 `xiv-frame-settings-v2`이며, 구현은 [`src/store/useStore.ts`](src/store/useStore.ts)에 있습니다.
+
+사용자 설정과 관련된 코드를 수정할 때는 다음 순서를 지킵니다.
+
+1. `src/store/slices/`에서 상태와 초기값을 확인합니다.
+2. `partialize`에서 새 필드를 저장할지 결정합니다.
+3. 저장 필드 이름이나 형식을 바꾸면 `version`을 올리고 `migrate`를 추가합니다.
+4. 사진 Blob URL, 배경 제거 임시 결과처럼 새로고침 후 유지하면 안 되는 데이터는 저장하지 않습니다.
+5. 기존 텍스트·레이아웃·시그니처·로고 설정이 유지되는지 기존 브라우저 저장값으로 확인합니다.
+
+저장소 용량이 부족하거나 비공개 브라우징에서 `localStorage`를 사용할 수 없어도 현재 세션의 편집이 중단되지 않도록 저장은 best-effort로 처리합니다.
+
+### 가이드 콘텐츠
+
+새 가이드는 세 언어 파일을 함께 추가합니다.
+
+    src/content/blog/my-guide/ko.md
+    src/content/blog/my-guide/en.md
+    src/content/blog/my-guide/ja.md
+
+각 파일에는 `title`, `description`, `date`, `category`, `tags` front matter가 필요합니다. `updated`는 실제 본문이나 기능 설명을 수정했을 때만 갱신합니다.
+
+가이드에는 다음 내용을 포함합니다.
+
+- 첫 문단의 사용 목적과 완성할 결과
+- 실제 UI 라벨과 일치하는 번호 단계
+- 레이아웃·배율·위치·합성 선택 기준
+- 실패·용량 초과·처리 지연 시 확인 순서
+- 저장 전 잘림·가독성·권리·개인정보 점검
+
+새 slug를 추가하면 [`src/lib/markdown.ts`](src/lib/markdown.ts)의 `relatedGuideSlugs`에서 관련 문서 연결도 검토합니다. `npm run content:check`가 번역 누락, 필수 메타데이터 누락, 지나치게 짧은 본문과 번호 단계 부족을 빌드에서 차단합니다.
+
+FAQ·소개·정책 문서는 `src/components/pages/`의 언어별 컴포넌트를 수정하고, UI 문자열은 `src/messages/ko.json`, `en.json`, `ja.json`의 같은 키를 함께 수정합니다.
+
+### 캔버스와 성능
+
+- 배경 제거 연산은 [`src/lib/backgroundRemoval.ts`](src/lib/backgroundRemoval.ts)의 Worker 우선 경로를 유지합니다.
+- 이미지 파일을 불필요하게 Base64로 복제하지 말고 Blob URL 수명을 관리합니다.
+- Konva 레이어의 `listening`, `React.memo`, 선택 상태를 확인해 다른 편집 요소를 가리지 않게 합니다.
+- 모바일 전처리 해상도와 Worker timeout을 임의로 늘리지 않습니다.
+- 변경 후 50MB 입력, 첫 모델 준비, 배경 제거 실패, 복원 브러시, 500% 합성 배율을 회귀 확인합니다.
+
+### 글꼴과 디자인
+
+- 공통 CSS 토큰은 [`src/app/globals.css`](src/app/globals.css)에서 확인합니다.
+- 제목·편집기 UI는 `Terrarum Sans Bitmap`, 설명·본문은 `Pretendard`를 기본으로 사용합니다.
+- 색상·간격·모서리·포커스 스타일은 기존 토큰과 공통 컴포넌트를 우선 재사용합니다.
+- 시각 디자인 변경 시 `DESIGN.md`와 실제 CSS 토큰의 차이도 함께 확인합니다.
+
+## 배포 전 릴리스 체크리스트
+
+```text
+[ ] git diff --check
+[ ] npm run content:check
+[ ] npm run lint
+[ ] npx tsc --noEmit
+[ ] npm run build
+[ ] /, /ko, /ko/blog, /ko/faq, /ko/about 실제 응답 확인
+[ ] /sitemap.xml, /robots.txt, /rss.xml, /ads.txt 확인
+[ ] 데스크톱·모바일 사진 추가 및 PNG 저장 확인
+[ ] 합성 배경 제거·복원·삭제와 키보드/터치 미세조정 확인
+[ ] 기존 localStorage 설정값 보존 확인
+[ ] .env, 인증서, 토큰, 개인 키가 diff에 없는지 확인
+```
+
+`npm run build`가 성공해도 실제 브라우저에서의 파일 선택, GPU/WASM fallback, 모바일 메모리, 다운로드 동작까지 자동으로 보장하지는 않습니다. 배포 후에는 익명 상태로 공개 페이지와 편집기 양쪽을 확인합니다.
+
+## 광고·검색 정책 유지
+
+현재 Google 광고 스크립트와 광고 슬롯은 로드하지 않습니다. 편집기·빈 상태·오류·저장 화면은 행동 목적 화면이므로 광고 후보에서 제외합니다.
+
+광고를 다시 도입하려면 다음을 먼저 완료합니다.
+
+1. 동의 관리와 지역별 동의 흐름을 구현합니다.
+2. 개인정보처리방침에 광고 공급자·쿠키·웹 비콘·데이터 처리 내용을 실제 동작과 일치하게 반영합니다.
+3. 콘텐츠 페이지와 편집기·행동 화면의 광고 영역을 분리합니다.
+4. `ads.txt`와 게시자 ID를 실제 광고 설정과 대조합니다.
+5. `validate-static-output.mjs`의 광고 태그 검사 기준을 의도한 공개 범위에 맞춰 갱신합니다.
+
+콘텐츠는 검색어 반복보다 고유한 사용 기준과 문제 해결을 우선합니다. 변경 기록은 [`docs/adsense-content-research.md`](docs/adsense-content-research.md)에 남깁니다.
 
 ## 권리와 라이선스
 

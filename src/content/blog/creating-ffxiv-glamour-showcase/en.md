@@ -2,6 +2,7 @@
 title: "Build an FFXIV Glamour Showcase: Front, Back, and Detail in One Image"
 description: "Arrange three or four GPose screenshots in a grid, correct each crop, add a restrained signature, and export a polished showcase PNG."
 date: "2026-06-03"
+category: "Showcase"
 tags: ["ffxiv", "glamour", "tutorial"]
 ---
 

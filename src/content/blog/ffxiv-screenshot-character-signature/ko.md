@@ -2,6 +2,7 @@
 title: "파판14 스크린샷에 캐릭터 이름과 서버명을 넣는 법"
 description: "시그니처 텍스트를 입력하고 글꼴, 굵기, 자간, 위치, 색상, 불투명도를 조정하는 전체 과정을 설명합니다."
 date: "2026-06-03"
+category: "시그니처"
 tags: ["ffxiv", "signature", "tutorial"]
 ---
 

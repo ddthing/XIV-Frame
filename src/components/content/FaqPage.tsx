@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
 import { ContentPage } from '@/components/layout/ContentPage'
-import type { ReactNode } from 'react'
+import React, { type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 
 export interface FaqItem {
@@ -13,6 +13,16 @@ export interface FaqGroup {
   number: string
   title: string
   items: FaqItem[]
+}
+
+function getTextContent(node: ReactNode): string {
+  if (node == null || typeof node === 'boolean') return ''
+  if (typeof node === 'string' || typeof node === 'number') return String(node)
+  if (Array.isArray(node)) return node.map(getTextContent).join(' ')
+  if (React.isValidElement(node)) {
+    return getTextContent((node as React.ReactElement<{ children?: ReactNode }>).props.children)
+  }
+  return ''
 }
 
 interface FaqPageProps {
@@ -40,6 +50,20 @@ export function FaqPage({
 }: FaqPageProps) {
   return (
     <ContentPage eyebrow={eyebrow} title={title} description={description} size="lg" density="editor">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: groups.flatMap((group) => group.items.map((item) => ({
+            '@type': 'Question',
+            name: item.question,
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: getTextContent(item.answer),
+            },
+          }))),
+        }),
+      }} />
       <div className="grid gap-4 lg:grid-cols-2">
         {groups.map((group) => (
           <section key={group.number} className={cn('rounded-xl border border-border bg-card p-5 shadow-subtle sm:p-6', group.number === '03' && 'lg:col-span-2')} aria-labelledby={`faq-group-${group.number}`}>

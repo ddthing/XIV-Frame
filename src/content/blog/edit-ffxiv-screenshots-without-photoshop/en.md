@@ -2,6 +2,7 @@
 title: "XIV Frame: A Complete Start-to-Finish Editing Guide"
 description: "Follow the real workflow from uploading screenshots to choosing a layout, compositing an image, adding a signature, and saving a PNG."
 date: "2026-06-03"
+category: "Getting started"
 tags: ["ffxiv", "screenshot", "tutorial"]
 ---
 

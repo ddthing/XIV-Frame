@@ -67,6 +67,28 @@ export function FaqEn() {
             },
           ],
         },
+        {
+          number: '04',
+          title: 'Quality and publishing checks',
+          items: [
+            {
+              question: 'Is slow background removal an error?',
+              answer: <p>The first run may take longer while the browser prepares the background-removal model. Keep the page open and wait for the state to finish. On mobile, process one image at a time. The <Link href="/en/blog/composite-elements-background-removal">compositing guide</Link> lists the checks for each symptom.</p>,
+            },
+            {
+              question: 'Would removing the 50 MB limit make uploads easier?',
+              answer: <p>The limit protects browser memory while the canvas and background-removal model are active. Files over the limit are rejected before optimization begins, so save a smaller copy and select it again. See the <Link href="/en/blog/large-ffxiv-screenshots-upload">large-file guide</Link> for a safer preparation workflow.</p>,
+            },
+            {
+              question: 'What should I check in the final PNG?',
+              answer: <p>Check other players&apos; characters, chat, notifications, logo permissions, any implication of official affiliation, composite halos, and clipped text. Open the downloaded PNG rather than relying only on the preview. The <Link href="/en/blog/ffxiv-screenshot-publishing-checklist">publishing checklist</Link> includes a short final review.</p>,
+            },
+            {
+              question: 'Which guide should I read first?',
+              answer: <p>Start with the complete workflow if you are new. Choose the layout guide for a multi-image composition, the compositing guide for a PNG element, or the signature guide for a character name and server label.</p>,
+            },
+          ],
+        },
       ]}
       helpLabel="MORE HELP"
       helpTitle="Does something behave differently?"

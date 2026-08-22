@@ -6,9 +6,11 @@
     "dev": "next dev",
     "predev": "node scripts/sync-transformers-worker.mjs",
     "build": "next build",
-    "prebuild": "node scripts/sync-transformers-worker.mjs",
+    "prebuild": "node scripts/sync-transformers-worker.mjs && node scripts/validate-content.mjs",
+    "postbuild": "node scripts/validate-static-output.mjs",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "content:check": "node scripts/validate-content.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

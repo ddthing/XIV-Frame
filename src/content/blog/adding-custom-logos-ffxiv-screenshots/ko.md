@@ -2,6 +2,7 @@
 title: "파판14 스크린샷에 FC 로고를 올리는 법"
 description: "로고 파일을 업로드하고 위치, 크기, 불투명도를 조정한 뒤 텍스트 시그니처와 함께 PNG로 저장하는 순서형 가이드입니다."
 date: "2026-06-03"
+category: "로고"
 tags: ["ffxiv", "logo", "tutorial"]
 ---
 

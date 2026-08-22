@@ -2,6 +2,7 @@
 title: "FF14のスクリーンショットを2～4枚にまとめる方法"
 description: "画像の順番を整え、横分割・縦分割・グリッド配置を使い分けて、各画像の位置と余白を調整する手順を紹介します。"
 date: "2026-06-03"
+category: "レイアウト"
 tags: ["ffxiv", "screenshot", "tutorial"]
 ---
 

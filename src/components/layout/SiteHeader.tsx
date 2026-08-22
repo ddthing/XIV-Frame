@@ -12,6 +12,10 @@ export function SiteHeader({ locale, hideBorder = false, className = '' }: { loc
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const t = useTranslations('Navigation')
   const pathname = usePathname()
+  const isPublicHome = pathname === '/' || pathname.endsWith('/landing')
+  const homeHref = isPublicHome
+    ? (pathname === '/' ? '/' : `/${locale}/landing`)
+    : `/${locale}`
 
   const navLinks = [
     { href: `/${locale}/blog`, label: t('blog') },
@@ -27,7 +31,7 @@ export function SiteHeader({ locale, hideBorder = false, className = '' }: { loc
       </a>
       <header className={`app-header border-b bg-primary text-primary-foreground ${hideBorder ? 'border-transparent' : 'border-primary-foreground/15'} transition-colors ${className}`}>
         <div className="app-header-inner mx-auto w-full justify-between gap-6 px-4 sm:px-5">
-          <Link href={`/${locale}`} className="shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sticky-note-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-primary">
+          <Link href={homeHref} className="shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sticky-note-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-primary">
             <Logo size="md" inverse />
           </Link>
 

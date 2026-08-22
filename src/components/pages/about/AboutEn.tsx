@@ -1,4 +1,5 @@
 import { DocumentPage } from '@/components/content/DocumentPage'
+import { FeatureCoverageTable } from '@/components/content/FeatureCoverageTable'
 import Link from 'next/link'
 
 export function AboutEn() {
@@ -8,7 +9,7 @@ export function AboutEn() {
       title="About XIV Frame"
       description="Learn what XIV Frame does and how it handles your images and editor settings."
       updatedLabel="Last updated"
-      updated="August 13, 2026"
+      updated="August 22, 2026"
       asideLabel="On this page"
       sections={[
         {
@@ -54,9 +55,51 @@ export function AboutEn() {
           title: 'Open source and rights',
           children: (
             <>
-              <p>The source code is available in the <a href="https://github.com/ddthing/XIV-Frame" target="_blank" rel="noopener noreferrer">XIV Frame GitHub repository</a>. Send bug reports and product feedback through the <Link href="/en/contact">contact page</Link>.</p>
+              <p>The public operating identifier is <strong>ddthing / XIV Frame</strong>. Source code and change history are available in the <a href="https://github.com/ddthing/XIV-Frame" target="_blank" rel="noopener noreferrer">XIV Frame GitHub repository</a>. Send bug reports and product feedback through the <Link href="/en/contact">contact page</Link>.</p>
               <p>Rights to Final Fantasy XIV game content and trademarks belong to their respective owners. XIV Frame is not affiliated with or endorsed by Square Enix.</p>
             </>
+          ),
+        },
+        {
+          id: 'how-guides-are-maintained',
+          index: '05',
+          title: 'How are the guides maintained?',
+          children: (
+            <>
+              <p>The guides are written around a real outcome in the editor, not as a list of search terms or controls. Separate articles cover different jobs such as layout, compositing, file size, and publishing checks so the same explanation is not repeated across thin pages.</p>
+              <p>When a feature changes, the instructions and the updated date are reviewed together. We avoid documenting controls that cannot be confirmed in the editor and include recovery steps when a workflow fails. See the <Link href="/en/blog">guide library</Link> for the full set of workflows.</p>
+            </>
+          ),
+        },
+        {
+          id: 'supported-workflow',
+          index: '06',
+          title: 'Recommended workflow and limits',
+          children: (
+            <>
+              <p>For a predictable first edit, add photos, choose a layout, then move through compositing, signature, and export. On mobile, process one background-removal image at a time and save important results as PNG files you keep separately.</p>
+              <p>XIV Frame is an editing tool, not a service that decides image ownership or publishing permission. Check rights and consent yourself when another person&apos;s character, logo, or conversation appears in an image.</p>
+            </>
+          ),
+        },
+        {
+          id: 'feature-coverage',
+          index: '07',
+          title: 'Verified feature coverage',
+          children: (
+            <FeatureCoverageTable
+              intro="This feature and limitation list reflects the review build checked on August 22, 2026. The public deployment is checked again after release. Processing time can vary with the browser, device memory, and source file."
+              areaLabel="Area"
+              supportLabel="Supported feature"
+              notesLabel="Usage notes"
+              rows={[
+                { area: 'Input images', support: 'PNG · JPG · WebP', notes: 'Up to 50 MB per file and four photos. Large dimensions may be optimized in the browser.' },
+                { area: 'Layouts', support: 'Split · vertical · grid', notes: 'Adjust Auto, 16:9, and 2:1 ratios plus spacing, border, and background.' },
+                { area: 'Compositing', support: 'Remove · erase · restore · shadow', notes: 'Runs in the browser; element size can be tuned from 25% to 500%.' },
+                { area: 'Fine movement', support: 'Desktop arrows · mobile nudge', notes: 'Desktop supports 1 px/10 px steps; mobile uses buttons and long press.' },
+                { area: 'Export and storage', support: 'PNG download', notes: 'Screenshots are not stored on the server; layout and signature settings may remain locally.' },
+              ]}
+            />
           ),
         },
       ]}

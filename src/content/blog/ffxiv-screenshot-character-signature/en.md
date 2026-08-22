@@ -2,6 +2,7 @@
 title: "How to Add a Character Name and Server to an FFXIV Screenshot"
 description: "Enter two lines of signature text, then tune the font, weight, spacing, position, color, and opacity before exporting."
 date: "2026-06-03"
+category: "Signature"
 tags: ["ffxiv", "signature", "tutorial"]
 ---
 

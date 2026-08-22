@@ -8,7 +8,7 @@ export function TermsJa() {
       title="利用規約"
       description="XIV Frameを安全に利用するためのサービス範囲と利用者の責任を案内します。"
       updatedLabel="施行日"
-      updated="2026年8月13日"
+      updated="2026年8月22日"
       asideLabel="目次"
       sections={[
         {
@@ -90,7 +90,7 @@ export function TermsJa() {
             <>
               <p>サービスの範囲、適用される要件、運用方法が変わった場合、本規約を更新することがあります。改定内容はこのページに掲載し、施行日を更新します。</p>
               <p>規約やサービスについての質問は<Link href="/ja/contact">お問い合わせページ</Link>をご利用ください。</p>
-              <p>最終更新：2026年8月13日</p>
+              <p>最終更新：2026年8月22日</p>
             </>
           ),
         },

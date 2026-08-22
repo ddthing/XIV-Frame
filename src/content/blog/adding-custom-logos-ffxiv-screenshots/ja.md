@@ -2,6 +2,7 @@
 title: "FF14のSSにFCロゴやカスタムロゴを追加する方法"
 description: "ロゴをアップロードし、9か所の位置グリッド、サイズ、不透明度を調整してスクリーンショットと一緒に保存します。"
 date: "2026-06-03"
+category: "ロゴ"
 tags: ["ffxiv", "logo", "tutorial"]
 ---
 

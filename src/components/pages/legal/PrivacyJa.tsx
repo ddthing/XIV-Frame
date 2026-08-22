@@ -6,9 +6,9 @@ export function PrivacyJa() {
     <DocumentPage
       eyebrow="06 / PRIVACY"
       title="プライバシーポリシー"
-      description="編集画像、ブラウザ設定、技術的なリクエスト、広告に関する情報の扱いを説明します。"
+      description="編集画像、ブラウザ設定、外部リソース、現在広告を提供していない状態について説明します。"
       updatedLabel="施行日"
-      updated="2026年8月13日"
+      updated="2026年8月22日"
       asideLabel="目次"
       sections={[
         {
@@ -40,7 +40,7 @@ export function PrivacyJa() {
           children: (
             <>
               <p>ウェブサイトを配信・保護するホスティングまたはCDNは、リクエスト処理とセキュリティのため、IPアドレス、ブラウザ情報、リクエスト時刻、アクセスしたパスなどを記録する場合があります。XIV Frameは編集画像の内容と結び付けたプロファイルを作成しません。</p>
-              <p>サイトではフォント、アイコン、広告などの外部リソースを読み込む場合があります。外部提供者はリクエストに必要な情報をそれぞれのポリシーに従って処理します。</p>
+              <p>サイトではフォントやアイコンなどの外部リソースを読み込む場合があります。公開ページでは現在、Google広告タグを読み込んでいません。外部提供者はリクエストに必要な情報をそれぞれのポリシーに従って処理します。</p>
             </>
           ),
         },
@@ -50,9 +50,9 @@ export function PrivacyJa() {
           title: 'CookieとGoogle広告',
           children: (
             <>
-              <p>サイトではGoogle AdSenseまたはGoogleの広告タグを使用する場合があります。広告リクエストが行われると、Googleおよび認定された第三者広告提供者が、広告の配信・測定のためにCookie、ウェブビーコン、IPアドレスなどを利用する場合があります。</p>
-              <p>広告Cookieについては<a href="https://support.google.com/adsense/answer/1348695" target="_blank" rel="noopener noreferrer">AdSenseの必須コンテンツに関する案内</a>を確認できます。パーソナライズド広告は<a href="https://adssettings.google.com/" target="_blank" rel="noopener noreferrer">Google広告設定</a>で管理でき、一部の第三者広告Cookieは<a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer">About Adsの選択ページ</a>から拒否できます。</p>
-              <p>必要な地域では、適用法令とGoogleの同意要件に従って同意管理画面を使用する場合があります。広告のクリックを促したり、広告をナビゲーションやダウンロードボタンに見せたりすることはありません。</p>
+              <p>現在、XIV Frameは広告スロットとGoogle広告タグを提供していません。このバージョンではGoogle広告Cookieのための情報収集を行いません。</p>
+              <p>将来広告を導入する場合は、広告配信前にGoogleの同意要件と適用法令を確認し、必要な同意管理画面、提供者の開示、Cookieに関する説明を先に適用します。広告をナビゲーションやダウンロードボタンのように見せることはありません。</p>
+              <p>広告を再開するバージョンを公開する前に、このページの広告提供状況と施行日を更新します。</p>
             </>
           ),
         },
@@ -73,8 +73,9 @@ export function PrivacyJa() {
           title: '変更とお問い合わせ',
           children: (
             <>
+              <p>公開運営識別子は<strong>ddthing / XIV Frame</strong>です。ソースコードと変更履歴は<a href="https://github.com/ddthing/XIV-Frame" target="_blank" rel="noopener noreferrer">GitHubリポジトリ</a>で確認できます。プライバシーに関する質問は<Link href="/ja/contact">お問い合わせページ</Link>からお送りください。</p>
               <p>サービス、広告の設定、または適用される要件が変わった場合、本ポリシーを更新することがあります。改定時はこのページの施行日を更新します。</p>
-              <p>最終更新：2026年8月13日</p>
+              <p>最終更新：2026年8月22日</p>
             </>
           ),
         },

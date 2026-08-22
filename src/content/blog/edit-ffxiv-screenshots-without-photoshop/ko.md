@@ -2,6 +2,7 @@
 title: "XIV Frame 처음 사용하기: 파판14 스크린샷을 PNG로 저장하는 전체 과정"
 description: "사진 추가부터 레이아웃, 이미지 합성, 시그니처, 배경, PNG 저장까지 실제 화면에서 따라 하는 순서형 가이드입니다."
 date: "2026-06-03"
+category: "시작하기"
 tags: ["ffxiv", "screenshot", "tutorial"]
 ---
 

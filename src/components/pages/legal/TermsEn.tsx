@@ -8,7 +8,7 @@ export function TermsEn() {
       title="Terms of Service"
       description="The service scope and user responsibilities for using XIV Frame safely and predictably."
       updatedLabel="Effective"
-      updated="August 13, 2026"
+      updated="August 22, 2026"
       asideLabel="On this page"
       sections={[
         {
@@ -90,7 +90,7 @@ export function TermsEn() {
             <>
               <p>We may update these terms when the service, applicable requirements, or operating practices change. Revised terms will be posted on this page with an updated effective date.</p>
               <p>For questions about these terms or the service, use the <Link href="/en/contact">contact page</Link>.</p>
-              <p>Last updated: August 13, 2026.</p>
+              <p>Last updated: August 22, 2026.</p>
             </>
           ),
         },

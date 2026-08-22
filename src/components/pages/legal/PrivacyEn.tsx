@@ -6,9 +6,9 @@ export function PrivacyEn() {
     <DocumentPage
       eyebrow="06 / PRIVACY"
       title="Privacy Policy"
-      description="How XIV Frame handles edited images, browser settings, technical requests, and advertising."
+      description="How XIV Frame handles edited images, browser settings, external resources, and its current no-ad state."
       updatedLabel="Effective"
-      updated="August 13, 2026"
+      updated="August 22, 2026"
       asideLabel="On this page"
       sections={[
         {
@@ -40,7 +40,7 @@ export function PrivacyEn() {
           children: (
             <>
               <p>The hosting or CDN that delivers and protects the website may record technical information needed to handle requests and security, such as an IP address, browser details, request time, and requested path. XIV Frame does not use that information to profile the contents of your edited images.</p>
-              <p>The site may load fonts, icons, or advertising resources from third parties. Those providers may process information needed to fulfill a request, under their own policies.</p>
+              <p>The site may load fonts or icons from third parties. Public pages do not currently load Google advertising tags. External providers may process information needed to fulfill a request under their own policies.</p>
             </>
           ),
         },
@@ -50,9 +50,9 @@ export function PrivacyEn() {
           title: 'Cookies and Google advertising',
           children: (
             <>
-              <p>The site may use Google AdSense or Google advertising tags. When an ad request is made, Google and certified third-party vendors may use cookies, web beacons, IP addresses, or similar technologies to serve and measure advertising.</p>
-              <p>See <a href="https://support.google.com/adsense/answer/1348695" target="_blank" rel="noopener noreferrer">Google&apos;s AdSense required content guidance</a> for more information about advertising cookies. You can manage personalized advertising in <a href="https://adssettings.google.com/" target="_blank" rel="noopener noreferrer">Google Ads Settings</a> and some third-party advertising cookies through <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer">About Ads choices</a>.</p>
-              <p>Where required, a consent management experience may be used in accordance with applicable law and Google&apos;s consent requirements. We do not encourage ad clicks or make ads look like navigation or download controls.</p>
+              <p>XIV Frame does not currently provide ad slots or load Google advertising tags. This version does not collect information for Google advertising cookies.</p>
+              <p>If advertising is introduced later, we will review Google&apos;s consent requirements and applicable law before serving ads, then publish the required consent flow, vendor disclosures, and cookie information. Ads will not be made to look like navigation or download controls.</p>
+              <p>The advertising status and effective date on this page will be updated before an advertising-enabled version is published.</p>
             </>
           ),
         },
@@ -73,8 +73,9 @@ export function PrivacyEn() {
           title: 'Changes and contact',
           children: (
             <>
+              <p>The public operating identifier is <strong>ddthing / XIV Frame</strong>. Source code and change history are available in the <a href="https://github.com/ddthing/XIV-Frame" target="_blank" rel="noopener noreferrer">GitHub repository</a>. Send privacy questions through the <Link href="/en/contact">contact page</Link>.</p>
               <p>We may update this policy when the service, advertising setup, or applicable requirements change. The effective date on this page will be updated when a revision is published.</p>
-              <p>Last updated: August 13, 2026.</p>
+              <p>Last updated: August 22, 2026.</p>
             </>
           ),
         },

@@ -14,6 +14,12 @@ export function LanguageSwitcher({ inverse = false }: { inverse?: boolean }) {
   const handleLanguageChange = (value: string | null) => {
     if (!value) return
     localStorage.setItem('locale', value)
+
+    const isLandingPath = pathname === '/' || pathname.endsWith('/landing')
+    if (isLandingPath) {
+      router.push(value === 'ko' ? '/' : `/${value}/landing`)
+      return
+    }
     
     let newPathname = pathname
     // Remove current locale prefix if exists
@@ -23,12 +29,7 @@ export function LanguageSwitcher({ inverse = false }: { inverse?: boolean }) {
       newPathname = '/'
     }
     
-    // Default locale root goes to '/'
-    if (value === 'ko' && newPathname === '/') {
-      router.push('/')
-    } else {
-      router.push(`/${value}${newPathname === '/' ? '' : newPathname}`)
-    }
+    router.push(`/${value}${newPathname === '/' ? '' : newPathname}`)
   }
 
   return (

@@ -2,6 +2,7 @@
 title: "How to Add a Free Company or Custom Logo to an FFXIV Screenshot"
 description: "Upload a logo, place it with the nine-position grid, tune its scale and opacity, and export it with your screenshot."
 date: "2026-06-03"
+category: "Logo"
 tags: ["ffxiv", "logo", "tutorial"]
 ---
 

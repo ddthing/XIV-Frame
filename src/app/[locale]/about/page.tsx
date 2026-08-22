@@ -19,10 +19,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   setRequestLocale(locale)
   const title = locale === 'ko' ? '소개' : locale === 'ja' ? 'XIV Frameについて' : 'About XIV Frame'
   const description = locale === 'ko'
-    ? 'XIV Frame의 기능, 이미지 처리 방식, 오픈 소스와 권리 안내를 확인하세요.'
+    ? 'XIV Frame의 기능, 편집 데이터 처리, 가이드 작성 원칙, 오픈 소스와 이미지 권리 안내를 확인하세요.'
     : locale === 'ja'
-      ? 'XIV Frameの機能、画像の扱い、オープンソースと権利について確認できます。'
-      : 'Learn about XIV Frame, image handling, open source, and third-party rights.'
+      ? 'XIV Frameの機能、画像の扱い、ガイドの更新方針、オープンソースと権利について説明します。'
+      : 'Learn about XIV Frame, image handling, guide maintenance, open source, and third-party rights.'
   const url = localizedUrl(locale, '/about')
   return {
     title,

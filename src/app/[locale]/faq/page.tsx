@@ -16,10 +16,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   setRequestLocale(locale)
   const title = locale === 'ko' ? '자주 묻는 질문' : locale === 'ja' ? 'よくある質問' : 'Frequently asked questions'
   const description = locale === 'ko'
-    ? 'XIV Frame의 이미지 추가, 레이아웃, 시그니처, PNG 저장 방법과 자주 생기는 문제를 확인하세요.'
+    ? 'XIV Frame의 이미지 추가, 레이아웃, 합성·배경 제거, 시그니처, PNG 저장과 파일·게시 전 문제 해결 방법을 확인하세요.'
     : locale === 'ja'
-      ? 'XIV Frameの画像追加、レイアウト、署名、PNG保存とよくある問題を確認できます。'
-      : 'Find answers about adding images, layouts, signatures, PNG export, and common XIV Frame issues.'
+      ? 'XIV Frameの画像追加、レイアウト、合成・背景削除、署名、PNG保存と公開前の確認方法を説明します。'
+      : 'Find answers about images, layouts, compositing, background removal, signatures, PNG export, and publishing checks.'
   const url = localizedUrl(locale, '/faq')
 
   return {

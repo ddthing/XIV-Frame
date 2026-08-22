@@ -2,6 +2,7 @@
 title: "파판14 룩덕 쇼케이스 이미지 만들기: 앞모습·뒷모습·디테일 한 장에 담기"
 description: "3~4장의 GPose 스크린샷을 바둑판 레이아웃에 배치하고, 구도와 시그니처를 정리해 쇼케이스 PNG를 만드는 실전 순서입니다."
 date: "2026-06-03"
+category: "쇼케이스"
 tags: ["ffxiv", "glamour", "tutorial"]
 ---
 

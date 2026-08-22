@@ -2,6 +2,7 @@
 title: "FF14ミラプリ紹介画像の作り方：前後・全身・細部を1枚にまとめる"
 description: "3～4枚のグルポSSをグリッドに配置し、各画像の構図を整えて、署名付きの紹介画像をPNGで保存する手順です。"
 date: "2026-06-03"
+category: "ショーケース"
 tags: ["ffxiv", "glamour", "tutorial"]
 ---
 

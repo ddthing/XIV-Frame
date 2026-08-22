@@ -2,6 +2,7 @@
 title: "How to Combine 2–4 FFXIV Screenshots in XIV Frame"
 description: "Choose the right composition for two to four images, reorder the cards, tune each crop, and export a clean combined PNG."
 date: "2026-06-03"
+category: "Layout"
 tags: ["ffxiv", "screenshot", "tutorial"]
 ---
 

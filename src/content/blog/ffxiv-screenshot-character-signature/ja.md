@@ -2,6 +2,7 @@
 title: "FF14のSSにキャラクター名とサーバー名を入れる方法"
 description: "2行の署名テキストを入力し、フォント、太さ、文字間隔、位置、色、不透明度を調整して保存する手順を解説します。"
 date: "2026-06-03"
+category: "署名"
 tags: ["ffxiv", "signature", "tutorial"]
 ---
 

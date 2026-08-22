@@ -67,6 +67,28 @@ export function FaqJa() {
             },
           ],
         },
+        {
+          number: '04',
+          title: '品質と公開前の確認',
+          items: [
+            {
+              question: '背景削除が遅いのはエラーですか？',
+              answer: <p>初回はブラウザ内で背景削除モデルを準備するため、通常の画像追加より時間がかかる場合があります。画面を閉じたり更新したりせず、完了を待ってください。モバイルでは1枚ずつ処理し、症状別の確認は<Link href="/ja/blog/composite-elements-background-removal">合成ガイド</Link>を参照してください。</p>,
+            },
+            {
+              question: '50MBの制限をなくせば便利になりませんか？',
+              answer: <p>この制限は、キャンバスと背景削除モデルが端末のメモリを使いすぎないための安全線です。制限を超えたファイルは最適化前に拒否されるため、小さいコピーを作って再度選択してください。準備方法は<Link href="/ja/blog/large-ffxiv-screenshots-upload">大容量ファイルのガイド</Link>で説明しています。</p>,
+            },
+            {
+              question: '保存したPNGで何を確認すればよいですか？',
+              answer: <p>他のプレイヤーのキャラクター・会話・通知、ロゴの利用権、公式サービスと誤解される表現、合成のハロー、文字の切れを確認します。プレビューだけでなく保存したPNGを直接開いてください。<Link href="/ja/blog/ffxiv-screenshot-publishing-checklist">公開前チェック</Link>に短い確認表があります。</p>,
+            },
+            {
+              question: 'どのガイドから読めばよいですか？',
+              answer: <p>初めてなら全体の使い方ガイドから始めます。複数画像の構成はレイアウト、PNG素材は合成、キャラクター名やサーバー名は署名のガイドを選んでください。</p>,
+            },
+          ],
+        },
       ]}
       helpLabel="MORE HELP"
       helpTitle="画面と違う動作をしますか？"
