@@ -1,12 +1,12 @@
 ---
-title: "How to Combine 2–4 FFXIV Screenshots in XIV Frame"
-description: "Choose the right composition for two to four images, reorder the cards, tune each crop, and export a clean combined PNG."
+title: "How to Combine 2–16 FFXIV Screenshots in XIV Frame"
+description: "Choose the right composition for two to sixteen images, reorder the cards, tune each crop, and export a clean combined PNG."
 date: "2026-06-03"
 category: "Layout"
 tags: ["ffxiv", "screenshot", "tutorial"]
 ---
 
-Combining screenshots works best when you decide what each image contributes before adjusting the controls. This guide covers the complete process for two to four images.
+Combining screenshots works best when you decide what each image contributes before adjusting the controls. This guide covers the complete process for two to sixteen images.
 
 ## 1. Decide the viewing order
 
@@ -27,7 +27,7 @@ Combining screenshots works best when you decide what each image contributes bef
 1. Open **Layout** on desktop or the mobile **Layout** sheet.
 2. With two images, choose **Split** for a side-by-side comparison.
 3. Choose **Vertical** when the top-to-bottom order matters, such as a full-body shot followed by a detail shot.
-4. With three or four images, choose **Grid** to create a compact multi-image board. Grid requires at least three images.
+4. With three or four images, choose **Grid** to create a compact 2×2-style board. For exactly 9 or 16 images, choose the **3×3** or **4×4 grid** template.
 
 ## 4. Choose a canvas ratio
 

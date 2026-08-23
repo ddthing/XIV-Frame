@@ -10,7 +10,7 @@ XIV Frame is a browser-based tool for arranging screenshots and exporting the fi
 
 ## Before you start
 
-- You can use up to **four images** in one canvas.
+- You can use up to **16 images** in one canvas. The 3×3 and 4×4 grids use 9 and 16 images.
 - Each image can be **up to 50MB**. Larger originals are optimized in the browser after upload.
 - Your images are processed in the browser; the original files are not uploaded to a server.
 - Preview zoom changes how large the canvas looks on screen. It does not change the exported image size.
@@ -38,7 +38,7 @@ XIV Frame is a browser-based tool for arranging screenshots and exporting the fi
 1. Open the **Layout** tab on desktop. On mobile, open the bottom **Layout** menu, labelled **Ratio** in the compact navigation.
 2. Choose **Split** for images placed side by side.
 3. Choose **Vertical** to stack images from top to bottom.
-4. Choose **Grid** for a 2×2-style arrangement. Grid becomes available when at least three images are uploaded.
+4. Choose **Grid** for a 2×2-style arrangement when you have three or four images. For exactly 9 or 16 images, choose the **3×3** or **4×4 grid** template.
 
 ## 4. Set the canvas ratio
 

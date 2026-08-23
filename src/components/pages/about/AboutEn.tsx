@@ -93,8 +93,8 @@ export function AboutEn() {
               supportLabel="Supported feature"
               notesLabel="Usage notes"
               rows={[
-                { area: 'Input images', support: 'PNG · JPG · WebP', notes: 'Up to 50 MB per file and four photos. Large dimensions may be optimized in the browser.' },
-                { area: 'Layouts', support: 'Split · vertical · grid', notes: 'Adjust Auto, 16:9, and 2:1 ratios plus spacing, border, and background.' },
+                { area: 'Input images', support: 'PNG · JPG · WebP', notes: 'Up to 50 MB per file and 16 photos. Large dimensions may be optimized in the browser.' },
+                { area: 'Layouts', support: 'Split · vertical · grid · 3×3 · 4×4', notes: 'Standard grid uses 3–4 images; 3×3 and 4×4 use 9 and 16. Adjust Auto, 16:9, and 2:1 ratios plus spacing, border, and background.' },
                 { area: 'Compositing', support: 'Remove · erase · restore · shadow', notes: 'Runs in the browser; element size can be tuned from 25% to 500%.' },
                 { area: 'Fine movement', support: 'Desktop arrows · mobile nudge', notes: 'Desktop supports 1 px/10 px steps; mobile uses buttons and long press.' },
                 { area: 'Export and storage', support: 'PNG download', notes: 'Screenshots are not stored on the server; layout and signature settings may remain locally.' },
