@@ -125,7 +125,7 @@
     "templateGroupMatrixHint": "9 or 16 frames",
     "presetGrid3x3": "3×3 equal grid",
     "presetGrid4x4": "4×4 equal grid",
-    "templateHint": "Templates for {count} images are highlighted.",
+    "templateHint": "Every layout is selectable. The preview uses {count} image(s), and the chosen composition applies as you add the required images.",
     "templateNeedsImages": "Requires {count}+ images",
     "templateMaxImages": "For {count} images",
     "templateFallback": "This template needs more images, so the preview uses the basic split until the required images are added.",

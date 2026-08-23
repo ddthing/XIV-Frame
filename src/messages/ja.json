@@ -74,7 +74,7 @@
     "templateGroupFourHint": "ワイド構成",
     "templateGroupMatrix": "多分割グリッド",
     "templateGroupMatrixHint": "9・16枚構成",
-    "templateHint": "{count}枚の画像に合うテンプレートを強調しています。",
+    "templateHint": "すべてのレイアウトを選択できます。現在は{count}枚でプレビューし、必要な画像を追加すると選択した構成が適用されます。",
     "templateNeedsImages": "{count}枚以上が必要",
     "templateMaxImages": "{count}枚専用",
     "templateFallback": "このテンプレートには画像が足りないため、必要な画像を追加するまで基本の横分割でプレビューします。",

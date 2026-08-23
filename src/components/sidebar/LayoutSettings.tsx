@@ -87,7 +87,6 @@ export function LayoutSettings() {
                       <EditorChoice
                         key={option.id}
                         active={layoutPreset === option.id}
-                        disabled={!isLayoutTemplateAvailable(option.id, imageCount)}
                         onClick={() => setLayoutPreset(option.id)}
                         aria-label={`${t(option.labelKey)}${requirement ? `, ${requirement}` : ''}`}
                         title={requirement || undefined}
