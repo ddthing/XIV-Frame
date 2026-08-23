@@ -1,4 +1,4 @@
-import { Blend } from 'lucide-react'
+import { Circle, Heart, Square, Star, Blend } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -23,6 +23,9 @@ export function LayoutSettings() {
     setImageTransition,
     imageGap,
     setImageGap,
+    canvasRatio,
+    imageShape,
+    setImageShape,
     blendWidth,
     setBlendWidth,
     borderWidth,
@@ -41,6 +44,9 @@ export function LayoutSettings() {
     setImageTransition: state.setImageTransition,
     imageGap: state.imageGap,
     setImageGap: state.setImageGap,
+    canvasRatio: state.canvasRatio,
+    imageShape: state.imageShape,
+    setImageShape: state.setImageShape,
     blendWidth: state.blendWidth,
     setBlendWidth: state.setBlendWidth,
     borderWidth: state.borderWidth,
@@ -65,6 +71,13 @@ export function LayoutSettings() {
     { value: 'custom', label: t('bgCustom'), swatch: safeCustomBackgroundColor },
   ]
   const selectedBackground = backgroundOptions.find((option) => option.value === backgroundColor) ?? backgroundOptions[0]
+  const canChooseImageShape = canvasRatio === '2:1' && imageCount === 1
+  const imageShapeOptions = [
+    { value: 'rectangle' as const, label: t('imageShapeRectangle'), Icon: Square },
+    { value: 'circle' as const, label: t('imageShapeCircle'), Icon: Circle },
+    { value: 'heart' as const, label: t('imageShapeHeart'), Icon: Heart },
+    { value: 'star' as const, label: t('imageShapeStar'), Icon: Star },
+  ]
 
   return (
     <div className="space-y-6">
@@ -109,6 +122,32 @@ export function LayoutSettings() {
           <p className="rounded-md border border-border bg-muted/50 px-3 py-2 font-body text-[11px] leading-4 text-muted-foreground">
             {t('templateFallback')}
           </p>
+        )}
+        {canChooseImageShape && (
+          <div className="editor-control-surface space-y-3 p-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-1">
+                <h4 className="text-xs font-semibold text-foreground">{t('imageShapeTitle')}</h4>
+                <p className="font-body text-[11px] leading-4 text-muted-foreground">{t('imageShapeDescription')}</p>
+              </div>
+              <span className="editor-meta shrink-0">4×2</span>
+            </div>
+            <div role="group" aria-label={t('imageShapeTitle')} className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {imageShapeOptions.map(({ value, label, Icon }) => (
+                <EditorChoice
+                  key={value}
+                  active={imageShape === value}
+                  onClick={() => setImageShape(value)}
+                  aria-label={label}
+                  className="min-w-0 flex-col gap-1.5 px-2 py-2.5 text-[11px]"
+                >
+                  <Icon className="size-5" strokeWidth={1.75} aria-hidden="true" />
+                  <span>{label}</span>
+                </EditorChoice>
+              ))}
+            </div>
+            <p className="font-body text-[11px] leading-4 text-muted-foreground">{t('imageShapeHint')}</p>
+          </div>
         )}
       </EditorSection>
 

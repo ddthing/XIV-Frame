@@ -16,7 +16,7 @@ import type Konva from 'konva'
 export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Konva.Stage | null> }) {
   const {
     images, layoutPreset, imageGap, imageTransition, blendWidth, canvasRatio,
-    borderWidth, backgroundColor, customBackgroundColor, grainIntensity
+    borderWidth, backgroundColor, customBackgroundColor, grainIntensity, imageShape
   } = useStore(useShallow(state => ({
     images: state.images,
     layoutPreset: state.layoutPreset,
@@ -27,7 +27,8 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
     borderWidth: state.borderWidth,
     backgroundColor: state.backgroundColor,
     customBackgroundColor: state.customBackgroundColor,
-    grainIntensity: state.grainIntensity
+    grainIntensity: state.grainIntensity,
+    imageShape: state.imageShape,
   })))
   
   const containerRef = useRef<HTMLDivElement>(null)
@@ -156,6 +157,7 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
 
   const outerWidth = logicalWidth + (borderWidth * 2)
   const outerHeight = logicalHeight + (borderWidth * 2)
+  const activeImageShape = imagesData.length === 1 && canvasRatio === '2:1' ? imageShape : 'rectangle'
 
   const scale = Math.min(
     stageSize.width / outerWidth,
@@ -192,6 +194,7 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
           isSoftBlend={imageTransition === 'soft-blend'}
           blendWidth={blendWidth}
           layoutPreset={layoutPreset}
+          imageShape={activeImageShape}
         />
 
         {imagesData.length > 0 && (

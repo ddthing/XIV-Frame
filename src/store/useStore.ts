@@ -2,13 +2,13 @@ import { create } from 'zustand'
 import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware'
 
 import { ImageSlice, createImageSlice, initialImageState } from './slices/imageSlice'
-import { LayoutSlice, createLayoutSlice, initialLayoutState, CanvasRatio, BackgroundColor, CopyrightPosition, CopyrightColor } from './slices/layoutSlice'
+import { LayoutSlice, createLayoutSlice, initialLayoutState, CanvasRatio, BackgroundColor, CopyrightPosition, CopyrightColor, ImageShape } from './slices/layoutSlice'
 import { SignatureSlice, createSignatureSlice, initialSignatureState, SignaturePosition, SignatureAlign } from './slices/signatureSlice'
 import { CharacterSlice, createCharacterSlice, initialCharacterState } from './slices/characterSlice'
 import { revokeObjectUrl } from '@/lib/imageUpload'
 
 // Re-export types so we don't break existing imports
-export type { CanvasRatio, BackgroundColor, CopyrightPosition, CopyrightColor, SignaturePosition, SignatureAlign }
+export type { CanvasRatio, BackgroundColor, CopyrightPosition, CopyrightColor, SignaturePosition, SignatureAlign, ImageShape }
 
 export interface AppState extends ImageSlice, LayoutSlice, SignatureSlice, CharacterSlice {
   resetAll: () => void

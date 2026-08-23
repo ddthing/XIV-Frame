@@ -5,6 +5,7 @@ import { useShallow } from 'zustand/react/shallow'
 import { useStore } from '@/store/useStore'
 import { ImageUploadError, prepareImageForCanvas, revokeObjectUrl } from '@/lib/imageUpload'
 import { getLayoutGeometry } from '@/lib/layoutTemplates'
+import { clipImageShape, type ImageShape } from '@/lib/imageShapes'
 import type Konva from 'konva'
 
 type PendingUpload = { requestId: number; sourceUrl: string | undefined }
@@ -17,7 +18,8 @@ function ImageGridLayerComponent({
   borderWidth = 0,
   isSoftBlend = false,
   blendWidth = 50,
-  layoutPreset
+  layoutPreset,
+  imageShape = 'rectangle',
 }: { 
   images: HTMLImageElement[], 
   contentWidth: number, 
@@ -27,6 +29,7 @@ function ImageGridLayerComponent({
   isSoftBlend?: boolean,
   blendWidth?: number,
   layoutPreset?: string
+  imageShape?: ImageShape
 }) {
   const { imagePositions, imageScales, imageUrls, isImageLocked, setImagePosition, setImageAt, setImageScale } = useStore(useShallow(state => ({
     imagePositions: state.imagePositions,
@@ -149,6 +152,7 @@ function ImageGridLayerComponent({
         const baseScale = Math.max(itemWidth / img.width, itemHeight / img.height)
         const userScale = imageScales[index] || 1
         const scale = baseScale * userScale
+        const hasShapeMask = images.length === 1 && imageShape !== 'rectangle'
         
         // Use saved position or default to 0,0
         const savedPos = imagePositions[index] || { x: 0, y: 0 }
@@ -160,10 +164,18 @@ function ImageGridLayerComponent({
               y={borderWidth + yPos}
             >
               <Group
-                clipX={0}
-                clipY={0}
-                clipWidth={itemWidth}
-                clipHeight={itemHeight}
+                {...(hasShapeMask
+                  ? {
+                      clipFunc: (context) => {
+                        clipImageShape(context, imageShape, itemWidth, itemHeight)
+                      },
+                    }
+                  : {
+                      clipX: 0,
+                      clipY: 0,
+                      clipWidth: itemWidth,
+                      clipHeight: itemHeight,
+                    })}
               >
               <KonvaImage
                 image={img}

@@ -1,7 +1,9 @@
 import { StateCreator } from 'zustand'
 import type { LayoutPreset } from '@/lib/layoutTemplates'
+import { DEFAULT_IMAGE_SHAPE, type ImageShape } from '@/lib/imageShapes'
 
 export type { LayoutPreset } from '@/lib/layoutTemplates'
+export type { ImageShape } from '@/lib/imageShapes'
 
 export type CanvasRatio = 'auto' | '16:9' | '2:1'
 export type BackgroundColor = 'white' | 'black' | 'light-gray' | 'transparent' | 'custom'
@@ -20,6 +22,8 @@ export interface LayoutSlice {
   setCustomBackgroundColor: (color: string) => void
   imageGap: number
   setImageGap: (gap: number) => void
+  imageShape: ImageShape
+  setImageShape: (shape: ImageShape) => void
   
   imageTransition: ImageTransition
   setImageTransition: (transition: ImageTransition) => void
@@ -52,6 +56,7 @@ export const initialLayoutState = {
   backgroundColor: 'white' as BackgroundColor,
   customBackgroundColor: '#e6e8e4',
   imageGap: 24,
+  imageShape: DEFAULT_IMAGE_SHAPE,
   imageTransition: 'none' as ImageTransition,
   blendWidth: 50,
   borderWidth: 0,
@@ -69,6 +74,7 @@ export const createLayoutSlice: StateCreator<LayoutSlice, [], [], LayoutSlice> =
   setLayoutPreset: (preset) => set({ layoutPreset: preset }),
   setCanvasRatio: (ratio) => set({ canvasRatio: ratio }),
   setImageGap: (gap) => set({ imageGap: gap }),
+  setImageShape: (shape) => set({ imageShape: shape }),
   setImageTransition: (t) => set({ imageTransition: t }),
   setBlendWidth: (w) => set({ blendWidth: w }),
   setBackgroundColor: (color) => set({ backgroundColor: color }),
