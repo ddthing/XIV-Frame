@@ -29,9 +29,9 @@ export function MobileLayout({ stageRef }: { stageRef: React.MutableRefObject<Ko
         <div className="ml-auto"><LanguageSwitcher inverse /></div>
       </header>
 
-      <main className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
         <PreviewCanvas stageRef={stageRef} />
-      </main>
+      </div>
 
       <div className="z-20 shrink-0 border-t border-border bg-background pb-[env(safe-area-inset-bottom,0px)]">
         <MobileBottomNav activeSheet={activeSheet} onSelect={setActiveSheet} />

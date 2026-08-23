@@ -21,10 +21,10 @@ export function CanvasToolbar({ className = '' }: { className?: string }) {
   const layoutT = useTranslations('LayoutSettings')
 
   return (
-    <div className={`flex min-h-[76px] shrink-0 items-end justify-between gap-6 border-b border-border bg-background px-7 py-4 ${className}`}>
+    <div className={`flex min-h-[76px] shrink-0 flex-wrap items-end justify-between gap-x-6 gap-y-3 border-b border-border bg-background px-7 py-4 ${className}`}>
       <div className="min-w-0">
         <p className="editor-meta">01 / Live preview</p>
-        <h1 className="mt-1 truncate font-display text-2xl font-bold tracking-[0.01em] text-foreground">
+        <h1 className="mt-1 truncate font-display text-xl font-bold tracking-[0.01em] text-foreground">
           Your frame, in focus.
         </h1>
       </div>
@@ -50,6 +50,20 @@ export function CanvasToolbar({ className = '' }: { className?: string }) {
             ))}
           </div>
         </div>
+
+        <label className="flex items-center gap-2 lg:hidden">
+          <span className="sr-only">{t('ratio')}</span>
+          <select
+            value={canvasRatio}
+            onChange={(event) => handleRatioChange(event.target.value as CanvasRatio)}
+            aria-label={t('ratio')}
+            className="h-8 rounded-md border border-border bg-surface-inset/70 px-2 text-[11px] font-semibold text-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/50"
+          >
+            <option value="auto">{layoutT('ratioAuto')}</option>
+            <option value="16:9">16:9</option>
+            <option value="2:1">2:1</option>
+          </select>
+        </label>
 
         <div className="flex items-center gap-1.5 rounded-md border border-border bg-card px-2 py-1 shadow-subtle">
           <Button variant="ghost" size="icon-xs" className="text-muted-foreground hover:bg-muted hover:text-foreground" aria-label={t('zoomOut')} onClick={handleZoomOut}>

@@ -87,7 +87,7 @@ export function ImagePositionControls({
         type="button"
         aria-label={`${label} · ${step}px`}
         disabled={disabled}
-        className="grid min-h-11 min-w-11 place-items-center rounded-md border border-border bg-surface-inset/70 text-foreground transition-colors hover:border-primary/35 hover:bg-muted/70 active:bg-sticky-note-mint active:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-45"
+        className="grid min-h-11 min-w-11 place-items-center rounded-md border border-border bg-surface-inset/70 text-foreground transition-colors hover:border-primary/35 hover:bg-muted/70 active:bg-accent active:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-45"
         onPointerDown={(event) => {
           event.preventDefault()
           event.currentTarget.setPointerCapture(event.pointerId)
@@ -116,7 +116,7 @@ export function ImagePositionControls({
             aria-label={t('positionStepToggle')}
             aria-pressed={step === 10}
             disabled={disabled}
-            className="inline-flex min-h-9 items-center gap-1 rounded-md border border-primary/30 bg-sticky-note-mint/60 px-2 text-primary transition-colors hover:bg-sticky-note-mint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-45"
+        className="inline-flex min-h-9 items-center gap-1 rounded-md border border-primary/30 bg-accent/60 px-2 text-accent-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-45"
             onClick={() => setStep((current) => current === 1 ? 10 : 1)}
           >
             <Move className="size-3.5" strokeWidth={1.8} aria-hidden="true" />

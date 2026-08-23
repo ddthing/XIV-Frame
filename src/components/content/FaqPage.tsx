@@ -69,7 +69,7 @@ export function FaqPage({
           <section key={group.number} className={cn('rounded-xl border border-border bg-card p-5 shadow-subtle sm:p-6', group.number === '03' && 'lg:col-span-2')} aria-labelledby={`faq-group-${group.number}`}>
           <div className="flex items-baseline gap-3 border-b border-border pb-4">
             <span className="editor-meta">{group.number}</span>
-            <h2 id={`faq-group-${group.number}`} className="font-display text-xl font-bold leading-7 tracking-[0.01em] text-foreground">{group.title}</h2>
+            <h2 id={`faq-group-${group.number}`} className="font-display text-lg font-bold leading-6 tracking-[0.01em] text-foreground">{group.title}</h2>
           </div>
           <div className={cn('divide-y divide-border', group.number === '03' && 'lg:grid lg:grid-cols-2 lg:gap-x-8 lg:divide-y-0 [&>details]:border-b [&>details]:border-border')}>
             {group.items.map((item) => (
@@ -88,10 +88,10 @@ export function FaqPage({
         ))}
       </div>
 
-      <section className="mt-8 flex flex-col gap-4 rounded-xl border border-primary/15 bg-sticky-note-mint p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6" aria-labelledby="faq-help-title">
+      <section className="mt-8 flex flex-col gap-4 rounded-xl border border-primary/15 bg-accent p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6" aria-labelledby="faq-help-title">
         <div>
           <p className="editor-meta">{helpLabel}</p>
-          <h2 id="faq-help-title" className="mt-2 font-display text-xl font-bold leading-7 tracking-[0.01em] text-foreground">{helpTitle}</h2>
+          <h2 id="faq-help-title" className="mt-2 font-display text-lg font-bold leading-6 tracking-[0.01em] text-foreground">{helpTitle}</h2>
           <p className="mt-2 max-w-xl font-body text-[13px] leading-5 text-foreground/75">{helpDescription}</p>
         </div>
         <Link href={`/${locale}/contact`} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2.5 font-body text-xs font-bold text-primary-foreground transition-transform hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-sticky-note-mint">

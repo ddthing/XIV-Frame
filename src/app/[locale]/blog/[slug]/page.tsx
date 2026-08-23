@@ -134,11 +134,11 @@ export default async function BlogPostPage({ params }: PostPageProps) {
         </div>
       </article>
 
-      <section className="mt-10 rounded-xl border border-border bg-sticky-note-mint p-5 shadow-subtle sm:p-6">
+      <section className="mt-10 rounded-xl border border-border bg-accent p-5 shadow-subtle sm:p-6">
         <p className="editor-meta">NEXT STEP</p>
         <h2 className="mt-2 font-display text-xl font-bold leading-7 tracking-[0.01em] text-foreground">{t('ctaTitle')}</h2>
         <p className="mt-2 max-w-xl font-body text-[13px] leading-5 text-foreground/80">{t('ctaDescription')}</p>
-        <Link href={`/${locale}`} className="mt-5 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 font-body text-xs font-bold text-primary-foreground shadow-subtle transition-transform hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-sticky-note-mint">
+        <Link href={`/${locale}`} className="mt-5 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 font-body text-xs font-bold text-primary-foreground shadow-subtle transition-transform hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-accent">
           {t('ctaButton')}
           <ArrowUpRight size={16} aria-hidden="true" />
         </Link>

@@ -4,7 +4,7 @@ import { ContentPage, ContentPanel } from '@/components/layout/ContentPage'
 export function ContactJa() {
   return (
     <ContentPage eyebrow="05 / CONTACT" title="お問い合わせ" description="バグ報告や使い心地のフィードバックをお送りください。次回のアップデートに活用します。" size="md" density="editor">
-      <ContentPanel className="max-w-3xl [&>h2]:font-display [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:text-foreground [&>p]:text-foreground/75">
+      <ContentPanel className="max-w-3xl [&>h2]:font-display [&>h2]:text-xl [&>h2]:font-bold [&>h2]:text-foreground [&>p]:text-foreground/75">
         <h2 className="text-xl font-semibold tracking-tight text-foreground">何を送ればよいですか？</h2>
         <p className="text-muted-foreground leading-relaxed">使用ブラウザと端末、選択したファイル形式、問題が再現する手順を添えてください。可能であれば画面のスクリーンショットも役立ちます。</p>
         <ol className="mt-5 grid gap-3 border-y border-border py-5 font-body text-sm leading-6 text-foreground/75">

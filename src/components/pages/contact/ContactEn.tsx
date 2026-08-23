@@ -4,7 +4,7 @@ import { ContentPage, ContentPanel } from '@/components/layout/ContentPage'
 export function ContactEn() {
   return (
     <ContentPage eyebrow="05 / CONTACT" title="Contact" description="Send a bug report or product feedback and help shape the next update." size="md" density="editor">
-      <ContentPanel className="max-w-3xl [&>h2]:font-display [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:text-foreground [&>p]:text-foreground/75">
+      <ContentPanel className="max-w-3xl [&>h2]:font-display [&>h2]:text-xl [&>h2]:font-bold [&>h2]:text-foreground [&>p]:text-foreground/75">
         <h2 className="text-xl font-semibold tracking-tight text-foreground">What should I include?</h2>
         <p className="text-muted-foreground leading-relaxed">Include your browser and device, the file type you selected, and the steps that reproduce the issue. A screenshot is helpful when available.</p>
         <ol className="mt-5 grid gap-3 border-y border-border py-5 font-body text-sm leading-6 text-foreground/75">

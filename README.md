@@ -229,7 +229,7 @@ FAQ·소개·정책 문서는 `src/components/pages/`의 언어별 컴포넌트�
 ### 글꼴과 디자인
 
 - 공통 CSS 토큰은 [`src/app/globals.css`](src/app/globals.css)에서 확인합니다.
-- 제목·편집기 UI는 `Terrarum Sans Bitmap`, 설명·본문은 `Pretendard`를 기본으로 사용합니다.
+- 전체 기본 UI와 설명·본문은 `Pretendard`를 사용합니다. 사용자가 저장한 시그니처 폰트 선택값은 유지하며, Terrarum은 기존 선택값 호환을 위해 남겨둡니다.
 - 색상·간격·모서리·포커스 스타일은 기존 토큰과 공통 컴포넌트를 우선 재사용합니다.
 - 시각 디자인 변경 시 `DESIGN.md`와 실제 CSS 토큰의 차이도 함께 확인합니다.
 

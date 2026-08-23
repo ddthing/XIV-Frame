@@ -3,7 +3,7 @@ import { SignaturePosition, SignatureAlign } from '@/store/useStore'
 
 export const FONT_MAP: Record<string, string> = {
   'Pretendard': 'fontDefault',
-  'Terrarum Sans Bitmap': 'fontDefault',
+  'Terrarum Sans Bitmap': 'fontPixel',
   'NexonMaplestory': 'fontMaplestory',
   'TMoneyDungunbaram': 'fontTmoney',
   'OgRenaissanceSecret': 'fontOg',
@@ -18,10 +18,10 @@ export const FONT_MAP: Record<string, string> = {
   'Mulmaru': 'fontMulmaru'
 }
 
-export const DEFAULT_SIGNATURE_FONT = 'Terrarum Sans Bitmap'
+export const DEFAULT_SIGNATURE_FONT = 'Pretendard'
 
 export function resolveSignatureFont(fontFamily: string) {
-  return fontFamily === 'Pretendard' ? DEFAULT_SIGNATURE_FONT : fontFamily
+  return fontFamily || DEFAULT_SIGNATURE_FONT
 }
 
 export type SignatureTranslationKey =

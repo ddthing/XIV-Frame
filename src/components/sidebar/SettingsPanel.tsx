@@ -1,13 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { LucideIcon } from 'lucide-react'
-import { CloudCheck, Images, LayoutTemplate, Type } from 'lucide-react'
+import { CloudCheck, CloudOff, Images, LayoutTemplate, Type } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { ImageUploader } from './ImageUploader'
 import { LazyLayoutSettings, LazySignatureSettings } from './LazySettings'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { getStorageStatus, type StorageStatus } from '@/store/useStore'
 
 type SettingsTab = 'image' | 'signature' | 'layout'
 
@@ -23,6 +24,13 @@ interface SettingsTabDefinition {
 export function SettingsPanel() {
   const t = useTranslations('SettingsPanel')
   const [activeTab, setActiveTab] = useState<SettingsTab>('image')
+  const [storageStatus, setStorageStatus] = useState<StorageStatus>(() => getStorageStatus())
+
+  useEffect(() => {
+    const handleStorageStatus = () => setStorageStatus(getStorageStatus())
+    window.addEventListener('xiv-frame-storage-status', handleStorageStatus)
+    return () => window.removeEventListener('xiv-frame-storage-status', handleStorageStatus)
+  }, [])
 
   const tabs: SettingsTabDefinition[] = [
     {
@@ -57,14 +65,14 @@ export function SettingsPanel() {
     <div className="flex h-full min-h-0 flex-col bg-background">
       <Tabs
         value={activeTab}
-        onValueChange={(value) => value && setActiveTab(value as SettingsTab)}
+        onValueChange={(value) => setActiveTab(value as SettingsTab)}
         className="flex h-full min-h-0 flex-col"
       >
         <header className="shrink-0 border-b border-border bg-background px-5 pt-5">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <p className="editor-meta">{t('inspectorEyebrow')}</p>
-              <h2 className="mt-2 truncate font-display text-2xl font-bold tracking-[0.01em] text-foreground">{currentTab.title}</h2>
+              <h2 className="mt-2 truncate font-display text-xl font-bold tracking-[0.01em] text-foreground">{currentTab.title}</h2>
             </div>
             <span className="mt-1 shrink-0 rounded-full border border-border bg-surface-inset/70 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
               {currentTab.role}
@@ -108,9 +116,20 @@ export function SettingsPanel() {
           </div>
         </div>
 
-        <footer className="flex shrink-0 items-center justify-between border-t border-border px-5 py-3 text-[10px] text-muted-foreground">
-          <span className="inline-flex items-center gap-2 font-mono uppercase tracking-[0.08em]"><CloudCheck className="size-3.5 text-primary" />{t('savedLocally')}</span>
-          <span>{t('settingsPersisted')}</span>
+        <footer className="flex shrink-0 items-center justify-between gap-3 border-t border-border px-5 py-3 text-[10px] text-muted-foreground">
+          <span className="inline-flex min-w-0 items-center gap-2 font-mono uppercase tracking-[0.08em]">
+            {storageStatus === 'saved' ? <CloudCheck className="size-3.5 shrink-0 text-primary" /> : <CloudOff className="size-3.5 shrink-0 text-muted-foreground" />}
+            <span className="truncate">
+              {storageStatus === 'saved' && t('savedLocally')}
+              {storageStatus === 'partial' && t('savedLocallyPartial')}
+              {storageStatus === 'session' && t('savedLocallySession')}
+            </span>
+          </span>
+          <span className="shrink-0 text-right">
+            {storageStatus === 'saved' && t('settingsPersisted')}
+            {storageStatus === 'partial' && t('settingsPersistedPartial')}
+            {storageStatus === 'session' && t('settingsSessionOnly')}
+          </span>
         </footer>
       </Tabs>
     </div>

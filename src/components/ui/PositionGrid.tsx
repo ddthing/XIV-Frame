@@ -20,7 +20,7 @@ export function PositionGrid({ value, options, onChange }: {
           onClick={() => onChange(optVal)}
           className={`flex h-10 items-center justify-center rounded-md border transition-all shadow-subtle
             ${value === optVal
-              ? 'border-primary bg-sticky-note-mint text-primary font-semibold'
+              ? 'border-primary bg-accent text-accent-foreground font-semibold'
               : 'border-border bg-card text-muted-foreground hover:bg-muted/50'
             }`}
         >

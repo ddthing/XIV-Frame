@@ -34,8 +34,8 @@ export function ContentPage({
             <h1 className={cn(
               'font-display font-bold text-foreground',
               isEditorDensity
-                ? 'mt-2 max-w-none text-2xl leading-[2rem] tracking-[0.01em]'
-                : 'mt-3 max-w-[18ch] text-[clamp(2.25rem,5vw,4rem)] leading-[1.08] tracking-[0.02em]',
+                ? 'mt-2 max-w-none text-xl leading-7 tracking-[0.01em]'
+                : 'mt-3 max-w-[18ch] text-[clamp(2rem,4.5vw,3.5rem)] leading-[1.08] tracking-[0.02em]',
             )}>
               {title}
             </h1>
@@ -43,7 +43,7 @@ export function ContentPage({
           {description && (
             <p className={cn(
               'font-body text-muted-foreground',
-              isEditorDensity ? 'mt-2 max-w-[31rem] text-[13px] leading-5' : 'mt-5 max-w-[62ch] text-base leading-7 sm:text-lg',
+              isEditorDensity ? 'mt-2 max-w-[31rem] text-sm leading-5' : 'mt-5 max-w-[62ch] text-base leading-7 sm:text-lg',
             )}>
               {description}
             </p>
@@ -66,8 +66,8 @@ export function ContentPanel({ eyebrow, title, children, className }: ContentPan
   return (
     <section className={cn('rounded-xl border border-border bg-card p-6 shadow-subtle sm:p-8', className)}>
       {eyebrow && <p className="editor-meta">{eyebrow}</p>}
-      {title && <h2 className="mt-3 font-display text-2xl font-bold leading-tight tracking-[0.02em] text-foreground">{title}</h2>}
-      <div className={cn(eyebrow || title ? 'mt-5' : undefined, 'font-body text-base leading-7 text-foreground/80 [&>h2]:font-display [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:text-foreground [&>h2:not(:first-child)]:mt-8 [&>p]:text-foreground/75')}>
+      {title && <h2 className="mt-3 font-display text-xl font-bold leading-tight tracking-[0.02em] text-foreground">{title}</h2>}
+      <div className={cn(eyebrow || title ? 'mt-5' : undefined, 'font-body text-base leading-7 text-foreground/80 [&>h2]:font-display [&>h2]:text-xl [&>h2]:font-bold [&>h2]:text-foreground [&>h2:not(:first-child)]:mt-8 [&>p]:text-foreground/75')}>
         {children}
       </div>
     </section>
@@ -85,7 +85,7 @@ export function ContentSection({ index, title, children, className }: ContentSec
   return (
     <section className={cn('border-t border-border pt-6 first:border-t-0 first:pt-0', className)}>
       <p className="editor-meta">{index}</p>
-      <h2 className="mt-3 font-display text-2xl font-bold leading-tight tracking-[0.02em] text-foreground">{title}</h2>
+      <h2 className="mt-3 font-display text-xl font-bold leading-tight tracking-[0.02em] text-foreground">{title}</h2>
       <div className="mt-4 font-body text-base leading-7 text-foreground/80">{children}</div>
     </section>
   )

@@ -37,7 +37,7 @@ The Signature panel adds a two-line text overlay to your screenshot. Use it for 
 ## 5. Choose the font and size
 
 1. Open the **Font** menu and compare the previews.
-2. The default is **Terrarum Sans bitmap**, which gives the signature a compact pixel-style appearance.
+2. The default is **Pretendard**, so both the character and server names stay readable on smaller screens.
 3. Choose another font when its shape fits the screenshot, but confirm that both lines remain readable at the final size.
 4. Use **Size** between 50% and 200%. Reduce the size for long names and increase it only when the image has enough empty space.
 

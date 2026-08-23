@@ -523,7 +523,7 @@ export function CharacterSettings() {
     <div className="space-y-6 font-sans">
       <EditorSection title={t('characterTitle')} description={t('characterDescription')}>
         <div className="space-y-4">
-          <div className="rounded-xl border border-primary/15 bg-sticky-note-mint/35 px-4 py-3">
+          <div className="rounded-xl border border-primary/15 bg-accent/35 px-4 py-3">
             <div className="flex gap-3">
               <span className="grid size-8 shrink-0 place-items-center rounded-md bg-card text-primary shadow-subtle">
                 <WandSparkles className="size-4" aria-hidden="true" />

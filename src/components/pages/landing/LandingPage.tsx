@@ -225,7 +225,7 @@ export function LandingPage({ locale }: { locale: Locale }) {
         <section className="grid gap-8 lg:grid-cols-[minmax(0,1.12fr)_minmax(20rem,0.88fr)] lg:items-center lg:gap-14" aria-labelledby="landing-title">
           <div>
             <p className="editor-meta">{text.eyebrow}</p>
-            <h1 id="landing-title" className="mt-3 max-w-3xl whitespace-pre-line font-display text-[clamp(2.35rem,6vw,5.25rem)] font-bold leading-[1.02] tracking-[0.015em] text-foreground">{text.title}</h1>
+            <h1 id="landing-title" className="mt-3 max-w-3xl whitespace-pre-line font-display text-[clamp(2.125rem,5vw,4.5rem)] font-bold leading-[1.04] tracking-[0.015em] text-foreground">{text.title}</h1>
             <p className="mt-6 max-w-2xl font-body text-base leading-7 text-foreground/75 sm:text-lg">{text.description}</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href={appHref} className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-3 font-body text-sm font-bold text-primary-foreground shadow-subtle transition-transform hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
@@ -243,7 +243,7 @@ export function LandingPage({ locale }: { locale: Locale }) {
               <p className="editor-meta">{text.previewLabel}</p>
               <ShieldCheck className="size-5 text-primary/70" aria-hidden="true" />
             </div>
-            <h2 id="landing-preview-title" className="mt-5 font-display text-2xl font-bold leading-8 tracking-[0.01em] text-foreground">{text.previewTitle}</h2>
+            <h2 id="landing-preview-title" className="mt-5 font-display text-xl font-bold leading-7 tracking-[0.01em] text-foreground">{text.previewTitle}</h2>
             <p className="mt-3 font-body text-sm leading-6 text-foreground/75">{text.previewDescription}</p>
             <div className="mt-6 grid gap-2 border-t border-border pt-5">
               {[text.trustItems[0], text.trustItems[1], text.trustItems[3]].map((item) => (
@@ -260,7 +260,7 @@ export function LandingPage({ locale }: { locale: Locale }) {
           <div className="flex flex-col gap-3 border-y border-border py-6 sm:flex-row sm:items-end sm:justify-between sm:gap-8 sm:py-7">
             <div>
               <p className="editor-meta">{text.workflowEyebrow}</p>
-              <h2 id="landing-workflow-title" className="mt-2 font-display text-2xl font-bold leading-8 tracking-[0.01em] text-foreground sm:text-3xl sm:leading-9">{text.workflowTitle}</h2>
+              <h2 id="landing-workflow-title" className="mt-2 font-display text-xl font-bold leading-7 tracking-[0.01em] text-foreground sm:text-2xl sm:leading-8">{text.workflowTitle}</h2>
             </div>
             <p className="max-w-[38rem] font-body text-sm leading-6 text-muted-foreground sm:text-[15px]">{text.workflowDescription}</p>
           </div>
@@ -285,7 +285,7 @@ export function LandingPage({ locale }: { locale: Locale }) {
           <div className="flex flex-col gap-3 border-y border-border py-6 sm:flex-row sm:items-end sm:justify-between sm:gap-8 sm:py-7">
             <div>
               <p className="editor-meta">{text.casesEyebrow}</p>
-              <h2 id="landing-cases-title" className="mt-2 font-display text-2xl font-bold leading-8 tracking-[0.01em] text-foreground sm:text-3xl sm:leading-9">{text.casesTitle}</h2>
+              <h2 id="landing-cases-title" className="mt-2 font-display text-xl font-bold leading-7 tracking-[0.01em] text-foreground sm:text-2xl sm:leading-8">{text.casesTitle}</h2>
             </div>
             <p className="max-w-[38rem] font-body text-sm leading-6 text-muted-foreground sm:text-[15px]">{text.casesDescription}</p>
           </div>
@@ -293,7 +293,7 @@ export function LandingPage({ locale }: { locale: Locale }) {
             {text.caseTitles.map((title, index) => (
               <article key={title} className="flex h-full flex-col rounded-xl border border-border bg-card p-5 shadow-subtle sm:p-6">
                 <p className="editor-meta">{caseLabels[index]}</p>
-                <h3 className="mt-4 font-display text-xl font-bold leading-7 tracking-[0.01em] text-foreground">{title}</h3>
+                <h3 className="mt-4 font-display text-lg font-bold leading-7 tracking-[0.01em] text-foreground">{title}</h3>
                 <p className="mt-3 flex-1 font-body text-sm leading-6 text-foreground/75">{text.caseDescriptions[index]}</p>
                 <Link href={caseHrefs[index]} className="mt-6 inline-flex items-center gap-2 font-body text-sm font-bold text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
                   {text.caseLinks[index]}
@@ -308,7 +308,7 @@ export function LandingPage({ locale }: { locale: Locale }) {
           <div className="flex flex-col gap-3 border-y border-border py-6 sm:flex-row sm:items-end sm:justify-between sm:gap-8 sm:py-7">
             <div>
               <p className="editor-meta">{text.evidenceEyebrow}</p>
-              <h2 id="landing-evidence-title" className="mt-2 font-display text-2xl font-bold leading-8 tracking-[0.01em] text-foreground sm:text-3xl sm:leading-9">{text.evidenceTitle}</h2>
+              <h2 id="landing-evidence-title" className="mt-2 font-display text-xl font-bold leading-7 tracking-[0.01em] text-foreground sm:text-2xl sm:leading-8">{text.evidenceTitle}</h2>
             </div>
             <p className="max-w-[38rem] font-body text-sm leading-6 text-muted-foreground sm:text-[15px]">{text.evidenceDescription}</p>
           </div>
@@ -322,11 +322,11 @@ export function LandingPage({ locale }: { locale: Locale }) {
           </div>
         </section>
 
-        <section className="mt-20 rounded-xl border border-border bg-sticky-note-mint p-5 shadow-subtle sm:mt-24 sm:p-7" aria-labelledby="landing-limits-title">
+        <section className="mt-20 rounded-xl border border-border bg-accent p-5 shadow-subtle sm:mt-24 sm:p-7" aria-labelledby="landing-limits-title">
           <div className="grid gap-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-start lg:gap-12">
             <div>
               <p className="editor-meta">{text.trustEyebrow}</p>
-              <h2 id="landing-limits-title" className="mt-2 font-display text-2xl font-bold leading-8 tracking-[0.01em] text-foreground">{text.trustTitle}</h2>
+              <h2 id="landing-limits-title" className="mt-2 font-display text-xl font-bold leading-7 tracking-[0.01em] text-foreground">{text.trustTitle}</h2>
               <p className="mt-3 font-body text-sm leading-6 text-foreground/75">{text.trustDescription}</p>
             </div>
             <ul className="grid gap-3 sm:grid-cols-2">
@@ -342,7 +342,7 @@ export function LandingPage({ locale }: { locale: Locale }) {
 
         <section className="mt-20 border-t border-border pt-8 sm:mt-24" aria-labelledby="landing-final-title">
           <p className="editor-meta">{text.finalEyebrow}</p>
-          <h2 id="landing-final-title" className="mt-2 max-w-2xl font-display text-3xl font-bold leading-9 tracking-[0.01em] text-foreground">{text.finalTitle}</h2>
+          <h2 id="landing-final-title" className="mt-2 max-w-2xl font-display text-2xl font-bold leading-8 tracking-[0.01em] text-foreground">{text.finalTitle}</h2>
           <p className="mt-3 max-w-2xl font-body text-base leading-7 text-foreground/75">{text.finalDescription}</p>
           <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
             <Link href={appHref} className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 font-body text-sm font-bold text-primary-foreground shadow-subtle transition-transform hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">

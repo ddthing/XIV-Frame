@@ -111,6 +111,7 @@ export function TextSettingsGroup() {
             </SelectTrigger>
             <SelectContent className="rounded-xl">
               <SelectItem value="Pretendard" className="text-sm font-sans font-medium" style={{ fontFamily: DEFAULT_SIGNATURE_FONT }}>{t('fontDefault')}</SelectItem>
+              <SelectItem value="Terrarum Sans Bitmap" className="text-sm font-medium" style={{ fontFamily: 'Terrarum Sans Bitmap' }}>{t('fontPixel')}</SelectItem>
               <SelectItem value="NexonMaplestory" className="text-sm font-medium" style={{ fontFamily: 'NexonMaplestory' }}>{t('fontMaplestory')}</SelectItem>
               <SelectItem value="TMoneyDungunbaram" className="text-sm font-medium" style={{ fontFamily: 'TMoneyDungunbaram' }}>{t('fontTmoney')}</SelectItem>
               <SelectItem value="OgRenaissanceSecret" className="text-sm font-medium" style={{ fontFamily: 'OgRenaissanceSecret' }}>{t('fontOg')}</SelectItem>

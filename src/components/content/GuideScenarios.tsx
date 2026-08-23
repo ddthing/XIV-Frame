@@ -34,7 +34,7 @@ function ScenarioPreview({ kind }: { kind: ScenarioKind }) {
       <div className="grid h-full grid-cols-2 gap-1.5 p-3">
         <div className="row-span-2 rounded-md border border-primary/20 bg-primary/15" />
         <div className="rounded-md border border-primary/15 bg-primary/5" />
-        <div className="rounded-md border border-primary/15 bg-sticky-note-mint/70" />
+        <div className="rounded-md border border-primary/15 bg-accent/70" />
       </div>
     )
   }
@@ -43,7 +43,7 @@ function ScenarioPreview({ kind }: { kind: ScenarioKind }) {
     return (
       <div className="relative h-full overflow-hidden p-3">
         <div className="absolute inset-x-6 bottom-3 top-3 rounded-md border border-primary/15 bg-primary/5" />
-        <div className="absolute bottom-4 left-1/2 grid size-16 -translate-x-1/2 place-items-center rounded-full border border-primary/25 bg-sticky-note-mint/80 shadow-subtle">
+        <div className="absolute bottom-4 left-1/2 grid size-16 -translate-x-1/2 place-items-center rounded-full border border-primary/25 bg-accent/80 shadow-subtle">
           <WandSparkles className="size-5 text-primary/75" aria-hidden="true" />
         </div>
         <div className="absolute right-5 top-5 h-1.5 w-12 rounded-full bg-primary/30" />
@@ -72,7 +72,7 @@ export function GuideScenarios({ eyebrow, title, description, scenarios }: Guide
       <div className="flex flex-col gap-3 border-y border-border py-6 sm:flex-row sm:items-end sm:justify-between sm:gap-8 sm:py-7">
         <div>
           <p className="editor-meta">{eyebrow}</p>
-          <h2 id="guide-scenarios-title" className="mt-2 font-display text-2xl font-bold leading-8 tracking-[0.01em] text-foreground sm:text-3xl sm:leading-9">{title}</h2>
+          <h2 id="guide-scenarios-title" className="mt-2 font-display text-xl font-bold leading-7 tracking-[0.01em] text-foreground sm:text-2xl sm:leading-8">{title}</h2>
         </div>
         <p className="max-w-[38rem] font-body text-sm leading-6 text-muted-foreground sm:text-[15px]">{description}</p>
       </div>

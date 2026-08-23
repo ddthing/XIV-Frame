@@ -54,7 +54,7 @@ export function TextOptionControl({
           <button 
             type="button" 
             aria-label={bold ? t('removeBold') : t('makeBold')}
-            className={`flex size-9 items-center justify-center rounded-md border transition-colors shadow-subtle ${bold ? 'border-primary bg-sticky-note-mint text-primary font-semibold' : 'border-border bg-card text-muted-foreground hover:bg-muted/50'}`}
+            className={`flex size-9 items-center justify-center rounded-md border transition-colors shadow-subtle ${bold ? 'border-primary bg-accent text-accent-foreground font-semibold' : 'border-border bg-card text-muted-foreground hover:bg-muted/50'}`}
             onClick={() => onChangeBold(!bold)}
           >
             <Bold className="w-4 h-4" />
@@ -62,7 +62,7 @@ export function TextOptionControl({
           <button 
             type="button" 
             aria-label={italic ? t('removeItalic') : t('makeItalic')}
-            className={`flex size-9 items-center justify-center rounded-md border transition-colors shadow-subtle ${italic ? 'border-primary bg-sticky-note-mint text-primary font-semibold' : 'border-border bg-card text-muted-foreground hover:bg-muted/50'}`}
+            className={`flex size-9 items-center justify-center rounded-md border transition-colors shadow-subtle ${italic ? 'border-primary bg-accent text-accent-foreground font-semibold' : 'border-border bg-card text-muted-foreground hover:bg-muted/50'}`}
             onClick={() => onChangeItalic(!italic)}
           >
             <Italic className="w-4 h-4" />

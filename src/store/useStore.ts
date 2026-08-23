@@ -19,6 +19,23 @@ type PersistedAppState = Omit<Partial<AppState>, 'layoutPreset' | 'imageTransiti
   imageTransition?: string
 }
 
+export type StorageStatus = 'saved' | 'partial' | 'session'
+
+let storageStatus: StorageStatus = 'saved'
+
+export function getStorageStatus() {
+  return storageStatus
+}
+
+function publishStorageStatus(status: StorageStatus) {
+  if (storageStatus === status) return
+
+  storageStatus = status
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('xiv-frame-storage-status'))
+  }
+}
+
 // Keep edits usable in private browsing and when a large legacy logo fills the
 // browser quota. The current Zustand state remains available for the session;
 // persistence is best-effort and existing stored settings are read unchanged.
@@ -27,14 +44,32 @@ const safeLocalStorage: StateStorage = {
     try {
       return typeof window === 'undefined' ? null : window.localStorage.getItem(name)
     } catch {
+      publishStorageStatus('session')
       return null
     }
   },
   setItem: (name, value) => {
+    if (typeof window === 'undefined') return
+
     try {
-      if (typeof window !== 'undefined') window.localStorage.setItem(name, value)
+      window.localStorage.setItem(name, value)
+      publishStorageStatus('saved')
     } catch {
-      // Do not let a storage quota error break text or logo controls.
+      // Keep existing settings when a legacy Base64 logo fills the quota.
+      // The logo remains available in memory for the current session.
+      try {
+        const parsed = JSON.parse(value) as { state?: Record<string, unknown> } & Record<string, unknown>
+        if (parsed.state && typeof parsed.state === 'object') {
+          delete parsed.state.logoUrl
+        } else {
+          delete parsed.logoUrl
+        }
+        window.localStorage.setItem(name, JSON.stringify(parsed))
+        publishStorageStatus('partial')
+      } catch {
+        // Do not let a storage quota error break text or logo controls.
+        publishStorageStatus('session')
+      }
     }
   },
   removeItem: (name) => {
@@ -42,6 +77,7 @@ const safeLocalStorage: StateStorage = {
       if (typeof window !== 'undefined') window.localStorage.removeItem(name)
     } catch {
       // Storage can be unavailable in private browsing contexts.
+      publishStorageStatus('session')
     }
   },
 }

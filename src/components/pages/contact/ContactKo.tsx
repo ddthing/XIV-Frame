@@ -4,7 +4,7 @@ import { ContentPage, ContentPanel } from '@/components/layout/ContentPage'
 export function ContactKo() {
   return (
     <ContentPage eyebrow="05 / CONTACT" title="문의" description="버그 제보와 사용성 피드백을 보내주시면 다음 업데이트에 반영하겠습니다." size="md" density="editor">
-      <ContentPanel className="max-w-3xl [&>h2]:font-display [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:text-foreground [&>p]:text-foreground/75">
+      <ContentPanel className="max-w-3xl [&>h2]:font-display [&>h2]:text-xl [&>h2]:font-bold [&>h2]:text-foreground [&>p]:text-foreground/75">
         <h2 className="text-xl font-semibold tracking-tight text-foreground">어떤 내용을 보내면 좋나요?</h2>
         <p className="text-muted-foreground leading-relaxed">사용 중인 브라우저와 기기, 선택한 파일 형식, 문제가 재현되는 순서를 함께 보내주세요. 화면 캡처가 있으면 확인이 더 쉽습니다.</p>
         <ol className="mt-5 grid gap-3 border-y border-border py-5 font-body text-sm leading-6 text-foreground/75">

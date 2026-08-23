@@ -70,7 +70,7 @@ export function CharacterPositionControls() {
       <button
         type="button"
         aria-label={`${label} · ${step}px`}
-        className="grid min-h-11 min-w-11 place-items-center rounded-md border border-border bg-surface-inset/70 text-foreground transition-colors hover:border-primary/35 hover:bg-muted/70 active:bg-sticky-note-mint active:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+        className="grid min-h-11 min-w-11 place-items-center rounded-md border border-border bg-surface-inset/70 text-foreground transition-colors hover:border-primary/35 hover:bg-muted/70 active:bg-accent active:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
         onPointerDown={(event) => {
           event.preventDefault()
           event.currentTarget.setPointerCapture(event.pointerId)
@@ -104,7 +104,7 @@ export function CharacterPositionControls() {
         <button
           type="button"
           aria-label={t('characterNudgeToggleStep')}
-          className="grid min-h-11 min-w-11 place-items-center rounded-md border border-primary/30 bg-sticky-note-mint/60 text-primary transition-colors hover:bg-sticky-note-mint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+        className="grid min-h-11 min-w-11 place-items-center rounded-md border border-primary/30 bg-accent/60 text-accent-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
           onClick={() => setStep((current) => current === 1 ? 10 : 1)}
         >
           <span className="flex flex-col items-center gap-0.5">

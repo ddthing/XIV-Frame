@@ -6,6 +6,7 @@
     "tabSignature": "Signature"
   },
   "ImageUploader": {
+    "close": "Close",
     "uploadLimit": "Image files must be 50MB or smaller. Larger dimensions are optimized in your browser.",
     "uploadError": "The image could not be read or optimized. Try a PNG, JPG, or WebP file again.",
     "dropTitle": "Drop photos here",
@@ -112,6 +113,7 @@
   },
   "SignatureSettings": {
     "sheetTitle": "Signature Settings",
+    "close": "Close",
     "charNamePlaceholder": "Character Name",
     "serverNamePlaceholder": "Server Name (ex. Chocobo)",
     "toggleSignature": "Enable Signature",
@@ -135,7 +137,8 @@
     "logoDelete": "Delete Logo",
     "logoUploadError": "The logo could not be read. Please choose a PNG or JPG file again.",
     "logoUploadTooLarge": "This image is too large. Please choose a smaller logo file.",
-    "fontDefault": "Default (Terrarum Sans bitmap)",
+    "fontDefault": "Default (Pretendard)",
+    "fontPixel": "Pixel (Terrarum Sans bitmap)",
     "fontMaplestory": "Nexon Maplestory",
     "fontTmoney": "Tmoney RoundWind",
     "fontOg": "OG Renaissance Secret",
@@ -224,6 +227,7 @@
     "savedLocally": "Saved locally"
   },
   "MobileLayout": {
+    "close": "Close",
     "sheetTitle": "Export & Ratio Settings",
     "exportTitle": "Export",
     "ratio": "Ratio",
@@ -276,7 +280,11 @@
     "flowOverlay": "Overlay",
     "flowComposition": "Composition",
     "savedLocally": "Saved locally",
+    "savedLocallyPartial": "Partially saved",
+    "savedLocallySession": "Session only",
     "settingsPersisted": "Preferences persist locally",
+    "settingsPersistedPartial": "Storage is full; the logo stays for this session only.",
+    "settingsSessionOnly": "Storage is unavailable; settings may reset after refresh.",
     "donate": "☕ Donate"
   },
   "Navigation": {

@@ -22,7 +22,7 @@ function StepPreview({ number }: { number: string }) {
     return (
       <div className="grid h-full grid-cols-3 gap-1.5 p-3">
         <div className="rounded-md border border-primary/15 bg-primary/10" />
-        <div className="rounded-md border border-primary/15 bg-sticky-note-mint/70" />
+        <div className="rounded-md border border-primary/15 bg-accent/70" />
         <div className="grid place-items-center rounded-md border border-dashed border-primary/25 bg-card text-primary/65">
           <ImagePlus className="size-4" aria-hidden="true" />
         </div>
@@ -47,7 +47,7 @@ function StepPreview({ number }: { number: string }) {
           <ImagePlus className="size-4 text-primary/70" aria-hidden="true" />
         </div>
         <WandSparkles className="size-4 text-primary/70" aria-hidden="true" />
-        <div className="h-3/4 w-1/3 rounded-md border border-dashed border-primary/25 bg-sticky-note-mint/60" />
+        <div className="h-3/4 w-1/3 rounded-md border border-dashed border-primary/25 bg-accent/60" />
       </div>
     )
   }
@@ -60,7 +60,7 @@ function StepPreview({ number }: { number: string }) {
           <span className="h-1.5 w-20 rounded-full bg-primary/65" />
         </div>
         <div className="ml-6 h-1 w-14 rounded-full bg-primary/25" />
-        <div className="ml-auto h-4 w-10 rounded-sm border border-primary/20 bg-sticky-note-yellow/70" />
+        <div className="ml-auto h-4 w-10 rounded-sm border border-primary/20 bg-accent/70" />
       </div>
     )
   }
@@ -84,7 +84,7 @@ export function GuideWorkflow({ eyebrow, title, description, steps }: GuideWorkf
       <div className="flex flex-col gap-3 border-y border-border py-6 sm:flex-row sm:items-end sm:justify-between sm:gap-8 sm:py-7">
         <div>
           <p className="editor-meta">{eyebrow}</p>
-          <h2 id="guide-workflow-title" className="mt-2 font-display text-2xl font-bold leading-8 tracking-[0.01em] text-foreground sm:text-3xl sm:leading-9">{title}</h2>
+          <h2 id="guide-workflow-title" className="mt-2 font-display text-xl font-bold leading-7 tracking-[0.01em] text-foreground sm:text-2xl sm:leading-8">{title}</h2>
         </div>
         <p className="max-w-[38rem] font-body text-sm leading-6 text-muted-foreground sm:text-[15px]">{description}</p>
       </div>

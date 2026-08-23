@@ -29,7 +29,7 @@ export function MobileBottomNav({ activeSheet, onSelect }: MobileBottomNavProps)
             aria-pressed={isActive}
             onClick={() => onSelect(isActive ? null : id)}
             className={`flex min-h-11 flex-col items-center justify-center gap-1 rounded-md text-[10px] transition-all ${
-              isActive ? 'bg-sticky-note-mint text-primary shadow-subtle' : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
+              isActive ? 'bg-accent text-accent-foreground shadow-subtle' : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
             }`}
           >
             <Icon className={`size-4 ${isActive ? 'stroke-[2]' : 'stroke-[1.5]'}`} />

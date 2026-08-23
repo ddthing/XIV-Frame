@@ -136,7 +136,7 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
         </div>
 
         {isDragActive && (
-          <div className="pointer-events-none absolute inset-5 z-20 flex items-center justify-center rounded-2xl border-2 border-dashed border-primary bg-sticky-note-mint/45 px-6 text-center backdrop-blur-[2px]">
+          <div className="pointer-events-none absolute inset-5 z-20 flex items-center justify-center rounded-2xl border-2 border-dashed border-primary bg-accent/45 px-6 text-center backdrop-blur-[2px]">
             <div>
               <Upload className="mx-auto size-8 text-primary" />
               <p className="mt-3 text-sm font-semibold text-primary">{t('dropActive')}</p>

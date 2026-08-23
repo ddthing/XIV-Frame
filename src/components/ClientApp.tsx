@@ -30,9 +30,9 @@ export function ClientApp({ currentLocale }: { currentLocale: string }) {
       <div className="hidden min-h-0 flex-1 flex-col md:flex">
         <DesktopToolbar stageRef={stageRef} />
         <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_360px] border-b border-border xl:grid-cols-[minmax(0,1fr)_390px]">
-          <main className="relative flex min-h-0 flex-col overflow-hidden border-r border-border bg-background">
+          <div className="relative flex min-h-0 flex-col overflow-hidden border-r border-border bg-background">
             <PreviewCanvas stageRef={stageRef} />
-          </main>
+          </div>
 
           <aside className="z-10 flex min-h-0 flex-col overflow-hidden bg-background">
             <SettingsPanel />

@@ -228,7 +228,7 @@ export function ImageUploader() {
                 key={index}
                 className={`group relative aspect-[4/3] overflow-hidden rounded-xl border bg-card transition-all ${
                   selected
-                    ? 'border-primary shadow-[inset_0_0_0_2px_var(--color-highlighter-yellow),var(--shadow-subtle)]'
+                    ? 'border-primary shadow-[inset_0_0_0_2px_var(--accent),var(--shadow-subtle)]'
                     : 'border-border hover:border-primary/30 hover:shadow-subtle'
                 }`}
               >
