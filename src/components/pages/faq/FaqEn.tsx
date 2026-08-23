@@ -19,7 +19,7 @@ export function FaqEn() {
             },
             {
               question: 'How many images can I add, and what is the limit?',
-              answer: <p>You can add up to four image files from the image panel. Each file can be up to 50 MB; after selection, the browser optimizes its dimensions and format for editing. Use a browser-readable image such as PNG, JPG, or WebP.</p>,
+              answer: <p>You can add up to 16 image files from the image panel. The 3×3 grid needs 9 images and the 4×4 grid needs 16. Each file can be up to 50 MB; after selection, the browser optimizes its dimensions and format for editing. Use a browser-readable image such as PNG, JPG, or WebP.</p>,
             },
             {
               question: 'Are uploaded screenshots stored on a server?',

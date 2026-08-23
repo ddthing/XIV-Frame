@@ -15,14 +15,14 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   setRequestLocale(locale);
   
   let title = "XIV Frame - Final Fantasy XIV Screenshot Framer";
-  let description = "파이널판타지14 스크린샷을 최대 4장까지 구성하고, 합성·시그니처·레이아웃을 브라우저에서 조정해 PNG로 저장하는 무료 편집 도구입니다.";
+  let description = "파이널판타지14 스크린샷을 최대 16장까지 구성하고, 합성·시그니처·레이아웃을 브라우저에서 조정해 PNG로 저장하는 무료 편집 도구입니다.";
   
   if (locale === 'en') {
     title = "XIV Frame - FF14 Screenshot Framer";
-    description = "Compose up to four Final Fantasy XIV screenshots, add composite elements and signatures, and save a PNG in your browser.";
+    description = "Compose up to 16 Final Fantasy XIV screenshots, including 3×3 and 4×4 grids, add composite elements and signatures, and save a PNG in your browser.";
   } else if (locale === 'ja') {
     title = "XIV Frame - FF14 スクリーンショットフレーマー";
-    description = "最大4枚のFF14スクリーンショットを配置し、合成素材と署名を調整してブラウザでPNG保存できます。";
+    description = "最大16枚のFF14スクリーンショットを配置し、3×3・4×4グリッドや合成素材、署名を調整してブラウザでPNG保存できます。";
   }
 
   return {

@@ -45,7 +45,7 @@ const copy: Record<Locale, LandingCopy> = {
   ko: {
     eyebrow: 'XIV FRAME / BROWSER EDITOR',
     title: '스크린샷을 고르고,\n한 장의 결과로 마무리하세요.',
-    description: '파이널판타지14 스크린샷을 최대 4장까지 배치하고, 레이아웃·합성·시그니처를 조정해 PNG로 저장하는 무료 브라우저 편집기입니다.',
+    description: '파이널판타지14 스크린샷을 최대 16장까지 배치하고, 3×3·4×4 격자와 레이아웃·합성·시그니처를 조정해 PNG로 저장하는 무료 브라우저 편집기입니다.',
     primaryCta: '편집기 열기',
     secondaryCta: '사용 순서 보기',
     previewLabel: 'LOCAL-FIRST WORKFLOW',
@@ -77,7 +77,7 @@ const copy: Record<Locale, LandingCopy> = {
     trustEyebrow: 'KNOWN LIMITS',
     trustTitle: '사용 전에 확인할 범위',
     trustDescription: '브라우저에서 실행되는 편집기인 만큼 파일 크기와 기기 메모리가 결과에 영향을 줍니다. 아래 기준을 먼저 확인하면 실패를 줄일 수 있습니다.',
-    trustItems: ['사진 최대 4장', '파일 하나 최대 50MB', '배경 제거는 첫 실행이 느릴 수 있음', '설정은 로컬 저장, 원본 이미지는 새로고침 후 재선택'],
+    trustItems: ['사진 최대 16장', '파일 하나 최대 50MB', '배경 제거는 첫 실행이 느릴 수 있음', '설정은 로컬 저장, 원본 이미지는 새로고침 후 재선택'],
     finalEyebrow: 'START WITH YOUR RESULT',
     finalTitle: '이제 만들고 싶은 결과부터 고르세요.',
     finalDescription: '편집기를 바로 열거나, 처음이라면 전체 사용 가이드에서 사진 추가부터 PNG 저장까지 순서대로 따라 할 수 있습니다.',
@@ -88,7 +88,7 @@ const copy: Record<Locale, LandingCopy> = {
   en: {
     eyebrow: 'XIV FRAME / BROWSER EDITOR',
     title: 'Choose your screenshots.\nFinish one clear result.',
-    description: 'A free browser editor for arranging up to four Final Fantasy XIV screenshots, tuning layouts and composites, adding signatures, and saving a PNG.',
+    description: 'A free browser editor for arranging up to 16 Final Fantasy XIV screenshots, including 3×3 and 4×4 grids, tuning layouts and composites, adding signatures, and saving a PNG.',
     primaryCta: 'Open the editor',
     secondaryCta: 'See the workflow',
     previewLabel: 'LOCAL-FIRST WORKFLOW',
@@ -120,7 +120,7 @@ const copy: Record<Locale, LandingCopy> = {
     trustEyebrow: 'KNOWN LIMITS',
     trustTitle: 'Know the boundaries before you start',
     trustDescription: 'Because the editor runs in your browser, file size and device memory affect the result. Check these limits first to avoid failed work.',
-    trustItems: ['Up to four screenshots', 'Up to 50 MB per file', 'Background removal can be slower on its first run', 'Settings stay local; screenshots must be selected again after refresh'],
+    trustItems: ['Up to 16 screenshots', 'Up to 50 MB per file', 'Background removal can be slower on its first run', 'Settings stay local; screenshots must be selected again after refresh'],
     finalEyebrow: 'START WITH YOUR RESULT',
     finalTitle: 'Start with the result you want to make.',
     finalDescription: 'Open the editor now, or follow the complete guide from adding screenshots through saving the final PNG.',
@@ -131,7 +131,7 @@ const copy: Record<Locale, LandingCopy> = {
   ja: {
     eyebrow: 'XIV FRAME / BROWSER EDITOR',
     title: 'スクリーンショットを選び、\n一枚の成果に仕上げます。',
-    description: '最大4枚のFFXIVスクリーンショットを配置し、レイアウト・合成・署名を調整してPNGで保存できる無料のブラウザエディターです。',
+    description: '最大16枚のFFXIVスクリーンショットを配置し、3×3・4×4グリッド、レイアウト・合成・署名を調整してPNGで保存できる無料のブラウザエディターです。',
     primaryCta: 'エディターを開く',
     secondaryCta: '使い方を見る',
     previewLabel: 'LOCAL-FIRST WORKFLOW',
@@ -163,7 +163,7 @@ const copy: Record<Locale, LandingCopy> = {
     trustEyebrow: 'KNOWN LIMITS',
     trustTitle: '始める前に確認する範囲',
     trustDescription: 'ブラウザで動作するため、ファイル容量と端末メモリが結果に影響します。次の制限を先に確認すると失敗を減らせます。',
-    trustItems: ['スクリーンショットは最大4枚', '1ファイル最大50MB', '背景削除は初回の準備に時間がかかる場合があります', '設定はローカル保存、画像は更新後に再選択'],
+    trustItems: ['スクリーンショットは最大16枚', '1ファイル最大50MB', '背景削除は初回の準備に時間がかかる場合があります', '設定はローカル保存、画像は更新後に再選択'],
     finalEyebrow: 'START WITH YOUR RESULT',
     finalTitle: 'まず作りたい結果を選んでください。',
     finalDescription: 'すぐにエディターを開くか、画像追加からPNG保存まで完全ガイドに沿って進められます。',
@@ -197,10 +197,10 @@ export function LandingPage({ locale }: { locale: Locale }) {
       ? ['画像を追加', 'レイアウトを選択', '合成を準備', '署名を整える', 'PNGを保存']
       : ['Add screenshots', 'Choose a layout', 'Prepare composites', 'Tune the signature', 'Save a PNG']
   const workflowDescriptions = locale === 'ko'
-    ? ['최대 4장의 PNG·JPG·WebP를 선택합니다.', '분할·세로·그리드와 비율을 정합니다.', '배경을 제거하고 PNG 요소를 다듬습니다.', '텍스트·로고의 위치와 가독성을 확인합니다.', '미리보기와 최종 파일을 모두 검수합니다.']
+    ? ['최대 16장의 PNG·JPG·WebP를 선택합니다.', '분할·세로·그리드·3×3·4×4와 비율을 정합니다.', '배경을 제거하고 PNG 요소를 다듬습니다.', '텍스트·로고의 위치와 가독성을 확인합니다.', '미리보기와 최종 파일을 모두 검수합니다.']
     : locale === 'ja'
-      ? ['最大4枚のPNG・JPG・WebPを選びます。', '分割・縦・グリッドと比率を決めます。', '背景を削除してPNG素材を整えます。', 'テキスト・ロゴの位置と可読性を確認します。', 'プレビューと最終ファイルを確認します。']
-      : ['Select up to four PNG, JPG, or WebP files.', 'Choose split, vertical, grid, and ratio settings.', 'Remove backgrounds and refine PNG elements.', 'Check text and logo position and readability.', 'Review both the preview and final file.']
+      ? ['最大16枚のPNG・JPG・WebPを選びます。', '分割・縦・グリッド・3×3・4×4と比率を決めます。', '背景を削除してPNG素材を整えます。', 'テキスト・ロゴの位置と可読性を確認します。', 'プレビューと最終ファイルを確認します。']
+      : ['Select up to 16 PNG, JPG, or WebP files.', 'Choose split, vertical, grid, 3×3, 4×4, and ratio settings.', 'Remove backgrounds and refine PNG elements.', 'Check text and logo position and readability.', 'Review both the preview and final file.']
   const caseLabels = [
     locale === 'ko' ? 'CASE 01 · SHOWCASE' : locale === 'ja' ? 'CASE 01 · SHOWCASE' : 'CASE 01 · SHOWCASE',
     locale === 'ko' ? 'CASE 02 · COMPOSITE' : locale === 'ja' ? 'CASE 02 · COMPOSITE' : 'CASE 02 · COMPOSITE',

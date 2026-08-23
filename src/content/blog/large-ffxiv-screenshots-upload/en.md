@@ -12,7 +12,7 @@ High-resolution GPose screenshots look great, but a browser editor uses both the
 ## Limits to know
 
 - Each photo or composite image must be **50 MB or smaller**.
-- A canvas can contain up to four photos.
+- A canvas can contain up to 16 photos. The 3×3 and 4×4 grid templates use 9 and 16 photos.
 - Large photo dimensions may be optimized in the browser into an editing size up to 4096 px on the long side.
 - Background removal needs additional memory because a model runs on the device.
 - A file over 50 MB is rejected before browser optimization can begin.

@@ -19,8 +19,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const isJapanese = locale === 'ja'
   const title = isJapanese ? 'XIV Frame | FFXIV スクリーンショット編集' : 'XIV Frame | Final Fantasy XIV screenshot editor'
   const description = isJapanese
-    ? '最大4枚のFFXIVスクリーンショットを配置し、合成・レイアウト・署名を調整してPNGで保存できる無料のブラウザエディターです。'
-    : 'A free browser editor for arranging up to four Final Fantasy XIV screenshots, tuning composites and signatures, and saving a finished PNG.'
+    ? '最大16枚のFFXIVスクリーンショットを配置し、3×3・4×4グリッド、合成・レイアウト・署名を調整してPNGで保存できる無料のブラウザエディターです。'
+    : 'A free browser editor for arranging up to 16 Final Fantasy XIV screenshots, including 3×3 and 4×4 grids, tuning composites and signatures, and saving a finished PNG.'
   const url = localizedUrl(locale, '/landing')
 
   return {

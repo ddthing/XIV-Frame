@@ -1,11 +1,13 @@
 import { StateCreator } from 'zustand'
+import type { LayoutPreset } from '@/lib/layoutTemplates'
+
+export type { LayoutPreset } from '@/lib/layoutTemplates'
 
 export type CanvasRatio = 'auto' | '16:9' | '2:1'
-export type BackgroundColor = 'white' | 'light-gray' | 'transparent'
+export type BackgroundColor = 'white' | 'black' | 'light-gray' | 'transparent' | 'custom'
 export type CopyrightPosition = 'bottom-left' | 'bottom-center' | 'bottom-right'
 export type CopyrightColor = 'black' | 'white' | 'gray'
 export type ImageTransition = 'none' | 'soft-blend'
-export type LayoutPreset = 'split' | 'vertical-split' | 'grid'
 
 export interface LayoutSlice {
   layoutPreset: LayoutPreset
@@ -14,6 +16,8 @@ export interface LayoutSlice {
   setCanvasRatio: (ratio: CanvasRatio) => void
   backgroundColor: BackgroundColor
   setBackgroundColor: (color: BackgroundColor) => void
+  customBackgroundColor: string
+  setCustomBackgroundColor: (color: string) => void
   imageGap: number
   setImageGap: (gap: number) => void
   
@@ -46,6 +50,7 @@ export const initialLayoutState = {
   layoutPreset: 'split' as LayoutPreset,
   canvasRatio: 'auto' as CanvasRatio,
   backgroundColor: 'white' as BackgroundColor,
+  customBackgroundColor: '#e6e8e4',
   imageGap: 24,
   imageTransition: 'none' as ImageTransition,
   blendWidth: 50,
@@ -67,6 +72,7 @@ export const createLayoutSlice: StateCreator<LayoutSlice, [], [], LayoutSlice> =
   setImageTransition: (t) => set({ imageTransition: t }),
   setBlendWidth: (w) => set({ blendWidth: w }),
   setBackgroundColor: (color) => set({ backgroundColor: color }),
+  setCustomBackgroundColor: (color) => set({ customBackgroundColor: color }),
   setCopyrightPosition: (pos) => set({ copyrightPosition: pos }),
   setCopyrightColor: (color) => set({ copyrightColor: color }),
   setBorderWidth: (width) => set({ borderWidth: width }),

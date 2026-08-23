@@ -20,7 +20,7 @@ A useful glamour board gives every image a job. The example below uses a front v
 
 1. Open **Image source** on desktop or **Photo** on mobile.
 2. Upload the hero image first, then the alternate view and detail shots.
-3. You can use up to four images, with a 50MB limit for each file. Larger originals are optimized in the browser after upload.
+3. You can use up to 16 images, with a 50MB limit for each file. The 3×3 and 4×4 grids use 9 and 16 images. Larger originals are optimized in the browser after upload.
 4. Use **Swap Order** or the card movement controls if the story of the images is not clear.
 
 ## 3. Choose the layout

@@ -9,13 +9,14 @@ import { SignatureLayer } from './layers/SignatureLayer'
 import { LogoLayer } from './layers/LogoLayer'
 import { CopyrightLayer } from './layers/CopyrightLayer'
 import { NoiseLayer } from './layers/NoiseLayer'
+import { getLayoutGeometry } from '@/lib/layoutTemplates'
 
 import type Konva from 'konva'
 
 export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Konva.Stage | null> }) {
   const {
     images, layoutPreset, imageGap, imageTransition, blendWidth, canvasRatio,
-    borderWidth, backgroundColor, grainIntensity
+    borderWidth, backgroundColor, customBackgroundColor, grainIntensity
   } = useStore(useShallow(state => ({
     images: state.images,
     layoutPreset: state.layoutPreset,
@@ -25,6 +26,7 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
     canvasRatio: state.canvasRatio,
     borderWidth: state.borderWidth,
     backgroundColor: state.backgroundColor,
+    customBackgroundColor: state.customBackgroundColor,
     grainIntensity: state.grainIntensity
   })))
   
@@ -106,12 +108,13 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
       const baseHeight = imagesData[0].height
       let totalWidth = 0
       let gridHeight = baseHeight
-      
-      if (layoutPreset === 'grid' && imagesData.length >= 3) {
+      const geometry = getLayoutGeometry(layoutPreset, imagesData.length)
+
+      if (geometry.effectivePreset === 'grid') {
         const cellWidth = imagesData[0].width
-        totalWidth = (cellWidth * 2) + imageGap
-        gridHeight = (baseHeight * 2) + imageGap
-      } else if (layoutPreset === 'vertical-split') {
+        totalWidth = (cellWidth * geometry.columns) + (imageGap * (geometry.columns - 1))
+        gridHeight = (baseHeight * geometry.rows) + (imageGap * (geometry.rows - 1))
+      } else if (geometry.effectivePreset === 'vertical-split') {
         const baseWidth = imagesData[0].width
         totalWidth = baseWidth
         gridHeight = 0
@@ -119,7 +122,7 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
           gridHeight += img.height * (baseWidth / img.width)
         })
         gridHeight += Math.max(0, imagesData.length - 1) * imageGap
-      } else {
+      } else if (geometry.effectivePreset === 'split') {
         imagesData.forEach(img => {
           totalWidth += img.width * (baseHeight / img.height)
         })
@@ -129,6 +132,12 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
         } else {
           totalWidth += Math.max(0, imagesData.length - 1) * imageGap
         }
+      } else {
+        const cellWidth = imagesData[0].width
+        const cellHeight = imagesData[0].height
+        const layoutGap = imageTransition === 'soft-blend' ? -blendWidth : imageGap
+        totalWidth = (cellWidth * geometry.columns) + (layoutGap * (geometry.columns - 1))
+        gridHeight = (cellHeight * geometry.rows) + (layoutGap * (geometry.rows - 1))
       }
 
       if (canvasRatio === '16:9') {
@@ -170,6 +179,7 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
             width={outerWidth} 
             height={outerHeight} 
             color={backgroundColor} 
+            customColor={customBackgroundColor}
           />
         </Layer>
         

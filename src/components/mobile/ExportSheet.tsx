@@ -58,11 +58,13 @@ import { MobileSheetBody } from './MobileSheetBody'
           {/* Canvas Ratio */}
           <div className="space-y-3">
             <span className="text-xs font-semibold text-foreground">{t('ratioSettings')}</span>
-            <div className="flex rounded-md border border-border bg-surface-inset/70 p-1">
+            <div className="flex rounded-md border border-border bg-surface-inset/70 p-1" role="group" aria-label={t('ratioSettings')}>
               {['auto', '16:9', '2:1'].map((ratio) => (
                 <button
                   key={ratio}
-                  className={`flex-1 rounded-sm py-2 text-xs font-semibold transition-colors ${
+                  type="button"
+                  aria-pressed={canvasRatio === ratio}
+                  className={`flex-1 rounded-sm py-2 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background ${
                     canvasRatio === ratio
                       ? 'bg-card text-foreground shadow-subtle'
                         : 'text-muted-foreground hover:text-foreground'

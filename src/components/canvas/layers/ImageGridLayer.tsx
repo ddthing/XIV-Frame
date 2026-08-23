@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import { useShallow } from 'zustand/react/shallow'
 import { useStore } from '@/store/useStore'
 import { ImageUploadError, prepareImageForCanvas, revokeObjectUrl } from '@/lib/imageUpload'
+import { getLayoutGeometry } from '@/lib/layoutTemplates'
 import type Konva from 'konva'
 
 type PendingUpload = { requestId: number; sourceUrl: string | undefined }
@@ -107,43 +108,42 @@ function ImageGridLayerComponent({
 
   if (images.length === 0) return null
 
-  const isGrid = layoutPreset === 'grid' && images.length >= 3
-  const isVertical = layoutPreset === 'vertical-split'
+  const geometry = getLayoutGeometry(layoutPreset, images.length)
+  const isAspectRow = geometry.effectivePreset === 'split'
+  const isAspectColumn = geometry.effectivePreset === 'vertical-split'
 
-  let itemWidth = 0
-  let itemHeight = 0
+  let unitWidth = 0
+  let unitHeight = 0
   
-  if (isGrid) {
-    itemWidth = (contentWidth - gap) / 2
-    itemHeight = (contentHeight - gap) / 2
-  } else if (isVertical) {
-    itemWidth = contentWidth
-    itemHeight = (contentHeight - (gap * (images.length - 1))) / images.length
+  if (isAspectColumn) {
+    unitWidth = contentWidth
+    unitHeight = (contentHeight - (gap * (images.length - 1))) / images.length
+  } else if (isAspectRow) {
+    unitWidth = (contentWidth - (gap * (images.length - 1))) / images.length
+    unitHeight = contentHeight
   } else {
-    itemWidth = (contentWidth - (gap * (images.length - 1))) / images.length
-    itemHeight = contentHeight
+    unitWidth = (contentWidth - (gap * (geometry.columns - 1))) / geometry.columns
+    unitHeight = (contentHeight - (gap * (geometry.rows - 1))) / geometry.rows
   }
 
   return (
-    <>
+    <Layer>
       {images.map((img, index) => {
+        const cell = geometry.cells[index] || { column: index, row: 0 }
+        const columnSpan = cell.columnSpan ?? 1
+        const rowSpan = cell.rowSpan ?? 1
+        const itemWidth = isAspectRow ? unitWidth : unitWidth * columnSpan + (gap * (columnSpan - 1))
+        const itemHeight = isAspectColumn ? unitHeight : unitHeight * rowSpan + (gap * (rowSpan - 1))
         let xPos = 0
         let yPos = 0
         
-        if (isGrid) {
-          if (index === 0) {
-            xPos = 0; yPos = 0
-          } else if (index === 1) {
-            xPos = itemWidth + gap; yPos = 0
-          } else if (index === 2) {
-            xPos = 0; yPos = itemHeight + gap
-          } else if (index === 3) {
-            xPos = itemWidth + gap; yPos = itemHeight + gap
-          }
-        } else if (isVertical) {
+        if (isAspectColumn) {
           yPos = index * (itemHeight + gap)
-        } else {
+        } else if (isAspectRow) {
           xPos = index * (itemWidth + gap)
+        } else {
+          xPos = cell.column * (unitWidth + gap)
+          yPos = cell.row * (unitHeight + gap)
         }
 
         const baseScale = Math.max(itemWidth / img.width, itemHeight / img.height)
@@ -154,7 +154,7 @@ function ImageGridLayerComponent({
         const savedPos = imagePositions[index] || { x: 0, y: 0 }
         
         return (
-          <Layer key={index}>
+          <Group key={index}>
             <Group
               x={borderWidth + xPos}
               y={borderWidth + yPos}
@@ -243,7 +243,7 @@ function ImageGridLayerComponent({
             {isSoftBlend && blendWidth > 0 && (
               <>
                 {/* 가로 블렌드 (Left to Right) */}
-                {((!isGrid && !isVertical && index > 0) || (isGrid && (index === 1 || index === 3))) && (
+                {cell.column > 0 && (
                   <Rect
                     listening={false}
                     x={0}
@@ -261,7 +261,7 @@ function ImageGridLayerComponent({
                   />
                 )}
                 {/* 세로 블렌드 (Top to Bottom) */}
-                {((!isGrid && isVertical && index > 0) || (isGrid && (index === 2 || index === 3))) && (
+                {cell.row > 0 && (
                   <Rect
                     listening={false}
                     x={0}
@@ -281,10 +281,10 @@ function ImageGridLayerComponent({
               </>
             )}
             </Group>
-          </Layer>
+          </Group>
         )
       })}
-    </>
+    </Layer>
   )
 }
 

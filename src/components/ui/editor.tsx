@@ -62,6 +62,8 @@ export function EditorChoice({
         active
           ? 'border-primary bg-accent text-accent-foreground shadow-subtle'
           : 'border-border bg-card text-muted-foreground hover:border-primary/30 hover:bg-muted/60 hover:text-foreground',
+        'focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background',
+        'disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:border-border disabled:hover:bg-card disabled:hover:text-muted-foreground',
         className
       )}
       {...props}

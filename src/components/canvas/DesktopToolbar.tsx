@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AlertCircle, BookOpen, Download, RefreshCw } from 'lucide-react'
+import { AlertCircle, BookOpen, CloudCheck, Download, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 
@@ -42,7 +42,7 @@ export function DesktopToolbar({ stageRef, className = '' }: DesktopToolbarProps
       </div>
 
       <div className="hidden items-center gap-2 text-[10px] font-medium uppercase tracking-[0.1em] text-primary-foreground/55 lg:flex">
-        <span className="size-1.5 rounded-full bg-accent shadow-[0_0_0_3px_rgba(255,233,92,0.14)]" />
+        <CloudCheck className="size-3.5" aria-hidden="true" />
         {t('savedLocally')}
       </div>
 

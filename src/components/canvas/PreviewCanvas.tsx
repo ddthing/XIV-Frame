@@ -9,6 +9,7 @@ import { CanvasToolbar } from './CanvasToolbar'
 import { useStore } from '@/store/useStore'
 import { Button } from '@/components/ui/button'
 import { ImageUploadError, prepareImageForCanvas } from '@/lib/imageUpload'
+import { MAX_IMAGE_COUNT } from '@/lib/imageLimits'
 
 const KonvaStage = dynamic(() => import('./KonvaStage'), { ssr: false })
 
@@ -48,7 +49,7 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
     }
 
     const currentImages = useStore.getState().images
-    const availableSlots = Array.from({ length: 4 }, (_, index) => index)
+    const availableSlots = Array.from({ length: MAX_IMAGE_COUNT }, (_, index) => index)
       .filter(index => !currentImages[index])
 
     if (availableSlots.length === 0) {

@@ -12,6 +12,7 @@ import { SketchbookTabsList, SketchbookTabsTrigger } from '@/components/ui/Sketc
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { ImageUploadError, prepareImageForCanvas, revokeObjectUrl } from '@/lib/imageUpload'
+import { MAX_IMAGE_COUNT } from '@/lib/imageLimits'
 import { nudgeImagePosition, type ImageNudgeDirection } from '@/lib/imagePosition'
 import { LazyCharacterSettings } from './LazySettings'
 import { ImagePositionControls } from './ImagePositionControls'
@@ -212,13 +213,13 @@ export function ImageUploader() {
           <EditorSection title={t('sourceTitle')} description={t('sourceDescription')}>
             <div className="flex items-center justify-between rounded-md border border-border bg-surface-inset/60 px-3 py-2.5">
               <span className="text-[13px] font-semibold text-foreground">{t('imageCount')}</span>
-              <span className="font-mono text-[11px] font-semibold tabular-nums text-muted-foreground">{String(imageCount).padStart(2, '0')} / 04</span>
+              <span className="font-mono text-[11px] font-semibold tabular-nums text-muted-foreground">{String(imageCount).padStart(2, '0')} / {String(MAX_IMAGE_COUNT).padStart(2, '0')}</span>
             </div>
           </EditorSection>
 
           <EditorSection title={t('uploadTitle')} description={t('uploadDescription')}>
             <div className="grid grid-cols-2 gap-3">
-          {[0, 1, 2, 3].map((index) => {
+          {Array.from({ length: MAX_IMAGE_COUNT }, (_, index) => index).map((index) => {
             const image = images[index]
             if (index > 1 && !images[index - 1] && !image) return null
             const selected = Boolean(image) && activeIndex === index

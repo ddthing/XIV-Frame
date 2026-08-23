@@ -20,7 +20,7 @@ export function AboutEn() {
             <>
               <p>XIV Frame is a browser-based editor for composing Final Fantasy XIV (FF14) screenshots into one PNG. You can arrange several screenshots, add a character name, server label, or logo, and save the finished frame without opening a full image-editing suite.</p>
               <ul>
-                <li>Add up to four screenshots and change their order.</li>
+                <li>Add up to 16 screenshots and change their order. The 3×3 and 4×4 grids use 9 and 16 images.</li>
                 <li>Choose split, vertical, or grid layouts and set the canvas ratio.</li>
                 <li>Adjust each image&apos;s scale and position, then place a text signature or logo.</li>
               </ul>

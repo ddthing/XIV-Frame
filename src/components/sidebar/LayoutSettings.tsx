@@ -1,8 +1,17 @@
-import { Blend, Grid2X2, LayoutTemplate, Rows2 } from 'lucide-react'
+import { Blend } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useShallow } from 'zustand/react/shallow'
 
 import { EditorChoice, EditorFieldHeader, EditorSection } from '@/components/ui/editor'
+import {
+  getLayoutGeometry,
+  isLayoutTemplateAvailable,
+  LAYOUT_TEMPLATE_GROUPS,
+  LAYOUT_TEMPLATE_OPTIONS,
+  type LayoutTemplateGroup,
+  type LayoutTemplateOption,
+} from '@/lib/layoutTemplates'
+import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
 import { useStore, type BackgroundColor } from '@/store/useStore'
 
@@ -22,6 +31,8 @@ export function LayoutSettings() {
     setGrainIntensity,
     backgroundColor,
     setBackgroundColor,
+    customBackgroundColor,
+    setCustomBackgroundColor,
     images,
   } = useStore(useShallow(state => ({
     layoutPreset: state.layoutPreset,
@@ -38,31 +49,68 @@ export function LayoutSettings() {
     setGrainIntensity: state.setGrainIntensity,
     backgroundColor: state.backgroundColor,
     setBackgroundColor: state.setBackgroundColor,
+    customBackgroundColor: state.customBackgroundColor,
+    setCustomBackgroundColor: state.setCustomBackgroundColor,
     images: state.images,
   })))
 
   const t = useTranslations('LayoutSettings')
-  const colors: BackgroundColor[] = ['white', 'light-gray', 'transparent']
   const imageCount = images.filter(Boolean).length
+  const safeCustomBackgroundColor = getSafeCustomBackgroundColor(customBackgroundColor)
+  const backgroundOptions: BackgroundOption[] = [
+    { value: 'white', label: t('bgWhite'), swatch: '#ffffff' },
+    { value: 'black', label: t('bgBlack'), swatch: '#171918' },
+    { value: 'light-gray', label: t('bgLightGray'), swatch: '#f1f5f9' },
+    { value: 'transparent', label: t('bgTransparent'), swatch: 'transparent' },
+    { value: 'custom', label: t('bgCustom'), swatch: safeCustomBackgroundColor },
+  ]
+  const selectedBackground = backgroundOptions.find((option) => option.value === backgroundColor) ?? backgroundOptions[0]
 
   return (
     <div className="space-y-6">
       <EditorSection title={t('compositionTitle')} description={t('compositionDescription')}>
-        <div className="grid grid-cols-3 gap-2">
-          <EditorChoice active={layoutPreset === 'split'} onClick={() => setLayoutPreset('split')} className="min-h-[76px] flex-col px-2">
-            <ColumnsIcon />
-            <span>{t('presetSplit')}</span>
-          </EditorChoice>
-          <EditorChoice active={layoutPreset === 'vertical-split'} onClick={() => setLayoutPreset('vertical-split')} className="min-h-[76px] flex-col px-2">
-            <Rows2 className="size-5" />
-            <span>{t('presetVertical')}</span>
-          </EditorChoice>
-          <EditorChoice active={layoutPreset === 'grid'} onClick={() => setLayoutPreset('grid')} disabled={imageCount < 3} className="min-h-[76px] flex-col px-2">
-            <Grid2X2 className="size-5" />
-            <span>{t('presetGrid')}</span>
-          </EditorChoice>
+        <div className="space-y-4">
+          {LAYOUT_TEMPLATE_GROUPS.map((group) => {
+            const options = LAYOUT_TEMPLATE_OPTIONS.filter((option) => option.group === group)
+
+            return (
+              <div key={group} className="space-y-2">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="editor-meta">{t(GROUP_LABEL_KEYS[group])}</span>
+                  <span className="font-body text-[11px] text-muted-foreground">{t(GROUP_HINT_KEYS[group])}</span>
+                </div>
+                <div role="group" aria-label={t(GROUP_LABEL_KEYS[group])} className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+                  {options.map((option) => {
+                    const requirement = getTemplateRequirement(t, option, imageCount)
+
+                    return (
+                      <EditorChoice
+                        key={option.id}
+                        active={layoutPreset === option.id}
+                        disabled={!isLayoutTemplateAvailable(option.id, imageCount)}
+                        onClick={() => setLayoutPreset(option.id)}
+                        aria-label={`${t(option.labelKey)}${requirement ? `, ${requirement}` : ''}`}
+                        title={requirement || undefined}
+                        className="h-auto min-h-[104px] min-w-[92px] shrink-0 snap-start flex-col justify-start gap-2 px-2 py-3"
+                      >
+                        <LayoutTemplatePreview option={option} />
+                        <span className="max-w-[76px] truncate text-center text-[11px] leading-4">{t(option.labelKey)}</span>
+                      </EditorChoice>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })}
         </div>
-        {imageCount < 3 && <p className="font-body text-[11px] leading-4 text-muted-foreground">{t('gridHint')}</p>}
+        <p className="font-body text-[11px] leading-4 text-muted-foreground">
+          {t('templateHint', { count: imageCount })}
+        </p>
+        {!isLayoutTemplateAvailable(layoutPreset, imageCount) && (
+          <p className="rounded-md border border-border bg-muted/50 px-3 py-2 font-body text-[11px] leading-4 text-muted-foreground">
+            {t('templateFallback')}
+          </p>
+        )}
       </EditorSection>
 
       <EditorSection title={t('transition')} description={t('transitionDescription')}>
@@ -100,14 +148,59 @@ export function LayoutSettings() {
       <EditorSection title={t('finishTitle')} description={t('finishDescription')}>
         <div className="space-y-5">
           <div className="space-y-3">
-            <EditorFieldHeader label={t('background')} value={backgroundColor === 'white' ? t('bgWhite') : backgroundColor === 'light-gray' ? t('bgLightGray') : t('bgTransparent')} />
-            <div className="grid grid-cols-3 gap-2">
-              {colors.map((color) => (
-                <EditorChoice key={color} active={backgroundColor === color} onClick={() => setBackgroundColor(color)} className="px-2">
-                  {color === 'white' ? t('bgWhite') : color === 'light-gray' ? t('bgLightGray') : t('bgTransparent')}
+            <EditorFieldHeader label={t('background')} value={selectedBackground.label} />
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {backgroundOptions.map((option) => (
+                <EditorChoice
+                  key={option.value}
+                  active={backgroundColor === option.value}
+                  onClick={() => setBackgroundColor(option.value)}
+                  aria-label={option.label}
+                  className="min-w-0 justify-start px-2.5"
+                >
+                  <BackgroundSwatch color={option.swatch} />
+                  <span className="truncate">{option.label}</span>
                 </EditorChoice>
               ))}
             </div>
+            {backgroundColor === 'custom' && (
+              <div className="editor-control-surface space-y-3 p-3">
+                <EditorFieldHeader label={t('customBackgroundColor')} value={safeCustomBackgroundColor.toUpperCase()} htmlFor="custom-background-color" />
+                <div className="flex items-center gap-2">
+                  <label htmlFor="custom-background-color" className="relative grid size-10 shrink-0 cursor-pointer place-items-center overflow-hidden rounded-md border border-input bg-background shadow-subtle focus-within:ring-2 focus-within:ring-ring">
+                    <BackgroundSwatch color={safeCustomBackgroundColor} className="size-6" />
+                    <input
+                      id="custom-background-color"
+                      type="color"
+                      value={safeCustomBackgroundColor}
+                      onChange={(event) => {
+                        setCustomBackgroundColor(event.target.value)
+                        setBackgroundColor('custom')
+                      }}
+                      className="absolute inset-0 cursor-pointer opacity-0"
+                      aria-label={t('customBackgroundPicker')}
+                    />
+                  </label>
+                  <Input
+                    value={customBackgroundColor}
+                    onChange={(event) => {
+                      const value = event.target.value
+                      setCustomBackgroundColor(value)
+                      if (isHexColor(value)) setBackgroundColor('custom')
+                    }}
+                    onBlur={() => {
+                      if (!isHexColor(customBackgroundColor)) setCustomBackgroundColor(safeCustomBackgroundColor)
+                    }}
+                    className="h-10 font-mono text-xs uppercase"
+                    maxLength={7}
+                    inputMode="text"
+                    spellCheck={false}
+                    aria-label={t('customBackgroundColor')}
+                  />
+                </div>
+                <p className="font-body text-[11px] leading-4 text-muted-foreground">{t('customBackgroundDescription')}</p>
+              </div>
+            )}
           </div>
           <div className="space-y-3 border-t border-border pt-4">
             <EditorFieldHeader label={t('grainIntensity')} value={`${grainIntensity}%`} htmlFor="grain-intensity" />
@@ -119,6 +212,82 @@ export function LayoutSettings() {
   )
 }
 
-function ColumnsIcon() {
-  return <LayoutTemplate className="size-5" />
+type BackgroundOption = {
+  value: BackgroundColor
+  label: string
+  swatch: string
+}
+
+const DEFAULT_CUSTOM_BACKGROUND = '#e6e8e4'
+
+function isHexColor(value: string) {
+  return /^#[0-9a-f]{6}$/i.test(value)
+}
+
+function getSafeCustomBackgroundColor(value: string) {
+  return isHexColor(value) ? value : DEFAULT_CUSTOM_BACKGROUND
+}
+
+function BackgroundSwatch({ color, className = 'size-4' }: { color: string; className?: string }) {
+  if (color === 'transparent') {
+    return (
+      <span
+        aria-hidden="true"
+        className={`${className} shrink-0 rounded-[4px] border border-border`}
+        style={{
+          backgroundImage: 'linear-gradient(45deg, #d1d5db 25%, transparent 25%, transparent 75%, #d1d5db 75%), linear-gradient(45deg, #d1d5db 25%, transparent 25%, transparent 75%, #d1d5db 75%)',
+          backgroundPosition: '0 0, 4px 4px',
+          backgroundSize: '8px 8px',
+        }}
+      />
+    )
+  }
+
+  return <span aria-hidden="true" className={`${className} shrink-0 rounded-[4px] border border-black/10`} style={{ backgroundColor: color }} />
+}
+
+const GROUP_LABEL_KEYS: Record<LayoutTemplateGroup, string> = {
+  two: 'templateGroupTwo',
+  three: 'templateGroupThree',
+  four: 'templateGroupFour',
+  matrix: 'templateGroupMatrix',
+}
+
+const GROUP_HINT_KEYS: Record<LayoutTemplateGroup, string> = {
+  two: 'templateGroupTwoHint',
+  three: 'templateGroupThreeHint',
+  four: 'templateGroupFourHint',
+  matrix: 'templateGroupMatrixHint',
+}
+
+function getTemplateRequirement(t: ReturnType<typeof useTranslations<'LayoutSettings'>>, option: LayoutTemplateOption, imageCount: number) {
+  if (imageCount < option.minImages) return t('templateNeedsImages', { count: option.minImages })
+  if (imageCount > option.maxImages) return t('templateMaxImages', { count: option.maxImages })
+  return ''
+}
+
+function LayoutTemplatePreview({ option }: { option: LayoutTemplateOption }) {
+  const geometry = getLayoutGeometry(option.id, option.previewCount)
+
+  return (
+    <span
+      aria-hidden="true"
+      className="grid size-12 shrink-0 gap-0.5 rounded-[5px] border border-primary/30 bg-primary/10 p-0.5"
+      style={{
+        gridTemplateColumns: `repeat(${geometry.columns}, minmax(0, 1fr))`,
+        gridTemplateRows: `repeat(${geometry.rows}, minmax(0, 1fr))`,
+      }}
+    >
+      {geometry.cells.map((cell, index) => (
+        <span
+          key={`${cell.column}-${cell.row}-${index}`}
+          className="min-h-0 rounded-[2px] bg-primary/65 transition-colors"
+          style={{
+            gridColumn: `${cell.column + 1} / span ${cell.columnSpan ?? 1}`,
+            gridRow: `${cell.row + 1} / span ${cell.rowSpan ?? 1}`,
+          }}
+        />
+      ))}
+    </span>
+  )
 }
