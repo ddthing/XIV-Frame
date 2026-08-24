@@ -10,7 +10,8 @@
     "postbuild": "node scripts/validate-static-output.mjs",
     "start": "next start",
     "lint": "eslint",
-    "content:check": "node scripts/validate-content.mjs"
+    "content:check": "node scripts/validate-content.mjs",
+    "render:check": "node scripts/validate-image-render-tree.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

@@ -130,7 +130,7 @@ function ImageGridLayerComponent({
   }
 
   return (
-    <Layer>
+    <>
       {images.map((img, index) => {
         const cell = geometry.cells[index] || { column: index, row: 0 }
         const columnSpan = cell.columnSpan ?? 1
@@ -158,7 +158,7 @@ function ImageGridLayerComponent({
         const savedPos = imagePositions[index] || { x: 0, y: 0 }
         
         return (
-          <Group key={index}>
+          <Layer key={index}>
             <Group
               x={borderWidth + xPos}
               y={borderWidth + yPos}
@@ -293,10 +293,10 @@ function ImageGridLayerComponent({
               </>
             )}
             </Group>
-          </Group>
+          </Layer>
         )
       })}
-    </Layer>
+    </>
   )
 }
 
