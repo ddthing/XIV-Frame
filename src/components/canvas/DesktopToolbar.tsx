@@ -28,11 +28,12 @@ export function DesktopToolbar({ stageRef, className = '' }: DesktopToolbarProps
   const [exportNotice, setExportNotice] = useState<string | null>(null)
 
   const handleSave = async () => {
-    setExportError(null)
-    setExportNotice(null)
-    try {
-      const result = await handleExport(stageRef, 'png')
-      if (result?.optimizedFrom) setExportNotice(t('exportOptimized'))
+      setExportError(null)
+      setExportNotice(null)
+      try {
+        const result = await handleExport(stageRef, 'png')
+      if (result?.resized) setExportNotice(t('exportResized'))
+      else if (result?.optimizedFrom) setExportNotice(t('exportOptimized'))
     } catch (error) {
       setExportError(error instanceof ExportFileTooLargeError ? t('exportTooLarge') : t('exportError'))
     }

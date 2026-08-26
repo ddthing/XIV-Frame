@@ -262,12 +262,12 @@ export function EmptySlotLayer({
         )
       })}
       {edgePoints.map((points, index) => (
-        <Line
-          key={`empty-edge-${index}`}
-          points={points}
-          stroke={palette.stroke}
-          strokeWidth={1.25}
-          dash={[8, 8]}
+          <Line
+            key={`empty-edge-${index}`}
+            points={points}
+            stroke={palette.stroke}
+            strokeWidth={1}
+            dash={[6, 6]}
           listening={false}
           strokeScaleEnabled={false}
         />

@@ -41,7 +41,17 @@ export function getImagePreparationConcurrency(info: BrowserInfo | undefined = g
     && Number.isFinite(info.deviceMemory)
     && info.deviceMemory <= 2
 
-  return isLikelyMobileBrowser(info) || isLowMemory ? 1 : 2
+  if (isLowMemory) return 1
+  if (!isLikelyMobileBrowser(info)) return 2
+
+  // Two simultaneous 1536px preparations materially reduce wait time on
+  // capable phones, while an unknown/low-core device keeps the safer serial
+  // path. The memory guard above remains the hard stop for low-end hardware.
+  const hardwareConcurrency = typeof info.hardwareConcurrency === 'number'
+    && Number.isFinite(info.hardwareConcurrency)
+    ? Math.max(1, Math.floor(info.hardwareConcurrency))
+    : 0
+  return hardwareConcurrency >= 6 ? 2 : 1
 }
 
 export function getExportMaxDimension(info: BrowserInfo | undefined = getBrowserInfo()) {

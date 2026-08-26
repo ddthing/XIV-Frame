@@ -1,9 +1,9 @@
 import path from 'node:path'
 import { spawn, spawnSync } from 'node:child_process'
 import { chromium } from '@playwright/test'
+import { findAvailablePerfPort, findRunningPerfUrl } from './perf-port.mjs'
 
 const projectRoot = process.cwd()
-const baseUrl = 'http://127.0.0.1:3000/ko'
 const nextEntrypoint = path.join(projectRoot, 'node_modules', 'next', 'dist', 'bin', 'next')
 const fixturePath = path.join(projectRoot, 'public', 'og-image.jpg')
 
@@ -70,7 +70,7 @@ async function measureRun(browser, fixtureBuffer, imageCount, run) {
 
     await page.locator('input[type="file"]').first().setInputFiles(files)
     await page.getByText(`${String(imageCount).padStart(2, '0')} / 16`, { exact: true }).waitFor({ state: 'visible', timeout: 30_000 })
-    await page.getByRole('tab', { name: '02 레이아웃 구성' }).click()
+    await page.locator('[data-xiv-frame-workflow-tabs="true"] [role="tab"]').nth(1).click()
     const templateName = imageCount === 16 ? '4×4 균등' : '바둑판 배치'
     const gridButton = page.getByRole('button', { name: new RegExp(`^${templateName}`) }).first()
     await gridButton.click()
@@ -157,7 +157,12 @@ async function measureRun(browser, fixtureBuffer, imageCount, run) {
   }
 }
 
-const server = spawn(process.execPath, [nextEntrypoint, 'dev', '--hostname', '127.0.0.1'], {
+const requestedPort = Number(process.env.PERF_PORT ?? 3000)
+const configuredBaseUrl = process.env.PERF_BASE_URL?.replace(/\/$/, '')
+const existingBaseUrl = configuredBaseUrl || await findRunningPerfUrl(requestedPort)
+const port = existingBaseUrl ? null : await findAvailablePerfPort(requestedPort)
+const baseUrl = existingBaseUrl ?? `http://127.0.0.1:${port}/ko`
+const server = existingBaseUrl ? null : spawn(process.execPath, [nextEntrypoint, 'dev', '--hostname', '127.0.0.1', '--port', String(port)], {
   cwd: projectRoot,
   env: process.env,
   stdio: 'inherit',
@@ -166,7 +171,7 @@ const server = spawn(process.execPath, [nextEntrypoint, 'dev', '--hostname', '12
 
 let browser
 try {
-  await waitForServer(server)
+  if (server) await waitForServer(server)
   browser = await chromium.launch({ channel: 'chrome', headless: true })
   const fixtureBuffer = await import('node:fs/promises').then(({ readFile }) => readFile(fixturePath))
   const imageCount = Math.max(2, Math.min(16, Math.floor(readNumberOption('--images', 16))))

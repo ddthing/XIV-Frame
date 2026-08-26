@@ -61,7 +61,7 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
       href={`/${locale}/blog/${post.slug}`}
       className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-background"
     >
-      <article className={`flex flex-col rounded-xl border border-border p-5 shadow-subtle transition-[transform,box-shadow,border-color] duration-200 group-hover:-translate-y-1 group-hover:border-primary/40 group-hover:shadow-md sm:p-6 ${isFeatured ? 'bg-accent' : 'bg-card'}`}>
+      <article className={`flex flex-col rounded-xl border border-border p-5 shadow-subtle transition-[transform,box-shadow,border-color] duration-200 group-hover:-translate-y-1 group-hover:border-primary/40 group-hover:shadow-subtle-2 sm:p-6 ${isFeatured ? 'bg-accent' : 'bg-card'}`}>
         <div className="flex items-center justify-between gap-3">
           <p className="editor-meta">{isFeatured ? 'FEATURED' : `GUIDE ${String(index + 1).padStart(2, '0')}`}</p>
           <div className="flex items-center gap-2 font-body text-xs font-medium text-muted-foreground">

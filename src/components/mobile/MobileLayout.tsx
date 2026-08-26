@@ -53,7 +53,7 @@ export function MobileLayout({ stageRef }: { stageRef: React.MutableRefObject<Ko
           </Link>
           <span className="hidden font-body text-[10px] text-primary-foreground/55 sm:inline">{t('savedLocally')}</span>
         </div>
-        <div className="ml-auto"><LanguageSwitcher inverse /></div>
+        <div className="ml-auto"><LanguageSwitcher inverse touchTarget /></div>
       </header>
 
       <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -61,7 +61,7 @@ export function MobileLayout({ stageRef }: { stageRef: React.MutableRefObject<Ko
       </div>
 
       {exportNotice && (
-        <p role="status" aria-live="polite" className="pointer-events-none absolute inset-x-4 bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] z-30 rounded-lg border border-border bg-card/95 px-3 py-2 text-center text-xs font-semibold text-foreground shadow-lg backdrop-blur-sm">
+        <p role="status" aria-live="polite" className="pointer-events-none absolute inset-x-4 bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] z-30 rounded-lg border border-border bg-card/95 px-3 py-2 text-center text-xs font-semibold text-foreground shadow-subtle">
           {exportNotice}
         </p>
       )}
@@ -78,7 +78,8 @@ export function MobileLayout({ stageRef }: { stageRef: React.MutableRefObject<Ko
         onOpenChange={(open) => !open && setActiveSheet(null)}
         stageRef={stageRef}
         onExportComplete={(result: ExportResult) => {
-          if (result.optimizedFrom) setExportNotice(t('exportOptimized'))
+          if (result.resized) setExportNotice(t('exportResized'))
+          else if (result.optimizedFrom) setExportNotice(t('exportOptimized'))
         }}
       />
     </div>

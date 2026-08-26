@@ -58,7 +58,7 @@ export function EditorChoice({
       type="button"
       aria-pressed={active}
       className={cn(
-        'inline-flex min-h-10 items-center justify-center gap-2 rounded-md border px-3 text-xs font-semibold transition-all',
+        'inline-flex min-h-11 items-center justify-center gap-2 rounded-md border px-3 text-xs font-semibold transition-all',
         active
           ? 'border-primary bg-accent text-accent-foreground shadow-subtle'
           : 'border-border bg-card text-muted-foreground hover:border-primary/30 hover:bg-muted/60 hover:text-foreground',

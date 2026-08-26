@@ -306,17 +306,12 @@ function BackgroundSwatch({ color, className = 'size-4' }: { color: string; clas
     return (
       <span
         aria-hidden="true"
-        className={`${className} shrink-0 rounded-[4px] border border-border`}
-        style={{
-          backgroundImage: 'linear-gradient(45deg, #d1d5db 25%, transparent 25%, transparent 75%, #d1d5db 75%), linear-gradient(45deg, #d1d5db 25%, transparent 25%, transparent 75%, #d1d5db 75%)',
-          backgroundPosition: '0 0, 4px 4px',
-          backgroundSize: '8px 8px',
-        }}
+        className={`${className} checkerboard shrink-0 rounded-sm border border-border`}
       />
     )
   }
 
-  return <span aria-hidden="true" className={`${className} shrink-0 rounded-[4px] border border-black/10`} style={{ backgroundColor: color }} />
+  return <span aria-hidden="true" className={`${className} shrink-0 rounded-sm border border-border`} style={{ backgroundColor: color }} />
 }
 
 const GROUP_LABEL_KEYS: Record<LayoutTemplateGroup, string> = {
@@ -345,7 +340,7 @@ function LayoutTemplatePreview({ option }: { option: LayoutTemplateOption }) {
   return (
     <span
       aria-hidden="true"
-      className="grid size-12 shrink-0 gap-0.5 rounded-[5px] border border-primary/30 bg-primary/10 p-0.5"
+      className="grid size-12 shrink-0 gap-0.5 rounded-md border border-primary/30 bg-primary/10 p-0.5"
       style={{
         gridTemplateColumns: `repeat(${geometry.columns}, minmax(0, 1fr))`,
         gridTemplateRows: `repeat(${geometry.rows}, minmax(0, 1fr))`,
@@ -354,7 +349,7 @@ function LayoutTemplatePreview({ option }: { option: LayoutTemplateOption }) {
       {geometry.cells.map((cell, index) => (
         <span
           key={`${cell.column}-${cell.row}-${index}`}
-          className="min-h-0 rounded-[2px] bg-primary/65 transition-colors"
+          className="min-h-0 rounded-sm bg-primary/65 transition-colors"
           style={{
             gridColumn: `${cell.column + 1} / span ${cell.columnSpan ?? 1}`,
             gridRow: `${cell.row + 1} / span ${cell.rowSpan ?? 1}`,

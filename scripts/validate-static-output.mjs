@@ -35,6 +35,7 @@ if (!fs.existsSync(outputRoot)) {
   const landing = readOutput('index.html')
   const editorPages = ['ko.html', 'en.html', 'ja.html']
   const runtimeAssets = [
+    'fonts/pretendard/PretendardVariable.woff2',
     'vendor/transformers.web.min.js',
     'vendor/onnxruntime/ort-wasm-simd-threaded.asyncify.mjs',
     'vendor/onnxruntime/ort-wasm-simd-threaded.asyncify.wasm',
@@ -96,7 +97,7 @@ if (!fs.existsSync(outputRoot)) {
       const pathname = new URL(href, 'https://xiv-frame.local').pathname
       const relativeTarget = pathname === '/'
         ? 'index.html'
-        : pathname.endsWith('.html') || pathname.endsWith('.xml') || pathname.endsWith('.svg')
+        : pathname.endsWith('.html') || pathname.endsWith('.xml') || pathname.endsWith('.svg') || pathname.endsWith('.woff') || pathname.endsWith('.woff2') || pathname.endsWith('.ttf') || pathname.endsWith('.otf')
           ? pathname.slice(1)
           : `${pathname.replace(/\/$/, '').slice(1)}.html`
       if (!fs.existsSync(path.join(outputRoot, relativeTarget))) {

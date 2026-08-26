@@ -96,7 +96,7 @@ export function GuideWorkflow({ eyebrow, title, description, steps }: GuideWorkf
             <li key={step.number} className="min-w-0">
               <Link
                 href={step.href}
-                className="group block h-full rounded-xl border border-border bg-card p-4 shadow-subtle transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:p-5"
+                className="group block h-full rounded-xl border border-border bg-card p-4 shadow-subtle transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-subtle-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:p-5"
               >
                 <div className="relative overflow-hidden rounded-lg border border-border bg-surface-inset/55">
                   <div className="absolute left-2.5 top-2.5 z-10 grid size-8 place-items-center rounded-md border border-primary/15 bg-background/90 font-mono text-xs font-bold text-foreground">

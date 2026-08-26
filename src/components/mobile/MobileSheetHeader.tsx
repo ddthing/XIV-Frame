@@ -24,7 +24,7 @@ export function MobileSheetHeader({
         <DrawerClose
           type="button"
           aria-label={closeLabel}
-          className="grid size-10 shrink-0 place-items-center rounded-lg border border-border bg-background text-muted-foreground transition-colors hover:bg-surface-inset hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+          className="grid size-11 shrink-0 place-items-center rounded-lg border border-border bg-background text-muted-foreground transition-colors hover:bg-surface-inset hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
         >
           <X className="size-4" aria-hidden="true" />
         </DrawerClose>

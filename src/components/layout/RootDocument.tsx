@@ -1,6 +1,13 @@
+import { preload } from 'react-dom'
 import { operatorName, operatorUrl, siteName, siteUrl } from '@/lib/site'
 
 export function RootDocument({ children, locale }: { children: React.ReactNode; locale: 'ko' | 'en' | 'ja' }) {
+  preload('/fonts/pretendard/PretendardVariable.woff2', {
+    as: 'font',
+    type: 'font/woff2',
+    crossOrigin: 'anonymous',
+  })
+
   return (
     <html lang={locale} suppressHydrationWarning className="h-full antialiased">
       <body className="min-h-full flex flex-col">

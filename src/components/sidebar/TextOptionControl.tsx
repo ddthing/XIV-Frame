@@ -55,7 +55,7 @@ export function TextOptionControl({
             type="button" 
             aria-label={bold ? t('removeBold') : t('makeBold')}
             aria-pressed={bold}
-            className={`flex size-9 items-center justify-center rounded-md border transition-colors shadow-subtle focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background ${bold ? 'border-primary bg-accent text-accent-foreground font-semibold' : 'border-border bg-card text-muted-foreground hover:bg-muted/50'}`}
+            className={`flex size-11 items-center justify-center rounded-md border transition-colors shadow-subtle focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background ${bold ? 'border-primary bg-accent text-accent-foreground font-semibold' : 'border-border bg-card text-muted-foreground hover:bg-muted/50'}`}
             onClick={() => onChangeBold(!bold)}
           >
             <Bold className="w-4 h-4" />
@@ -64,7 +64,7 @@ export function TextOptionControl({
             type="button" 
             aria-label={italic ? t('removeItalic') : t('makeItalic')}
             aria-pressed={italic}
-            className={`flex size-9 items-center justify-center rounded-md border transition-colors shadow-subtle focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background ${italic ? 'border-primary bg-accent text-accent-foreground font-semibold' : 'border-border bg-card text-muted-foreground hover:bg-muted/50'}`}
+            className={`flex size-11 items-center justify-center rounded-md border transition-colors shadow-subtle focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background ${italic ? 'border-primary bg-accent text-accent-foreground font-semibold' : 'border-border bg-card text-muted-foreground hover:bg-muted/50'}`}
             onClick={() => onChangeItalic(!italic)}
           >
             <Italic className="w-4 h-4" />

@@ -158,6 +158,8 @@ XIV Frame은 계정, 로그인, 유료 플랜, 서버 기반 프로젝트 보관
     npm run lint
     npx tsc --noEmit
     npm run build
+    npm run test:production:smoke
+    npm run test:production:edge
 
 `npm run render:check`는 공유 Konva 레이어, soft-blend 오프스크린 마스크와 단일 hit layer, 부분 이미지 로드 후 원본 슬롯 매핑, Blob URL과 취소 게이트를 정적으로 확인합니다. `npm run test:e2e`는 [`e2e/editor.spec.ts`](e2e/editor.spec.ts)를 Chromium에서 실행하며, 정상·혼합 비율 렌더링, 이미지 디코드 부분 실패 복구, 업로드·교체·초기화 취소, 문자·로고·Worker·export 수명 주기, 설정 보존과 반응형 셸을 회귀 확인합니다.
 
@@ -168,6 +170,8 @@ XIV Frame은 계정, 로그인, 유료 플랜, 서버 기반 프로젝트 보관
 soft-blend의 레이어 수와 캔버스 backing-store 면적은 `npm run perf:soft-blend`로 확인합니다. 기본 16장 기준으로 이미지별 오프스크린 마스크를 공유 visual layer에 합성하고, 단일 interaction layer를 유지하는지 측정합니다.
 
 `npm run build`는 `prebuild`에서 Worker와 콘텐츠를 확인하고, 정적 결과물을 `out/`에 생성한 뒤 `postbuild` 검사를 실행합니다. 현재 기준으로 정적 페이지 54개, HTML 51개, 사이트맵 URL 45개를 검사합니다.
+
+`npm run test:production:smoke`는 `out/` 정적 export를 별도 로컬 서버로 제공하고 iPhone 16 Pro Max·Android Chrome 조건에서 사진 추가, 레이아웃, Original ratio, 저장을 확인합니다. `npm run test:production:edge`는 같은 조건에서 15장 업로드 후 마지막 슬롯 선택, drag & drop, 테두리·필름 노이즈, 16장 저장과 5MB 제한까지 확인합니다. 이미 배포된 주소를 직접 확인하려면 PowerShell에서 `$env:SMOKE_BASE_URL='https://xiv-frame.pages.dev'; npm run test:production:edge`를 실행합니다. 두 명령 모두 콘솔 오류, 페이지 오류, 요청 실패, 모바일 가로 넘침을 실패 조건으로 처리합니다.
 
 ## 정적 배포
 

@@ -21,6 +21,7 @@ const android = {
 }
 assert.equal(browserCapabilities.isLikelyMobileBrowser(android), true)
 assert.equal(browserCapabilities.getImagePreparationConcurrency(android), 1)
+assert.equal(browserCapabilities.getImagePreparationConcurrency({ ...android, hardwareConcurrency: 8 }), 2)
 
 const iphone = {
   userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148',
@@ -30,6 +31,8 @@ const iphone = {
 }
 assert.equal(browserCapabilities.isLikelyMobileBrowser(iphone), true)
 assert.equal(browserCapabilities.getImagePreparationConcurrency(iphone), 1)
+assert.equal(browserCapabilities.getImagePreparationConcurrency({ ...iphone, hardwareConcurrency: 6 }), 2)
+assert.equal(browserCapabilities.getImagePreparationConcurrency({ ...iphone, deviceMemory: 2, hardwareConcurrency: 8 }), 1)
 
 const desktop = {
   userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/131.0.0.0 Safari/537.36',

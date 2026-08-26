@@ -81,7 +81,7 @@ export function GuideScenarios({ eyebrow, title, description, scenarios }: Guide
         {scenarios.map((scenario) => {
           const Icon = scenarioIcons[scenario.kind]
           return (
-            <article key={scenario.kind} className="group flex h-full flex-col rounded-xl border border-border bg-card p-4 shadow-subtle transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md sm:p-5">
+            <article key={scenario.kind} className="group flex h-full flex-col rounded-xl border border-border bg-card p-4 shadow-subtle transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-subtle-2 sm:p-5">
               <div className="relative overflow-hidden rounded-lg border border-border bg-surface-inset/55">
                 <div className="absolute left-2.5 top-2.5 z-10 grid size-8 place-items-center rounded-md border border-primary/15 bg-background/90 text-primary/75">
                   <Icon className="size-4" aria-hidden="true" />

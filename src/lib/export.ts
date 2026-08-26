@@ -12,6 +12,7 @@ export interface ExportResult {
   bytes: number
   quality?: number
   optimizedFrom?: ExportFormat
+  resized?: boolean
 }
 
 export class ExportFileTooLargeError extends Error {
@@ -36,6 +37,7 @@ const exportQueue = createSerialTaskQueue()
 
 interface EncodedExport extends ExportResult {
   blob: Blob
+  targetDimension: number
 }
 
 function waitForCanvasPaint() {
@@ -138,6 +140,7 @@ async function renderJpegAtTarget({
       bytes: preferredBlob.size,
       format: 'jpeg',
       quality: INITIAL_JPEG_QUALITY,
+      targetDimension,
     }
   }
 
@@ -188,6 +191,7 @@ async function renderJpegAtTarget({
     bytes: bestBlob.size,
     format: 'jpeg',
     quality: bestQuality,
+    targetDimension,
   }
 }
 
@@ -255,6 +259,7 @@ async function renderPngWithinLimit({
         blob: pngBlob,
         bytes: pngBlob.size,
         format: 'png',
+        targetDimension: currentTargetDimension,
       }
     }
 
@@ -342,6 +347,7 @@ async function runExportCanvas(
       bytes: encoded.blob.size,
       ...(encoded.quality === undefined ? {} : { quality: encoded.quality }),
       ...(encoded.optimizedFrom === undefined ? {} : { optimizedFrom: encoded.optimizedFrom }),
+      ...(encoded.targetDimension < targetDimension ? { resized: true } : {}),
     }
   } finally {
     store.setIsExporting(false)

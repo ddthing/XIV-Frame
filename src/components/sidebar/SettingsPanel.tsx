@@ -6,8 +6,9 @@ import { CloudCheck, CloudOff, Images, LayoutTemplate, Type } from 'lucide-react
 import { useTranslations } from 'next-intl'
 
 import { ImageUploader } from './ImageUploader'
+import { InspectorWorkflowTabs } from './InspectorWorkflowTabs'
 import { LazyLayoutSettings, LazySignatureSettings } from './LazySettings'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { getStorageStatus, type StorageStatus } from '@/store/useStore'
 
 type SettingsTab = 'image' | 'signature' | 'layout'
@@ -81,22 +82,7 @@ export function SettingsPanel() {
           <p className="mt-2 max-w-[31rem] font-body text-[13px] leading-5 text-muted-foreground">{currentTab.description}</p>
 
           <div className="-mx-5 mt-4 overflow-hidden border-t border-border px-4 py-3">
-            <TabsList aria-label={t('flowLabel')} className="grid min-h-[78px] w-full min-w-0 grid-cols-3 gap-1.5 rounded-xl border border-border bg-surface-inset/70 p-1.5">
-              {tabs.map(({ value, label, role, icon: Icon }, index) => (
-                <TabsTrigger
-                  key={value}
-                  value={value}
-                  className="group min-h-[62px] min-w-0 items-center justify-start gap-2 rounded-lg border border-transparent bg-transparent px-2 py-2 text-left text-muted-foreground shadow-none transition-[background-color,border-color,box-shadow,color] hover:bg-background/70 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 after:!hidden data-[state=active]:border-primary/25 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-subtle data-active:border-primary/25 data-active:bg-card data-active:text-foreground data-active:shadow-subtle"
-                >
-                  <span className="mt-0.5 font-mono text-[10px] font-semibold tabular-nums text-muted-foreground">{String(index + 1).padStart(2, '0')}</span>
-                  <Icon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-                  <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5 overflow-hidden leading-none whitespace-normal">
-                    <strong className="block max-w-full break-words text-[13px] font-semibold leading-4 whitespace-normal">{label}</strong>
-                    <small className="block max-w-full truncate font-mono text-[10px] font-medium uppercase tracking-[0.05em] text-muted-foreground">{role}</small>
-                  </span>
-                </TabsTrigger>
-              ))}
-            </TabsList>
+            <InspectorWorkflowTabs ariaLabel={t('flowLabel')} tabs={tabs} />
           </div>
         </header>
 
