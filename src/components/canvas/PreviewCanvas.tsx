@@ -1,14 +1,15 @@
-import { useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 
-import { AlertCircle, ImagePlus, Upload } from 'lucide-react'
+import { AlertCircle, Upload } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useShallow } from 'zustand/react/shallow'
 
 import { CanvasToolbar } from './CanvasToolbar'
 import { useStore } from '@/store/useStore'
-import { Button } from '@/components/ui/button'
-import { ImageUploadError, prepareImageForCanvas } from '@/lib/imageUpload'
+import { ImageUploadError, filterImageFiles, getImagePreparationMaxDimension, prepareImageForCanvas, revokeObjectUrl } from '@/lib/imageUpload'
+import { settleWithConcurrency } from '@/lib/asyncPool'
+import { getImagePreparationConcurrency } from '@/lib/browserCapabilities'
 import { MAX_IMAGE_COUNT } from '@/lib/imageLimits'
 
 const KonvaStage = dynamic(() => import('./KonvaStage'), { ssr: false })
@@ -17,32 +18,72 @@ import type Konva from 'konva'
 
 export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<Konva.Stage | null> }) {
   const {
-    images,
     zoom,
+    resetVersion,
+    layoutPreset,
+    hasChosenLayout,
     setImageAt,
     setImageScale,
     setImagePosition,
+    setSelectedImageIndex,
+    setLayoutPreset,
   } = useStore(useShallow(state => ({
-    images: state.images,
     zoom: state.zoom,
+    resetVersion: state.resetVersion,
+    layoutPreset: state.layoutPreset,
+    hasChosenLayout: state.hasChosenLayout,
     setImageAt: state.setImageAt,
     setImageScale: state.setImageScale,
     setImagePosition: state.setImagePosition,
+    setSelectedImageIndex: state.setSelectedImageIndex,
+    setLayoutPreset: state.setLayoutPreset,
   })))
   const t = useTranslations('ImageUploader')
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const targetSlotRef = useRef<number | null>(null)
   const dragDepthRef = useRef(0)
   const [isDragActive, setIsDragActive] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
-  const hasImages = images.some(Boolean)
+  const uploadAbortRef = useRef<AbortController | null>(null)
+  const mountedRef = useRef(true)
+  useEffect(() => {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+      uploadAbortRef.current?.abort()
+      uploadAbortRef.current = null
+    }
+  }, [])
 
-  const handleFiles = async (fileList: FileList | File[]) => {
+  useEffect(() => {
+    uploadAbortRef.current?.abort()
+    uploadAbortRef.current = null
+  }, [resetVersion])
+
+  useEffect(() => {
+    const handleCanvasUploadError = (event: Event) => {
+      const message = (event as CustomEvent<string>).detail
+      if (typeof message === 'string' && message) setUploadError(message)
+    }
+    const handleCanvasImageError = () => setUploadError(t('uploadError'))
+
+    window.addEventListener('xiv-frame:upload-error', handleCanvasUploadError)
+    window.addEventListener('xiv-frame:canvas-image-error', handleCanvasImageError)
+    return () => {
+      window.removeEventListener('xiv-frame:upload-error', handleCanvasUploadError)
+      window.removeEventListener('xiv-frame:canvas-image-error', handleCanvasImageError)
+    }
+  }, [t])
+
+  const handleFiles = async (fileList: FileList | File[], targetSlot?: number) => {
     if (isUploading) return
     const files = Array.from(fileList)
     if (files.length === 0) return
 
-    const imageFiles = files.filter(file => file.type.startsWith('image/'))
+    // Some browsers leave File.type empty for local files. Keep the extension
+    // fallback in imageUpload.ts as the source of truth for those uploads.
+    const imageFiles = filterImageFiles(files)
     if (imageFiles.length === 0) {
       setUploadError(t('dropInvalidType'))
       return
@@ -51,27 +92,56 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
     const currentImages = useStore.getState().images
     const availableSlots = Array.from({ length: MAX_IMAGE_COUNT }, (_, index) => index)
       .filter(index => !currentImages[index])
+    const targetSlots = targetSlot === undefined
+      ? availableSlots
+      : targetSlot >= 0 && targetSlot < MAX_IMAGE_COUNT
+        ? [targetSlot]
+        : []
 
-    if (availableSlots.length === 0) {
+    if (targetSlots.length === 0) {
       setUploadError(t('dropFull'))
       return
     }
 
-    const filesToPrepare = imageFiles.slice(0, availableSlots.length)
+    const filesToPrepare = imageFiles.slice(0, targetSlots.length)
+    const uploadVersion = resetVersion
+    const preparationConcurrency = getImagePreparationConcurrency()
+    const replacesExistingImage = targetSlot !== undefined && Boolean(currentImages[targetSlot])
+    const targetImageCount = currentImages.filter(Boolean).length + (replacesExistingImage ? 0 : filesToPrepare.length)
+    const maxDimension = getImagePreparationMaxDimension(targetImageCount)
+    const controller = new AbortController()
+    uploadAbortRef.current = controller
     setUploadError(null)
     setIsUploading(true)
 
     try {
-      const results = await Promise.allSettled(filesToPrepare.map(prepareImageForCanvas))
+      const results = await settleWithConcurrency(
+        filesToPrepare,
+        (file) => prepareImageForCanvas(file, controller.signal, { maxDimension }),
+        preparationConcurrency,
+        () => !controller.signal.aborted && useStore.getState().resetVersion === uploadVersion,
+      )
+      if (
+        controller.signal.aborted
+        || !mountedRef.current
+        || useStore.getState().resetVersion !== uploadVersion
+      ) {
+        results.forEach((result) => {
+          if (result.status === 'fulfilled') revokeObjectUrl(result.value)
+        })
+        return
+      }
+
       let uploadedCount = 0
       let hadTooLargeFile = false
 
       results.forEach((result, offset) => {
         if (result.status === 'fulfilled') {
-          const slot = availableSlots[offset]
+          const slot = targetSlots[offset]
           setImageAt(slot, result.value)
           setImageScale(slot, 1)
           setImagePosition(slot, { x: 0, y: 0 })
+          if (targetSlot !== undefined) setSelectedImageIndex(slot)
           uploadedCount += 1
           return
         }
@@ -83,11 +153,12 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
 
       if (uploadedCount === 0) {
         setUploadError(hadTooLargeFile ? t('uploadLimit') : t('uploadError'))
-      } else if (uploadedCount < imageFiles.length || imageFiles.length > availableSlots.length) {
+      } else if (uploadedCount < imageFiles.length || imageFiles.length > targetSlots.length) {
         setUploadError(t('dropPartial'))
       }
     } finally {
-      setIsUploading(false)
+      if (uploadAbortRef.current === controller) uploadAbortRef.current = null
+      if (mountedRef.current) setIsUploading(false)
     }
   }
 
@@ -98,10 +169,26 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
     void handleFiles(event.dataTransfer.files)
   }
 
+  const handleSlotSelect = useCallback((index: number) => {
+    if (isUploading) return
+    const input = fileInputRef.current
+    if (!input) return
+    // Clicking an empty slot is an explicit choice to fill the visible
+    // layout preview, even when the default composition has not been
+    // confirmed from the layout panel yet.
+    if (!hasChosenLayout) setLayoutPreset(layoutPreset)
+    targetSlotRef.current = index
+    input.multiple = false
+    input.click()
+  }, [hasChosenLayout, isUploading, layoutPreset, setLayoutPreset])
+
   const handleFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.currentTarget.files ? Array.from(event.currentTarget.files) : []
+    const targetSlot = targetSlotRef.current
+    targetSlotRef.current = null
     event.currentTarget.value = ''
-    void handleFiles(files)
+    event.currentTarget.multiple = true
+    void handleFiles(files, targetSlot ?? undefined)
   }
 
   return (
@@ -133,7 +220,13 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
           className="flex size-full items-center justify-center transition-transform duration-200 motion-reduce:transition-none"
           style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'center' }}
         >
-          <KonvaStage stageRef={stageRef} />
+          <KonvaStage
+            stageRef={stageRef}
+            onSlotSelect={handleSlotSelect}
+            emptySlotLabel={isUploading ? t('uploading') : t('emptySlotLabel')}
+            emptySlotHint={isUploading ? '' : t('emptySlotHint')}
+            emptySlotDisabled={isUploading}
+          />
         </div>
 
         {isDragActive && (
@@ -145,30 +238,7 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
           </div>
         )}
 
-        {!hasImages && !isDragActive && (
-          <div className="pointer-events-auto absolute inset-0 z-10 flex items-center justify-center bg-background/88 px-6 backdrop-blur-[2px]">
-            <div className="flex max-w-sm flex-col items-center rounded-2xl border border-dashed border-primary/25 bg-card/90 px-8 py-8 text-center shadow-subtle">
-              <div className="grid size-14 place-items-center rounded-xl bg-accent text-accent-foreground">
-                <ImagePlus className="size-6" />
-              </div>
-              <p className="mt-5 font-display text-lg font-bold tracking-[0.01em] text-foreground">{isUploading ? t('uploading') : t('dropTitle')}</p>
-              <p className="mt-2 text-sm leading-5 text-muted-foreground">{t('dropDescription')}</p>
-              <Button type="button" size="sm" className="mt-5 h-10 rounded-md px-4 text-xs" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
-                <Upload className="size-3.5" />
-                {isUploading ? t('uploading') : t('chooseFiles')}
-              </Button>
-              <span className="mt-4 editor-meta">{t('dropHint')}</span>
-              {uploadError && (
-                <p role="alert" className="mt-4 inline-flex items-start gap-1.5 text-left text-xs leading-4 text-destructive">
-                  <AlertCircle className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
-                  <span>{uploadError}</span>
-                </p>
-              )}
-            </div>
-          </div>
-        )}
-
-        {uploadError && hasImages && (
+        {uploadError && (
           <div className="pointer-events-none absolute bottom-4 left-1/2 z-20 max-w-[min(90%,28rem)] -translate-x-1/2">
             <p role="alert" className="inline-flex items-start gap-1.5 rounded-md border border-destructive/25 bg-background/95 px-3 py-2 text-left text-xs leading-4 text-destructive shadow-subtle">
               <AlertCircle className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />

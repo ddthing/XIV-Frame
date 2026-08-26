@@ -16,7 +16,7 @@ export function RootDocument({ children, locale }: { children: React.ReactNode; 
                   applicationCategory: 'MultimediaApplication',
                   operatingSystem: 'Web',
                   url: siteUrl,
-                  description: '파이널판타지14 스크린샷을 구성하고 PNG로 저장하는 브라우저 기반 편집 도구',
+                  description: '파이널판타지14 스크린샷을 구성하고 결과 파일로 저장하는 브라우저 기반 편집 도구',
                   offers: { '@type': 'Offer', price: '0', priceCurrency: 'KRW' },
                 },
                 {

@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { useStore, CanvasRatio } from '@/store/useStore'
-import { exportCanvas } from '@/lib/export'
+import { exportCanvas, type ExportResult } from '@/lib/export'
 import type Konva from 'konva'
 
 export interface UseCanvasActionsReturn {
@@ -12,7 +12,7 @@ export interface UseCanvasActionsReturn {
   handleZoomChange: (value: number | readonly number[]) => void;
   handleRatioChange: (ratio: CanvasRatio) => void;
   handleReset: () => void;
-  handleExport: (stageRef: React.MutableRefObject<Konva.Stage | null>, format?: 'png' | 'jpeg') => Promise<void>;
+  handleExport: (stageRef: React.MutableRefObject<Konva.Stage | null>, format?: 'png' | 'jpeg') => Promise<ExportResult | undefined>;
   isExporting: boolean;
   hasImages: boolean;
 }
@@ -45,7 +45,7 @@ export function useCanvasActions(): UseCanvasActionsReturn {
   }, [setCanvasRatio])
 
   const handleExport = useCallback(async (stageRef: React.MutableRefObject<Konva.Stage | null>, format: 'png' | 'jpeg' = 'png') => {
-    await exportCanvas(stageRef, format)
+    return exportCanvas(stageRef, format)
   }, [])
 
   return {

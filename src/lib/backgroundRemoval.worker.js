@@ -20,6 +20,27 @@ function isLikelyMobileBrowser() {
     || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
 }
 
+function getWasmThreadCount() {
+  if (globalThis.crossOriginIsolated !== true) return 1
+
+  const hardwareConcurrency = Number.isFinite(navigator.hardwareConcurrency)
+    ? Math.max(1, Math.floor(navigator.hardwareConcurrency))
+    : 1
+  const maxThreads = isLikelyMobileBrowser() ? 2 : 4
+  return Math.min(maxThreads, Math.max(1, Math.ceil(hardwareConcurrency / 2)))
+}
+
+function getWasmAssetPaths(threadCount) {
+  const runtimeName = threadCount > 1
+    ? 'ort-wasm-simd-threaded'
+    : 'ort-wasm-simd-threaded.asyncify'
+  const assetRoot = '/vendor/onnxruntime/'
+  return {
+    mjs: `${assetRoot}${runtimeName}.mjs`,
+    wasm: `${assetRoot}${runtimeName}.wasm`,
+  }
+}
+
 const workerScope = self
 let pipelinePromise = null
 
@@ -34,6 +55,9 @@ async function getBackgroundRemovalPipeline() {
       env.allowRemoteModels = true
       env.allowLocalModels = false
       env.useBrowserCache = true
+      const wasmThreadCount = getWasmThreadCount()
+      env.backends.onnx.wasm.numThreads = wasmThreadCount
+      env.backends.onnx.wasm.wasmPaths = getWasmAssetPaths(wasmThreadCount)
 
       const supportsWebGPU = typeof navigator !== 'undefined' && 'gpu' in navigator && !isLikelyMobileBrowser()
       const createPipeline = (device) => pipeline('background-removal', CHARACTER_MODEL_ID, {
@@ -61,6 +85,13 @@ async function getBackgroundRemovalPipeline() {
   return pipelinePromise
 }
 
+function toTransferableBytes(data) {
+  if (data instanceof Uint8Array && data.byteOffset === 0 && data.byteLength === data.buffer.byteLength) {
+    return data
+  }
+  return new Uint8Array(data)
+}
+
 async function handleRequest(request) {
   try {
     const segmenter = await getBackgroundRemovalPipeline()
@@ -72,7 +103,7 @@ async function handleRequest(request) {
     }
 
     const output = await segmenter(request.blob)
-    const data = new Uint8Array(output.data)
+    const data = toTransferableBytes(output.data)
 
     workerScope.postMessage({
       type: 'result',

@@ -42,20 +42,20 @@ export function SettingsPanel() {
       icon: Images,
     },
     {
-      value: 'signature',
-      label: t('tabSignature'),
-      role: t('tabSignatureRole'),
-      title: t('panelSignatureTitle'),
-      description: t('panelSignatureDescription'),
-      icon: Type,
-    },
-    {
       value: 'layout',
       label: t('tabLayout'),
       role: t('tabLayoutRole'),
       title: t('panelLayoutTitle'),
       description: t('panelLayoutDescription'),
       icon: LayoutTemplate,
+    },
+    {
+      value: 'signature',
+      label: t('tabSignature'),
+      role: t('tabSignatureRole'),
+      title: t('panelSignatureTitle'),
+      description: t('panelSignatureDescription'),
+      icon: Type,
     },
   ]
 
@@ -81,7 +81,7 @@ export function SettingsPanel() {
           <p className="mt-2 max-w-[31rem] font-body text-[13px] leading-5 text-muted-foreground">{currentTab.description}</p>
 
           <div className="-mx-5 mt-4 overflow-hidden border-t border-border px-4 py-3">
-            <TabsList aria-label={t('flowLabel')} className="grid min-h-[78px] w-full grid-cols-3 gap-1.5 rounded-xl border border-border bg-surface-inset/70 p-1.5">
+            <TabsList aria-label={t('flowLabel')} className="grid min-h-[78px] w-full min-w-0 grid-cols-3 gap-1.5 rounded-xl border border-border bg-surface-inset/70 p-1.5">
               {tabs.map(({ value, label, role, icon: Icon }, index) => (
                 <TabsTrigger
                   key={value}
@@ -90,9 +90,9 @@ export function SettingsPanel() {
                 >
                   <span className="mt-0.5 font-mono text-[10px] font-semibold tabular-nums text-muted-foreground">{String(index + 1).padStart(2, '0')}</span>
                   <Icon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-                  <span className="flex min-w-0 flex-col items-start gap-0.5 leading-none">
-                    <strong className="text-[13px] font-semibold leading-4">{label}</strong>
-                    <small className="font-mono text-[10px] font-medium uppercase tracking-[0.05em] text-muted-foreground">{role}</small>
+                  <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5 overflow-hidden leading-none whitespace-normal">
+                    <strong className="block max-w-full break-words text-[13px] font-semibold leading-4 whitespace-normal">{label}</strong>
+                    <small className="block max-w-full truncate font-mono text-[10px] font-medium uppercase tracking-[0.05em] text-muted-foreground">{role}</small>
                   </span>
                 </TabsTrigger>
               ))}
@@ -106,12 +106,12 @@ export function SettingsPanel() {
               <ImageUploader />
             </TabsContent>
 
-            <TabsContent value="signature" className="mt-0 focus-visible:outline-none">
-              <LazySignatureSettings />
-            </TabsContent>
-
             <TabsContent value="layout" className="mt-0 focus-visible:outline-none">
               <LazyLayoutSettings />
+            </TabsContent>
+
+            <TabsContent value="signature" className="mt-0 focus-visible:outline-none">
+              <LazySignatureSettings />
             </TabsContent>
           </div>
         </div>

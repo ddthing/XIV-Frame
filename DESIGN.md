@@ -1,6 +1,6 @@
 # XIV Frame Design Contract
 
-Status: 2026-08-23
+Status: 2026-08-26
 
 This document is the visual contract for XIV Frame. The product is a local-first
 FFXIV screenshot compositor: users upload screenshots, arrange them, add text
@@ -27,6 +27,8 @@ feel calm, precise, and trustworthy while keeping the canvas visually primary.
 - CSS tokens and global primitives: `src/app/globals.css`
 - shadcn generator configuration: `components.json`
 - Generated/reusable primitives: `src/components/ui/`
+- Brand mark source: `src/app/icon.svg`; the share image `public/og-image.jpg`
+  is generated from it by `scripts/generate-og-image.mjs`.
 - Public/content shell: `src/components/layout/ContentPage.tsx`
 - Product editor shell: `src/components/ClientApp.tsx`, canvas and sidebar
   components
@@ -35,6 +37,10 @@ Do not introduce page-specific palette variables. Every product-chrome color
 must resolve to a semantic token (`background`, `foreground`, `card`,
 `popover`, `primary`, `secondary`, `muted`, `accent`, `destructive`, `border`,
 `input`, or `ring`).
+
+Brand surfaces must use the shared `FrameWindowMark`/`icon.svg` asset. Do not
+redraw or replace the mark in metadata, social preview images, or page-specific
+components; regenerate derived raster assets when the source mark changes.
 
 ## Color tokens
 
@@ -118,6 +124,13 @@ The current route is indicated by a low-opacity foreground surface. The main
 editor CTA uses `bg-accent` with `text-accent-foreground`; it must remain
 visible in both light and dark themes.
 
+`PageShell` is the only public-page owner of the shared `SiteHeader` and
+`SiteFooter`. `SiteHeader` owns the primary product navigation (`blog`, `faq`,
+`about`, and `contact`). `SiteFooter` must not repeat those links; it owns only
+secondary links such as privacy, terms, and support/donation. Public pages must
+not add page-specific header or footer navigation without updating this
+contract and the shared shell first.
+
 ### Controls
 
 All buttons, inputs, selects, sliders, tabs, drawers, and accordions use the
@@ -139,9 +152,21 @@ The editor keeps the canvas dominant and the inspector predictable:
 
 1. Header: product identity, save/export, and global actions.
 2. Canvas toolbar: ratio and zoom controls.
-3. Inspector: one active settings tab, then the relevant controls.
+3. Inspector: one active settings tab, then the relevant controls. The top-level
+   workflow order is always photos, layout, then signature; export remains a
+   global action.
 4. Mobile: the same control order is exposed through the bottom navigation and
    drawer sheets; only the container changes, not the visual language.
+
+The editor header variants (`DesktopToolbar` and `MobileLayout`) share the
+public shell's header contract: the same semantic primary surface, border,
+logo scale, 56px desktop/52px mobile height, spacing rhythm, and focus states.
+They may add editor-only controls such as reset and PNG export, but must not
+introduce a separate brand header style. The editor is a full-viewport tool, so
+the public `SiteFooter` is intentionally omitted to preserve canvas space;
+legal and support links remain available in the public shell. The editor logo
+must remain an explicit localized link back to the landing page, with a leave
+confirmation when the current session contains images.
 
 User settings are state, not design. A visual normalization must not change
 localStorage keys, persisted values, migration behavior, canvas coordinates,

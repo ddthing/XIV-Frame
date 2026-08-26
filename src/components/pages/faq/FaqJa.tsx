@@ -7,7 +7,7 @@ export function FaqJa() {
       locale="ja"
       eyebrow="05 / FAQ"
       title="よくある質問"
-      description="画像を追加してから完成したPNGを保存するまで、よくある質問をまとめました。"
+      description="画像を追加してから完成した結果ファイルを保存するまで、よくある質問をまとめました。"
       groups={[
         {
           number: '01',
@@ -33,7 +33,7 @@ export function FaqJa() {
           items: [
             {
               question: '画像の順番とレイアウトはどこで変更しますか？',
-              answer: <p><strong>画像</strong>タブでカードの順番を変更したり、すべて削除したりできます。<strong>レイアウト</strong>タブで分割・縦並び・グリッドとキャンバス比率を選びます。グリッドは3枚以上の画像で使用できます。</p>,
+              answer: <p><strong>画像</strong>タブでカードの順番を変更したり、すべて削除したりできます。<strong>レイアウト</strong>タブで分割・縦並び・グリッドとキャンバス比率を選びます。グリッドは2×2の4枠で、3～4枚に使います。3枚の場合は1枠が空きます。</p>,
             },
             {
               question: '画像の切り抜きや位置を調整するには？',
@@ -51,7 +51,7 @@ export function FaqJa() {
           items: [
             {
               question: '完成したフレームを保存するには？',
-              answer: <p>デスクトップでは上部バーの<strong>PNG保存</strong>をクリックします。モバイルでは下部バーの<strong>保存</strong>を開き、写真を保存する操作を選びます。保存前にプレビューの端とテキストの位置を確認してください。</p>,
+              answer: <p>デスクトップでは上部バーの<strong>PNG保存</strong>をクリックし、モバイルでは下部バーの<strong>保存</strong>を開いて写真を保存する操作を選びます。PNGを優先しますが、5MBを超える不透明な結果は高画質JPEGとして保存されます。透明PNGを5MB以下にできない場合は案内が表示され、保存されません。</p>,
             },
             {
               question: '画像を選択したのに表示されません。',
@@ -73,15 +73,15 @@ export function FaqJa() {
           items: [
             {
               question: '背景削除が遅いのはエラーですか？',
-              answer: <p>初回はブラウザ内で背景削除モデルを準備するため、通常の画像追加より時間がかかる場合があります。画面を閉じたり更新したりせず、完了を待ってください。モバイルでは1枚ずつ処理し、症状別の確認は<Link href="/ja/blog/composite-elements-background-removal">合成ガイド</Link>を参照してください。</p>,
+              answer: <p>初回はブラウザ内で背景削除モデルを準備するため、通常の画像追加より時間がかかる場合があります。画面を閉じたり更新したりせず、完了を待ってください。モデル準備・ブラウザ対応・メモリ・画像処理・時間超過のどの案内かを確認し、モバイルでは1枚ずつ処理します。症状別の確認は<Link href="/ja/blog/composite-elements-background-removal">合成ガイド</Link>を参照してください。</p>,
             },
             {
               question: '50MBの制限をなくせば便利になりませんか？',
               answer: <p>この制限は、キャンバスと背景削除モデルが端末のメモリを使いすぎないための安全線です。制限を超えたファイルは最適化前に拒否されるため、小さいコピーを作って再度選択してください。準備方法は<Link href="/ja/blog/large-ffxiv-screenshots-upload">大容量ファイルのガイド</Link>で説明しています。</p>,
             },
             {
-              question: '保存したPNGで何を確認すればよいですか？',
-              answer: <p>他のプレイヤーのキャラクター・会話・通知、ロゴの利用権、公式サービスと誤解される表現、合成のハロー、文字の切れを確認します。プレビューだけでなく保存したPNGを直接開いてください。<Link href="/ja/blog/ffxiv-screenshot-publishing-checklist">公開前チェック</Link>に短い確認表があります。</p>,
+              question: '保存した結果ファイルで何を確認すればよいですか？',
+              answer: <p>他のプレイヤーのキャラクター・会話・通知、ロゴの利用権、公式サービスと誤解される表現、合成のハロー、文字の切れを確認します。プレビューだけでなく保存したPNGまたはJPEGを直接開いてください。<Link href="/ja/blog/ffxiv-screenshot-publishing-checklist">公開前チェック</Link>に短い確認表があります。</p>,
             },
             {
               question: 'どのガイドから読めばよいですか？',

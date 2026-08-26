@@ -7,7 +7,7 @@ export function FaqEn() {
       locale="en"
       eyebrow="05 / FAQ"
       title="Frequently asked questions"
-      description="Answers to the questions that come up between adding an image and saving the final PNG."
+      description="Answers to the questions that come up between adding an image and saving the finished result file."
       groups={[
         {
           number: '01',
@@ -33,7 +33,7 @@ export function FaqEn() {
           items: [
             {
               question: 'Where do I change the image order and layout?',
-              answer: <p>Use the <strong>Image</strong> tab to reorder cards or clear them. Use the <strong>Layout</strong> tab to choose split, vertical, or grid and set the canvas ratio. Grid becomes available with three or more images.</p>,
+              answer: <p>Use the <strong>Image</strong> tab to reorder cards or clear them. Use the <strong>Layout</strong> tab to choose split, vertical, or grid and set the canvas ratio. Grid is a four-slot 2×2 layout for three or four images; with three images, one slot stays empty.</p>,
             },
             {
               question: 'How do I fix a crop or move an image?',
@@ -51,7 +51,7 @@ export function FaqEn() {
           items: [
             {
               question: 'How do I save the finished frame?',
-              answer: <p>On desktop, select <strong>Save PNG</strong> in the top bar. On mobile, open <strong>Export</strong> from the bottom bar and choose the photo-saving action. Check the preview edges and text placement before saving.</p>,
+              answer: <p>On desktop, select <strong>Save PNG</strong> in the top bar. On mobile, open <strong>Export</strong> from the bottom bar and choose the photo-saving action. PNG is preferred, but an opaque result over 5 MB is saved as a high-quality JPEG. If a transparent PNG cannot fit under 5 MB, the editor shows guidance instead of downloading it.</p>,
             },
             {
               question: 'I selected an image, but it is not visible.',
@@ -73,15 +73,15 @@ export function FaqEn() {
           items: [
             {
               question: 'Is slow background removal an error?',
-              answer: <p>The first run may take longer while the browser prepares the background-removal model. Keep the page open and wait for the state to finish. On mobile, process one image at a time. The <Link href="/en/blog/composite-elements-background-removal">compositing guide</Link> lists the checks for each symptom.</p>,
+              answer: <p>The first run may take longer while the browser prepares the background-removal model. Keep the page open and wait for the state to finish. Read the error category—model preparation, browser support, memory, image processing, or timeout—before choosing the recovery step, and process one image at a time on mobile. The <Link href="/en/blog/composite-elements-background-removal">compositing guide</Link> lists the checks for each symptom.</p>,
             },
             {
               question: 'Would removing the 50 MB limit make uploads easier?',
               answer: <p>The limit protects browser memory while the canvas and background-removal model are active. Files over the limit are rejected before optimization begins, so save a smaller copy and select it again. See the <Link href="/en/blog/large-ffxiv-screenshots-upload">large-file guide</Link> for a safer preparation workflow.</p>,
             },
             {
-              question: 'What should I check in the final PNG?',
-              answer: <p>Check other players&apos; characters, chat, notifications, logo permissions, any implication of official affiliation, composite halos, and clipped text. Open the downloaded PNG rather than relying only on the preview. The <Link href="/en/blog/ffxiv-screenshot-publishing-checklist">publishing checklist</Link> includes a short final review.</p>,
+              question: 'What should I check in the downloaded result?',
+              answer: <p>Check other players&apos; characters, chat, notifications, logo permissions, any implication of official affiliation, composite halos, and clipped text. Open the downloaded PNG or JPEG rather than relying only on the preview. The <Link href="/en/blog/ffxiv-screenshot-publishing-checklist">publishing checklist</Link> includes a short final review.</p>,
             },
             {
               question: 'Which guide should I read first?',

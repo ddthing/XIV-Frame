@@ -4,14 +4,29 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "predev": "node scripts/sync-transformers-worker.mjs",
+    "predev": "node scripts/sync-transformers-worker.mjs && node scripts/generate-og-image.mjs",
     "build": "next build",
-    "prebuild": "node scripts/sync-transformers-worker.mjs && node scripts/validate-content.mjs",
+    "prebuild": "node scripts/sync-transformers-worker.mjs && node scripts/generate-og-image.mjs && node scripts/validate-content.mjs",
     "postbuild": "node scripts/validate-static-output.mjs",
     "start": "next start",
     "lint": "eslint",
     "content:check": "node scripts/validate-content.mjs",
-    "render:check": "node scripts/validate-image-render-tree.mjs"
+    "assets:og": "node scripts/generate-og-image.mjs",
+    "prerender:check": "node scripts/sync-transformers-worker.mjs",
+    "render:check": "node scripts/validate-image-render-tree.mjs && node scripts/validate-image-layout.mjs && node scripts/validate-character-pixels.mjs && node scripts/validate-cancellation-gate.mjs && node scripts/validate-fallback-queue.mjs && node scripts/validate-pipeline-cache.mjs && node scripts/validate-upload-concurrency.mjs && node scripts/validate-browser-capabilities.mjs && node scripts/validate-wasm-assets.mjs && node scripts/validate-image-memory-policy.mjs && node scripts/validate-background-model-loading-policy.mjs && node scripts/validate-deferred-storage.mjs && node scripts/validate-background-removal-errors.mjs",
+    "wasm:check": "node scripts/sync-transformers-worker.mjs && node scripts/validate-wasm-assets.mjs",
+    "layout:check": "node scripts/validate-image-layout.mjs",
+    "character:check": "node scripts/validate-character-pixels.mjs",
+    "background:check": "node scripts/validate-cancellation-gate.mjs && node scripts/validate-background-removal-errors.mjs",
+    "fallback:check": "node scripts/validate-fallback-queue.mjs && node scripts/validate-pipeline-cache.mjs",
+    "upload:check": "node scripts/validate-upload-concurrency.mjs",
+    "device:check": "node scripts/validate-browser-capabilities.mjs",
+    "perf:upload": "node scripts/measure-upload-performance.mjs",
+    "perf:soft-blend": "node scripts/measure-soft-blend-performance.mjs",
+    "pretest:background:live": "node scripts/sync-transformers-worker.mjs",
+    "test:background:live": "node scripts/live-background-removal-smoke.mjs",
+    "pretest:e2e": "node scripts/sync-transformers-worker.mjs",
+    "test:e2e": "node scripts/run-e2e.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
@@ -40,6 +55,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

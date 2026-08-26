@@ -1,11 +1,11 @@
-import { Circle, Heart, Square, Star, Blend } from 'lucide-react'
+import { Blend, Circle, Heart, Sparkles, Square, Star } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useShallow } from 'zustand/react/shallow'
 
 import { EditorChoice, EditorFieldHeader, EditorSection } from '@/components/ui/editor'
 import {
-  getLayoutGeometry,
-  isLayoutTemplateAvailable,
+  getLayoutPreviewGeometry,
+  getRecommendedLayoutPreset,
   LAYOUT_TEMPLATE_GROUPS,
   LAYOUT_TEMPLATE_OPTIONS,
   type LayoutTemplateGroup,
@@ -18,6 +18,7 @@ import { useStore, type BackgroundColor } from '@/store/useStore'
 export function LayoutSettings() {
   const {
     layoutPreset,
+    hasChosenLayout,
     setLayoutPreset,
     imageTransition,
     setImageTransition,
@@ -39,6 +40,7 @@ export function LayoutSettings() {
     images,
   } = useStore(useShallow(state => ({
     layoutPreset: state.layoutPreset,
+    hasChosenLayout: state.hasChosenLayout,
     setLayoutPreset: state.setLayoutPreset,
     imageTransition: state.imageTransition,
     setImageTransition: state.setImageTransition,
@@ -62,6 +64,12 @@ export function LayoutSettings() {
 
   const t = useTranslations('LayoutSettings')
   const imageCount = images.filter(Boolean).length
+  const recommendedPreset = getRecommendedLayoutPreset(imageCount)
+  const recommendedTemplate = recommendedPreset
+    ? LAYOUT_TEMPLATE_OPTIONS.find((option) => option.id === recommendedPreset)
+    : undefined
+  const selectedTemplate = LAYOUT_TEMPLATE_OPTIONS.find((option) => option.id === layoutPreset)
+  const hasTemplateOverflow = Boolean(selectedTemplate && imageCount > selectedTemplate.maxImages)
   const safeCustomBackgroundColor = getSafeCustomBackgroundColor(customBackgroundColor)
   const backgroundOptions: BackgroundOption[] = [
     { value: 'white', label: t('bgWhite'), swatch: '#ffffff' },
@@ -82,15 +90,40 @@ export function LayoutSettings() {
   return (
     <div className="space-y-6">
       <EditorSection title={t('compositionTitle')} description={t('compositionDescription')}>
+        {recommendedTemplate && !hasChosenLayout && (
+          <div
+            role="status"
+            aria-label={t('recommendationEyebrow')}
+            data-layout-recommendation
+            className="flex items-center justify-between gap-3 rounded-xl border border-primary/20 bg-accent/45 p-3"
+          >
+            <div className="flex min-w-0 items-start gap-2.5">
+              <Sparkles className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+              <div className="min-w-0 space-y-1">
+                <p className="editor-meta">{t('recommendationEyebrow')}</p>
+                <p className="text-xs font-semibold leading-4 text-foreground">
+                  {t('recommendationDescription', { count: imageCount, layout: t(recommendedTemplate.labelKey) })}
+                </p>
+              </div>
+            </div>
+            <EditorChoice
+              aria-label={t('recommendationApply', { layout: t(recommendedTemplate.labelKey) })}
+              onClick={() => setLayoutPreset(recommendedTemplate.id)}
+              className="h-9 shrink-0 px-2.5 text-[11px]"
+            >
+              {t('recommendationApply', { layout: t(recommendedTemplate.labelKey) })}
+            </EditorChoice>
+          </div>
+        )}
         <div className="space-y-4">
           {LAYOUT_TEMPLATE_GROUPS.map((group) => {
             const options = LAYOUT_TEMPLATE_OPTIONS.filter((option) => option.group === group)
 
             return (
               <div key={group} className="space-y-2">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="editor-meta">{t(GROUP_LABEL_KEYS[group])}</span>
-                  <span className="font-body text-[11px] text-muted-foreground">{t(GROUP_HINT_KEYS[group])}</span>
+                <div className="flex min-w-0 items-center justify-between gap-3">
+                  <span className="editor-meta min-w-0 truncate">{t(GROUP_LABEL_KEYS[group])}</span>
+                  <span className="min-w-0 truncate font-body text-[11px] text-muted-foreground">{t(GROUP_HINT_KEYS[group])}</span>
                 </div>
                 <div role="group" aria-label={t(GROUP_LABEL_KEYS[group])} className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
                   {options.map((option) => {
@@ -103,10 +136,11 @@ export function LayoutSettings() {
                         onClick={() => setLayoutPreset(option.id)}
                         aria-label={`${t(option.labelKey)}${requirement ? `, ${requirement}` : ''}`}
                         title={requirement || undefined}
-                        className="h-auto min-h-[104px] min-w-[92px] shrink-0 snap-start flex-col justify-start gap-2 px-2 py-3"
+                        data-layout-template-card="true"
+                        className="h-auto min-h-[104px] w-[92px] max-w-[92px] min-w-[92px] shrink-0 snap-start flex-col justify-start gap-2 px-2 py-3"
                       >
                         <LayoutTemplatePreview option={option} />
-                        <span className="max-w-[76px] truncate text-center text-[11px] leading-4">{t(option.labelKey)}</span>
+                        <span className="block min-w-0 max-w-full line-clamp-2 break-words text-center text-[11px] leading-4 whitespace-normal">{t(option.labelKey)}</span>
                       </EditorChoice>
                     )
                   })}
@@ -118,9 +152,9 @@ export function LayoutSettings() {
         <p className="font-body text-[11px] leading-4 text-muted-foreground">
           {t('templateHint', { count: imageCount })}
         </p>
-        {!isLayoutTemplateAvailable(layoutPreset, imageCount) && (
+        {hasTemplateOverflow && selectedTemplate && (
           <p className="rounded-md border border-border bg-muted/50 px-3 py-2 font-body text-[11px] leading-4 text-muted-foreground">
-            {t('templateFallback')}
+            {t('templateOverflow', { count: imageCount, max: selectedTemplate.maxImages })}
           </p>
         )}
         {canChooseImageShape && (
@@ -186,7 +220,7 @@ export function LayoutSettings() {
       <EditorSection title={t('finishTitle')} description={t('finishDescription')}>
         <div className="space-y-5">
           <div className="space-y-3">
-            <EditorFieldHeader label={t('background')} value={selectedBackground.label} />
+            <EditorFieldHeader label={t('backgroundAndBorder')} value={selectedBackground.label} />
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {backgroundOptions.map((option) => (
                 <EditorChoice
@@ -239,6 +273,7 @@ export function LayoutSettings() {
                 <p className="font-body text-[11px] leading-4 text-muted-foreground">{t('customBackgroundDescription')}</p>
               </div>
             )}
+            <p className="font-body text-[11px] leading-4 text-muted-foreground">{t('backgroundAndBorderDescription')}</p>
           </div>
           <div className="space-y-3 border-t border-border pt-4">
             <EditorFieldHeader label={t('grainIntensity')} value={`${grainIntensity}%`} htmlFor="grain-intensity" />
@@ -305,7 +340,7 @@ function getTemplateRequirement(t: ReturnType<typeof useTranslations<'LayoutSett
 }
 
 function LayoutTemplatePreview({ option }: { option: LayoutTemplateOption }) {
-  const geometry = getLayoutGeometry(option.id, option.previewCount)
+  const geometry = getLayoutPreviewGeometry(option.id)
 
   return (
     <span

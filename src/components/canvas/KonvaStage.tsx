@@ -3,23 +3,49 @@ import { Stage, Layer } from 'react-konva'
 import { useStore } from '@/store/useStore'
 import { useShallow } from 'zustand/react/shallow'
 import { BackgroundLayer } from './layers/BackgroundLayer'
-import { ImageGridLayer } from './layers/ImageGridLayer'
+import { ImageGridLayer, type LoadedCanvasImage } from './layers/ImageGridLayer'
+import { EmptySlotLayer } from './layers/EmptySlotLayer'
 import { CharacterLayer } from './layers/CharacterLayer'
 import { SignatureLayer } from './layers/SignatureLayer'
 import { LogoLayer } from './layers/LogoLayer'
 import { CopyrightLayer } from './layers/CopyrightLayer'
 import { NoiseLayer } from './layers/NoiseLayer'
-import { getLayoutGeometry } from '@/lib/layoutTemplates'
+import { getLayoutGeometry, getLayoutGeometryImageCount } from '@/lib/layoutTemplates'
+import { getCanvasLogicalSize } from '@/lib/canvasGeometry'
 
 import type Konva from 'konva'
 
-export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Konva.Stage | null> }) {
+type PendingImageLoad = {
+  promise: Promise<HTMLImageElement>
+  cancel: () => void
+}
+
+function clearImageElement(image: HTMLImageElement) {
+  image.onload = null
+  image.onerror = null
+  image.src = ''
+}
+
+export default function KonvaStage({
+  stageRef,
+  onSlotSelect,
+  emptySlotLabel = 'Add photo',
+  emptySlotHint = 'Click or drop',
+  emptySlotDisabled = false,
+}: {
+  stageRef: React.RefObject<Konva.Stage | null>
+  onSlotSelect?: (index: number) => void
+  emptySlotLabel?: string
+  emptySlotHint?: string
+  emptySlotDisabled?: boolean
+}) {
   const {
-    images, layoutPreset, imageGap, imageTransition, blendWidth, canvasRatio,
-    borderWidth, backgroundColor, customBackgroundColor, grainIntensity, imageShape
+    images, layoutPreset, hasChosenLayout, imageGap, imageTransition, blendWidth, canvasRatio,
+    borderWidth, backgroundColor, customBackgroundColor, grainIntensity, imageShape, isExporting,
   } = useStore(useShallow(state => ({
     images: state.images,
     layoutPreset: state.layoutPreset,
+    hasChosenLayout: state.hasChosenLayout,
     imageGap: state.imageGap,
     imageTransition: state.imageTransition,
     blendWidth: state.blendWidth,
@@ -29,45 +55,157 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
     customBackgroundColor: state.customBackgroundColor,
     grainIntensity: state.grainIntensity,
     imageShape: state.imageShape,
+    isExporting: state.isExporting,
   })))
-  
   const containerRef = useRef<HTMLDivElement>(null)
   
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 })
-  const [imagesData, setImagesData] = useState<HTMLImageElement[]>([])
+  const [imagesData, setImagesData] = useState<LoadedCanvasImage[]>([])
+  const imageCacheRef = useRef(new Map<string, HTMLImageElement>())
+  const pendingImageLoadsRef = useRef(new Map<string, PendingImageLoad>())
+  const activeUrlsRef = useRef(new Set<string>())
+  const activeRef = useRef(true)
   
   useEffect(() => {
-    let active = true
-    const imgInstances: HTMLImageElement[] = []
-    
-    const loadImages = async () => {
-      const promises = images.map(url => {
-        return new Promise<HTMLImageElement>((resolve, reject) => {
-          const img = new window.Image()
-          imgInstances.push(img)
-          img.src = url
-          img.onload = () => resolve(img)
-          img.onerror = reject
-        })
-      })
-      
-      try {
-        const loaded = await Promise.all(promises)
-        if (active) setImagesData(loaded)
-      } catch (e) {
-        console.error('Failed to load image', e)
+    let effectActive = true
+    const imageCache = imageCacheRef.current
+    const pendingLoads = pendingImageLoadsRef.current
+    const imageEntries = images.flatMap((url, sourceIndex) => (
+      url ? [{ url, sourceIndex }] : []
+    ))
+    const imageUrls = imageEntries.map(({ url }) => url)
+    const activeUrls = new Set(imageUrls)
+    activeUrlsRef.current = activeUrls
+
+    imageCache.forEach((image, url) => {
+      if (!activeUrls.has(url)) {
+        clearImageElement(image)
+        imageCache.delete(url)
       }
-    }
-    loadImages()
-    return () => { 
-      active = false 
-      imgInstances.forEach(img => {
-        img.onload = null
-        img.onerror = null
-        img.src = ''
+    })
+
+    pendingLoads.forEach((pending, url) => {
+      if (!activeUrls.has(url)) {
+        pending.cancel()
+        pendingLoads.delete(url)
+      }
+    })
+
+    const loadImage = (url: string) => {
+      const cachedImage = imageCache.get(url)
+      if (cachedImage) return Promise.resolve(cachedImage)
+
+      const pendingLoad = pendingLoads.get(url)
+      if (pendingLoad) return pendingLoad.promise
+
+      let cancelLoad: () => void = () => undefined
+      const nextLoad = new Promise<HTMLImageElement>((resolve, reject) => {
+        const image = new window.Image()
+        let settled = false
+        const cleanup = () => {
+          image.onload = null
+          image.onerror = null
+        }
+
+        cancelLoad = () => {
+          if (settled) return
+          settled = true
+          cleanup()
+          image.src = ''
+          reject(new Error(`Cancelled image load: ${url}`))
+        }
+
+        image.onload = () => {
+          if (settled) return
+          settled = true
+          cleanup()
+          resolve(image)
+        }
+        image.onerror = () => {
+          if (settled) return
+          settled = true
+          cleanup()
+          reject(new Error(`Failed to load image: ${url}`))
+        }
+        image.src = url
       })
+
+      const pendingRecord: PendingImageLoad = { promise: nextLoad, cancel: () => cancelLoad() }
+      pendingLoads.set(url, pendingRecord)
+      void nextLoad.then(
+        (image) => {
+          if (pendingLoads.get(url) === pendingRecord) pendingLoads.delete(url)
+          if (activeRef.current && activeUrlsRef.current.has(url)) imageCache.set(url, image)
+        },
+        () => {
+          if (pendingLoads.get(url) === pendingRecord) pendingLoads.delete(url)
+        },
+      )
+      return nextLoad
+    }
+
+    const syncLoadedImages = () => {
+      if (!effectActive) return
+
+      const loaded = imageEntries.flatMap(({ url, sourceIndex }) => {
+        const image = imageCache.get(url)
+        return image ? [{ image, sourceIndex }] : []
+      })
+
+      setImagesData((current) => {
+        if (
+          current.length === loaded.length
+          && current.every((entry, index) => entry.image === loaded[index]?.image && entry.sourceIndex === loaded[index]?.sourceIndex)
+        ) {
+          return current
+        }
+        return loaded
+      })
+    }
+
+    const imageLoadPromises = imageEntries.map(({ url }) => {
+      const promise = loadImage(url)
+      void promise.then(syncLoadedImages, syncLoadedImages)
+      return promise
+    })
+
+    // Paint already-cached images immediately, then reveal each successful
+    // decode as it arrives instead of waiting for the slowest image.
+    syncLoadedImages()
+
+    void Promise.allSettled(imageLoadPromises).then((results) => {
+      if (!effectActive) return
+      const failures: PromiseRejectedResult[] = []
+      results.forEach((result) => {
+        if (result.status === 'rejected') failures.push(result)
+      })
+
+      failures.forEach((failure) => console.error('Failed to load image', failure.reason))
+      if (failures.length > 0) {
+        window.setTimeout(() => {
+          if (effectActive) window.dispatchEvent(new Event('xiv-frame:canvas-image-error'))
+        }, 0)
+      }
+    })
+
+    return () => {
+      effectActive = false
     }
   }, [images])
+
+  useEffect(() => {
+    const imageCache = imageCacheRef.current
+    const pendingLoads = pendingImageLoadsRef.current
+    activeRef.current = true
+    return () => {
+      activeRef.current = false
+      activeUrlsRef.current.clear()
+      imageCache.forEach(clearImageElement)
+      imageCache.clear()
+      pendingLoads.forEach((pending) => pending.cancel())
+      pendingLoads.clear()
+    }
+  }, [])
 
   useEffect(() => {
     const updateSize = () => {
@@ -101,63 +239,28 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
     }
   }, [])
 
-  const { logicalWidth, logicalHeight } = useMemo(() => {
-    let width = 1920
-    let height = 1080
+  const occupiedSlotIndices = images.flatMap((url, index) => url ? [index] : [])
+  const imageSlotCount = occupiedSlotIndices.length > 0
+    ? Math.max(...occupiedSlotIndices) + 1
+    : 0
 
-    if (imagesData.length > 0) {
-      const baseHeight = imagesData[0].height
-      let totalWidth = 0
-      let gridHeight = baseHeight
-      const geometry = getLayoutGeometry(layoutPreset, imagesData.length)
+  const geometryImageCount = getLayoutGeometryImageCount(layoutPreset, imageSlotCount, hasChosenLayout)
+  const { logicalWidth, logicalHeight, geometry, effectiveLayoutPreset } = useMemo(() => {
+    const geometry = getLayoutGeometry(layoutPreset, geometryImageCount)
+    const canvasSize = getCanvasLogicalSize(imagesData.map(({ image }) => image), geometry, {
+      imageGap,
+      imageTransition,
+      blendWidth,
+      canvasRatio,
+    })
 
-      if (geometry.effectivePreset === 'grid') {
-        const cellWidth = imagesData[0].width
-        totalWidth = (cellWidth * geometry.columns) + (imageGap * (geometry.columns - 1))
-        gridHeight = (baseHeight * geometry.rows) + (imageGap * (geometry.rows - 1))
-      } else if (geometry.effectivePreset === 'vertical-split') {
-        const baseWidth = imagesData[0].width
-        totalWidth = baseWidth
-        gridHeight = 0
-        imagesData.forEach(img => {
-          gridHeight += img.height * (baseWidth / img.width)
-        })
-        gridHeight += Math.max(0, imagesData.length - 1) * imageGap
-      } else if (geometry.effectivePreset === 'split') {
-        imagesData.forEach(img => {
-          totalWidth += img.width * (baseHeight / img.height)
-        })
-        
-        if (imageTransition === 'soft-blend') {
-          totalWidth -= Math.max(0, imagesData.length - 1) * blendWidth
-        } else {
-          totalWidth += Math.max(0, imagesData.length - 1) * imageGap
-        }
-      } else {
-        const cellWidth = imagesData[0].width
-        const cellHeight = imagesData[0].height
-        const layoutGap = imageTransition === 'soft-blend' ? -blendWidth : imageGap
-        totalWidth = (cellWidth * geometry.columns) + (layoutGap * (geometry.columns - 1))
-        gridHeight = (cellHeight * geometry.rows) + (layoutGap * (geometry.rows - 1))
-      }
-
-      if (canvasRatio === '16:9') {
-        width = Math.max(totalWidth, gridHeight * (16 / 9))
-        height = width * (9 / 16)
-      } else if (canvasRatio === '2:1') {
-        width = Math.max(totalWidth, gridHeight * 2)
-        height = width / 2
-      } else {
-        width = totalWidth
-        height = gridHeight
-      }
-    }
-    return { logicalWidth: width, logicalHeight: height }
-  }, [imagesData, layoutPreset, imageGap, imageTransition, blendWidth, canvasRatio])
+    return { ...canvasSize, geometry, effectiveLayoutPreset: geometry.effectivePreset }
+  }, [imagesData, geometryImageCount, layoutPreset, imageGap, imageTransition, blendWidth, canvasRatio])
 
   const outerWidth = logicalWidth + (borderWidth * 2)
   const outerHeight = logicalHeight + (borderWidth * 2)
   const activeImageShape = imagesData.length === 1 && canvasRatio === '2:1' ? imageShape : 'rectangle'
+  const emptySlotCount = Math.max(0, geometry.cells.length - occupiedSlotIndices.length)
 
   const scale = Math.min(
     stageSize.width / outerWidth,
@@ -168,7 +271,14 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
   if (!scale || scale <= 0 || !outerWidth || !outerHeight) return <div ref={containerRef} className="w-full h-full" />
 
   return (
-    <div ref={containerRef} className="w-full h-full flex items-center justify-center overflow-hidden">
+    <div
+      ref={containerRef}
+      className="w-full h-full flex items-center justify-center overflow-hidden"
+      data-layout-effective-preset={effectiveLayoutPreset}
+      data-layout-image-count={occupiedSlotIndices.length}
+      data-layout-slot-count={geometry.cells.length}
+      data-layout-empty-slot-count={emptySlotCount}
+    >
       <Stage
         width={outerWidth * scale}
         height={outerHeight * scale}
@@ -185,6 +295,22 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
           />
         </Layer>
         
+        {!isExporting && emptySlotCount > 0 && (
+          <EmptySlotLayer
+            geometry={geometry}
+            contentWidth={logicalWidth}
+            contentHeight={logicalHeight}
+            gap={imageTransition === 'soft-blend' ? -blendWidth : imageGap}
+            borderWidth={borderWidth}
+            occupiedSlotIndices={occupiedSlotIndices}
+            backgroundColor={backgroundColor}
+            primaryLabel={emptySlotLabel}
+            primaryHint={emptySlotHint}
+            onSlotSelect={onSlotSelect}
+            disabled={emptySlotDisabled}
+          />
+        )}
+
         <ImageGridLayer 
           images={imagesData}
           contentWidth={logicalWidth}
@@ -194,7 +320,9 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
           isSoftBlend={imageTransition === 'soft-blend'}
           blendWidth={blendWidth}
           layoutPreset={layoutPreset}
+          layoutImageCount={geometryImageCount}
           imageShape={activeImageShape}
+          onImageSlotSelect={onSlotSelect}
         />
 
         {imagesData.length > 0 && (

@@ -1,7 +1,8 @@
 ---
 title: "Build an FFXIV Glamour Showcase: Front, Back, and Detail in One Image"
-description: "Arrange three or four GPose screenshots in a grid, correct each crop, add a restrained signature, and export a polished showcase PNG."
+description: "Arrange three or four GPose screenshots in a grid, correct each crop, add a restrained signature, and export a polished showcase image."
 date: "2026-06-03"
+updated: "2026-08-26"
 category: "Showcase"
 tags: ["ffxiv", "glamour", "tutorial"]
 ---
@@ -26,14 +27,14 @@ A useful glamour board gives every image a job. The example below uses a front v
 ## 3. Choose the layout
 
 1. Open **Layout** on desktop or the mobile **Layout** sheet.
-2. Choose **Grid** when you have three or four images and want a compact board.
+2. Choose **Grid** for its four-slot 2×2 board when you have three or four images. With three images, one slot remains empty; four images fill the board.
 3. Choose **Split** or **Vertical** when you have only two images. Grid requires at least three images.
 4. Recheck the crop after changing the layout because each image receives a new frame area.
 
 ## 4. Set the ratio
 
-1. Start with **Auto** to inspect the natural composition.
-2. Choose **16:9** for a familiar wide showcase canvas.
+1. Start with the default **Original ratio** to inspect the natural composition.
+2. Choose the **X timeline** profile when you want a 16:9 wide showcase canvas.
 3. Choose **2:1** for a long banner-like result.
 4. On mobile, use **Export → Ratio Settings**. The export ratio is separate from preview zoom.
 
@@ -68,4 +69,4 @@ A useful glamour board gives every image a job. The example below uses a front v
 - Are the name, server, and logo separate from the main subject?
 - Is the text contrast strong enough at the size where you will post it?
 
-When the checklist is clear, click **Save PNG** on desktop or **Export → Save Photo** on mobile.
+When the checklist is clear, click **Save PNG** on desktop or **Export → Save Photo** on mobile. PNG is preferred; an opaque result over 5 MB is automatically saved as a high-quality JPEG.

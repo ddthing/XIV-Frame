@@ -6,20 +6,20 @@ import { homeAlternates, siteUrl } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'XIV Frame | 파이널판타지14 스크린샷 편집기',
-  description: '파이널판타지14 스크린샷을 최대 16장까지 배치하고, 합성·레이아웃·시그니처를 조정해 PNG로 저장하는 무료 브라우저 편집기입니다. 3×3·4×4 격자와 실제 사용 순서, 게시 전 검수 방법도 제공합니다.',
+  description: '파이널판타지14 스크린샷을 최대 16장까지 배치하고, 합성·레이아웃·시그니처를 조정해 결과 파일로 저장하는 무료 브라우저 편집기입니다. 3×3·4×4 격자와 실제 사용 순서, 게시 전 검수 방법도 제공합니다.',
   alternates: {
     canonical: siteUrl,
     languages: homeAlternates(),
   },
   openGraph: {
     title: 'XIV Frame | 파이널판타지14 스크린샷 편집기',
-    description: '파이널판타지14 스크린샷을 배치하고 합성·시그니처를 더한 뒤 PNG로 저장하세요. 실제 사용 순서와 게시 전 검수 방법을 함께 제공합니다.',
+    description: '파이널판타지14 스크린샷을 배치하고 합성·시그니처를 더한 뒤 결과 파일로 저장하세요. 실제 사용 순서와 게시 전 검수 방법을 함께 제공합니다.',
     url: siteUrl,
     locale: 'ko_KR',
   },
   twitter: {
     title: 'XIV Frame | 파이널판타지14 스크린샷 편집기',
-    description: '파이널판타지14 스크린샷을 배치하고 합성·시그니처를 더한 뒤 PNG로 저장하세요.',
+    description: '파이널판타지14 스크린샷을 배치하고 합성·시그니처를 더한 뒤 결과 파일로 저장하세요.',
   },
 }
 

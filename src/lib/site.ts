@@ -8,6 +8,10 @@ export function localizedUrl(locale: string, path = '') {
   return `${siteUrl}/${locale}${normalizedPath}`
 }
 
+export function localizedLandingPath(locale: string) {
+  return locale === 'ko' ? '/' : `/${locale}/landing`
+}
+
 export function localizedAlternates(path = '') {
   return {
     ko: localizedUrl('ko', path),

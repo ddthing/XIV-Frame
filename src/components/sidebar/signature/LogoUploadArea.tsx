@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useStore } from '@/store/useStore'
 import { useShallow } from 'zustand/react/shallow'
 import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { Upload, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
@@ -14,14 +15,32 @@ const MAX_LOGO_FILE_SIZE = 10 * 1024 * 1024
 const MAX_LOGO_DIMENSION = 512
 const MAX_LOGO_DATA_URL_LENGTH = 1_500_000
 
+function getLogoUploadErrorMessage(error: unknown, t: (key: string) => string) {
+  if (!(error instanceof ImageUploadError)) return t('logoUploadPrepareError')
+
+  switch (error.code) {
+    case 'invalid-type':
+      return t('logoUploadFileTypeError')
+    case 'too-large':
+      return t('logoUploadTooLarge')
+    case 'decode':
+      return t('logoUploadDecodeError')
+    case 'cancelled':
+      return t('logoUploadCancelled')
+    default:
+      return t('logoUploadPrepareError')
+  }
+}
+
 export function LogoUploadArea() {
   const {
-    logoUrl, setLogoUrl,
+    logoUrl, resetVersion, setLogoUrl,
     logoPosition, setLogoPosition,
     logoScale, setLogoScale,
     logoOpacity, setLogoOpacity
   } = useStore(useShallow(state => ({
     logoUrl: state.logoUrl,
+    resetVersion: state.resetVersion,
     setLogoUrl: state.setLogoUrl,
     logoPosition: state.logoPosition,
     setLogoPosition: state.setLogoPosition,
@@ -33,10 +52,36 @@ export function LogoUploadArea() {
   const t = useTranslations('SignatureSettings')
   const [uploadError, setUploadError] = useState<string | null>(null)
   const uploadRequestRef = useRef(0)
+  const readerRef = useRef<FileReader | null>(null)
+  const imageRef = useRef<HTMLImageElement | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => () => {
+  const cancelPendingUpload = useCallback(() => {
     uploadRequestRef.current += 1
+
+    const reader = readerRef.current
+    readerRef.current = null
+    if (reader) {
+      reader.onload = null
+      reader.onerror = null
+      reader.onabort = null
+      if (reader.readyState === FileReader.LOADING) reader.abort()
+    }
+
+    const image = imageRef.current
+    imageRef.current = null
+    if (image) {
+      image.onload = null
+      image.onerror = null
+      image.src = ''
+    }
   }, [])
+
+  useEffect(() => cancelPendingUpload, [cancelPendingUpload])
+
+  useEffect(() => {
+    cancelPendingUpload()
+  }, [cancelPendingUpload, resetVersion])
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.currentTarget.files?.[0]
@@ -44,35 +89,61 @@ export function LogoUploadArea() {
     event.currentTarget.value = ''
     if (!file) return
 
-    const requestId = ++uploadRequestRef.current
+    cancelPendingUpload()
+    const requestId = uploadRequestRef.current
+    const resetVersionAtStart = useStore.getState().resetVersion
+    const isStale = () => (
+      requestId !== uploadRequestRef.current
+      || useStore.getState().resetVersion !== resetVersionAtStart
+    )
     setUploadError(null)
 
     try {
       validateImageFile(file, MAX_LOGO_FILE_SIZE)
     } catch (cause) {
-      if (requestId !== uploadRequestRef.current) return
-      setUploadError(cause instanceof ImageUploadError && cause.code === 'too-large' ? t('logoUploadTooLarge') : t('logoUploadError'))
+      if (isStale()) return
+      setUploadError(getLogoUploadErrorMessage(cause, t))
       return
     }
 
     const reader = new FileReader()
+    readerRef.current = reader
+    const releaseReader = () => {
+      if (readerRef.current === reader) readerRef.current = null
+      reader.onload = null
+      reader.onerror = null
+      reader.onabort = null
+    }
     reader.onerror = () => {
-      if (requestId === uploadRequestRef.current) setUploadError(t('logoUploadError'))
+      releaseReader()
+      if (!isStale()) setUploadError(t('logoUploadReadError'))
     }
     reader.onload = () => {
-      if (requestId !== uploadRequestRef.current) return
+      releaseReader()
+      if (isStale()) return
       const dataUrl = typeof reader.result === 'string' ? reader.result : null
       if (!dataUrl) {
-        setUploadError(t('logoUploadError'))
+        setUploadError(t('logoUploadReadError'))
         return
       }
 
       const img = new Image()
+      imageRef.current = img
+      const releaseImage = () => {
+        if (imageRef.current === img) imageRef.current = null
+        img.onload = null
+        img.onerror = null
+        img.src = ''
+      }
       img.onerror = () => {
-        if (requestId === uploadRequestRef.current) setUploadError(t('logoUploadError'))
+        releaseImage()
+        if (!isStale()) setUploadError(t('logoUploadDecodeError'))
       }
       img.onload = () => {
-        if (requestId !== uploadRequestRef.current) return
+        if (isStale()) {
+          releaseImage()
+          return
+        }
         try {
           const canvas = document.createElement('canvas')
           const sourceWidth = img.naturalWidth || img.width
@@ -102,10 +173,12 @@ export function LogoUploadArea() {
             setLogoUrl(resizedDataUrl)
             setUploadError(null)
           } catch {
-            setUploadError(t('logoUploadError'))
+            setUploadError(t('logoUploadPrepareError'))
           }
         } catch {
-          setUploadError(t('logoUploadError'))
+          if (!isStale()) setUploadError(t('logoUploadPrepareError'))
+        } finally {
+          releaseImage()
         }
       }
       img.src = dataUrl
@@ -114,12 +187,13 @@ export function LogoUploadArea() {
     try {
       reader.readAsDataURL(file)
     } catch {
-      if (requestId === uploadRequestRef.current) setUploadError(t('logoUploadError'))
+      releaseReader()
+      if (!isStale()) setUploadError(t('logoUploadReadError'))
     }
   }
 
   const handleDelete = () => {
-    uploadRequestRef.current += 1
+    cancelPendingUpload()
     setLogoUrl(null)
     setUploadError(null)
   }
@@ -133,6 +207,7 @@ export function LogoUploadArea() {
             <span className="text-xs font-semibold text-muted-foreground">{t('logoUploadLabel')}</span>
           </div>
           <input
+            ref={fileInputRef}
             id="logo-file-input"
             type="file"
             accept="image/*"
@@ -143,6 +218,15 @@ export function LogoUploadArea() {
         </div>
       ) : (
         <div className="space-y-4">
+          <input
+            ref={fileInputRef}
+            id="logo-file-input"
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="sr-only"
+            aria-label={t('logoUploadLabel')}
+          />
           <div className="group relative flex aspect-[2/1] w-full items-center justify-center overflow-hidden rounded-xl border border-border bg-card shadow-subtle">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={logoUrl} alt="Logo" className="max-w-[80%] max-h-[80%] object-contain" />
@@ -155,6 +239,12 @@ export function LogoUploadArea() {
             </button>
           </div>
           
+          <div className="flex gap-2">
+            <Button type="button" variant="outline" size="sm" className="h-10 flex-1 rounded-md" onClick={() => fileInputRef.current?.click()}>
+              <Upload className="size-3.5" aria-hidden="true" /> {t('logoChange')}
+            </Button>
+          </div>
+
           <div className="space-y-2">
             <Label className="block text-xs font-semibold text-foreground">{t('position')}</Label>
             <PositionGrid

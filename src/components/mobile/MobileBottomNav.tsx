@@ -13,8 +13,8 @@ export function MobileBottomNav({ activeSheet, onSelect }: MobileBottomNavProps)
   const t = useTranslations('MobileLayout')
   const items = [
     { id: 'image', label: t('navImage'), icon: ImageIcon },
-    { id: 'signature', label: t('navSignature'), icon: Type },
     { id: 'layout', label: t('navLayout'), icon: LayoutTemplate },
+    { id: 'signature', label: t('navSignature'), icon: Type },
     { id: 'export', label: t('navExport'), icon: Download },
   ] as const
 

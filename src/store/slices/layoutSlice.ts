@@ -5,7 +5,11 @@ import { DEFAULT_IMAGE_SHAPE, type ImageShape } from '@/lib/imageShapes'
 export type { LayoutPreset } from '@/lib/layoutTemplates'
 export type { ImageShape } from '@/lib/imageShapes'
 
-export type CanvasRatio = 'auto' | '16:9' | '2:1'
+/**
+ * The named profiles make the export intent explicit in the UI. `original`
+ * preserves the natural composition by default; `x` is the timeline profile.
+ */
+export type CanvasRatio = 'x' | 'original' | '2:1'
 export type BackgroundColor = 'white' | 'black' | 'light-gray' | 'transparent' | 'custom'
 export type CopyrightPosition = 'bottom-left' | 'bottom-center' | 'bottom-right'
 export type CopyrightColor = 'black' | 'white' | 'gray'
@@ -13,6 +17,7 @@ export type ImageTransition = 'none' | 'soft-blend'
 
 export interface LayoutSlice {
   layoutPreset: LayoutPreset
+  hasChosenLayout: boolean
   setLayoutPreset: (preset: LayoutPreset) => void
   canvasRatio: CanvasRatio
   setCanvasRatio: (ratio: CanvasRatio) => void
@@ -52,7 +57,8 @@ export interface LayoutSlice {
 
 export const initialLayoutState = {
   layoutPreset: 'split' as LayoutPreset,
-  canvasRatio: 'auto' as CanvasRatio,
+  hasChosenLayout: false,
+  canvasRatio: 'original' as CanvasRatio,
   backgroundColor: 'white' as BackgroundColor,
   customBackgroundColor: '#e6e8e4',
   imageGap: 24,
@@ -71,7 +77,7 @@ export const initialLayoutState = {
 export const createLayoutSlice: StateCreator<LayoutSlice, [], [], LayoutSlice> = (set) => ({
   ...initialLayoutState,
   
-  setLayoutPreset: (preset) => set({ layoutPreset: preset }),
+  setLayoutPreset: (preset) => set({ layoutPreset: preset, hasChosenLayout: true }),
   setCanvasRatio: (ratio) => set({ canvasRatio: ratio }),
   setImageGap: (gap) => set({ imageGap: gap }),
   setImageShape: (shape) => set({ imageShape: shape }),

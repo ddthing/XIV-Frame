@@ -43,7 +43,7 @@ export interface LayoutGeometry {
 export const LAYOUT_TEMPLATE_OPTIONS: readonly LayoutTemplateOption[] = [
   { id: 'split', group: 'two', minImages: 0, maxImages: MAX_IMAGE_COUNT, previewCount: 2, labelKey: 'presetSplit' },
   { id: 'vertical-split', group: 'two', minImages: 0, maxImages: MAX_IMAGE_COUNT, previewCount: 2, labelKey: 'presetVertical' },
-  { id: 'grid', group: 'three', minImages: 3, maxImages: 4, previewCount: 4, labelKey: 'presetGrid' },
+  { id: 'grid', group: 'four', minImages: 3, maxImages: 4, previewCount: 4, labelKey: 'presetGrid' },
   { id: 'feature-top', group: 'three', minImages: 3, maxImages: 4, previewCount: 3, labelKey: 'presetFeatureTop' },
   { id: 'feature-bottom', group: 'three', minImages: 3, maxImages: 4, previewCount: 3, labelKey: 'presetFeatureBottom' },
   { id: 'feature-left', group: 'three', minImages: 3, maxImages: 4, previewCount: 3, labelKey: 'presetFeatureLeft' },
@@ -181,15 +181,80 @@ function featureRightCells(imageCount: number): LayoutGeometry {
   }
 }
 
+function getTemplateGeometry(preset: LayoutPreset, previewCount: number): LayoutGeometry {
+  const count = Math.max(1, Math.min(MAX_IMAGE_COUNT, Math.floor(previewCount)))
+
+  switch (preset) {
+    case 'vertical-split':
+      return { effectivePreset: 'vertical-split', columns: 1, rows: count, cells: cellsInColumn(count) }
+    case 'grid':
+      return { effectivePreset: 'grid', columns: 2, rows: 2, cells: cellsInGrid(2, 2, 4) }
+    case 'feature-top':
+      return featureTopCells(Math.max(3, Math.min(4, count)))
+    case 'feature-bottom':
+      return featureBottomCells(Math.max(3, Math.min(4, count)))
+    case 'feature-left':
+      return featureLeftCells(Math.max(3, Math.min(4, count)))
+    case 'feature-right':
+      return featureRightCells(Math.max(3, Math.min(4, count)))
+    case 'columns-3':
+      return count === 4
+        ? {
+            effectivePreset: 'columns-3',
+            columns: 3,
+            rows: 2,
+            cells: [
+              { column: 0, row: 0 },
+              { column: 1, row: 0 },
+              { column: 2, row: 0 },
+              { column: 1, row: 1 },
+            ],
+          }
+        : { effectivePreset: 'columns-3', columns: 3, rows: 1, cells: cellsInRow(3) }
+    case 'rows-3':
+      return count === 4
+        ? {
+            effectivePreset: 'rows-3',
+            columns: 2,
+            rows: 3,
+            cells: [
+              { column: 0, row: 0 },
+              { column: 0, row: 1 },
+              { column: 0, row: 2 },
+              { column: 1, row: 1 },
+            ],
+          }
+        : { effectivePreset: 'rows-3', columns: 1, rows: 3, cells: cellsInColumn(3) }
+    case 'columns-4':
+      return { effectivePreset: 'columns-4', columns: 4, rows: 1, cells: cellsInRow(4) }
+    case 'rows-4':
+      return { effectivePreset: 'rows-4', columns: 1, rows: 4, cells: cellsInColumn(4) }
+    case 'matrix-3':
+      return { effectivePreset: 'matrix-3', columns: 3, rows: 3, cells: cellsInGrid(3, 3, 9) }
+    case 'matrix-4':
+      return { effectivePreset: 'matrix-4', columns: 4, rows: 4, cells: cellsInGrid(4, 4, 16) }
+    case 'split':
+    default:
+      return { effectivePreset: 'split', columns: count, rows: 1, cells: cellsInRow(count) }
+  }
+}
+
 export function getLayoutGeometry(preset: LayoutPreset | string | undefined, imageCount: number): LayoutGeometry {
   const count = Math.max(1, Math.min(MAX_IMAGE_COUNT, imageCount))
+  const template = LAYOUT_TEMPLATE_OPTIONS.find((option) => option.id === preset)
+
+  // Keep the selected composition while its slots are being filled. Overflow
+  // still falls back below so extra images remain visible instead of clipping.
+  if (template && imageCount < template.minImages) {
+    return getTemplateGeometry(template.id, template.previewCount)
+  }
 
   switch (preset) {
     case 'vertical-split':
       return { effectivePreset: 'vertical-split', columns: 1, rows: count, cells: cellsInColumn(count) }
     case 'grid':
       if (count >= 3 && count <= 4) {
-        return { effectivePreset: 'grid', columns: 2, rows: 2, cells: cellsInGrid(2, 2, count) }
+        return { effectivePreset: 'grid', columns: 2, rows: 2, cells: cellsInGrid(2, 2, 4) }
       }
       return { effectivePreset: 'split', columns: count, rows: 1, cells: cellsInRow(count) }
     case 'feature-top':
@@ -242,6 +307,39 @@ export function getLayoutGeometry(preset: LayoutPreset | string | undefined, ima
     default:
       return { effectivePreset: 'split', columns: count, rows: 1, cells: cellsInRow(count) }
   }
+}
+
+export function getLayoutGeometryImageCount(
+  preset: LayoutPreset | string | undefined,
+  imageCount: number,
+  preserveSelectedPreview = false,
+) {
+  const count = Math.max(0, Math.min(MAX_IMAGE_COUNT, Math.floor(imageCount)))
+  if (count === 0) return 2
+
+  // A selected two-slot composition must not collapse into a full-canvas
+  // single image while the user is filling its preview.
+  if (
+    preserveSelectedPreview
+    && count === 1
+    && (preset === 'split' || preset === 'vertical-split')
+  ) {
+    return 2
+  }
+
+  return count
+}
+
+export function getLayoutPreviewGeometry(preset: LayoutPreset | string | undefined): LayoutGeometry {
+  const option = LAYOUT_TEMPLATE_OPTIONS.find((template) => template.id === preset)
+  return getTemplateGeometry(option?.id ?? 'split', option?.previewCount ?? 2)
+}
+
+export function getRecommendedLayoutPreset(imageCount: number): LayoutPreset | undefined {
+  if (imageCount === 3 || imageCount === 4) return 'grid'
+  if (imageCount === 9) return 'matrix-3'
+  if (imageCount === 16) return 'matrix-4'
+  return undefined
 }
 
 export function isLayoutTemplateAvailable(preset: LayoutPreset | string | undefined, imageCount: number) {

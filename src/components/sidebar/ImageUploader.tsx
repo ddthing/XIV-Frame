@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent as ReactMouseEvent } from 'react'
-import { AlertCircle, ArrowLeftRight, ChevronLeft, ChevronRight, Lock, RefreshCw, Trash2, Unlock, Upload, UserRound, X } from 'lucide-react'
+import { AlertCircle, ArrowLeftRight, ChevronLeft, ChevronRight, ImagePlus, LoaderCircle, Lock, RefreshCw, Trash2, Unlock, Upload, UserRound, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -11,43 +11,49 @@ import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { SketchbookTabsList, SketchbookTabsTrigger } from '@/components/ui/SketchbookTabs'
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
-import { ImageUploadError, prepareImageForCanvas, revokeObjectUrl } from '@/lib/imageUpload'
+import { ImageUploadError, getImagePreparationMaxDimension, prepareImageForCanvas, revokeObjectUrl } from '@/lib/imageUpload'
 import { MAX_IMAGE_COUNT } from '@/lib/imageLimits'
 import { nudgeImagePosition, type ImageNudgeDirection } from '@/lib/imagePosition'
 import { LazyCharacterSettings } from './LazySettings'
 import { ImagePositionControls } from './ImagePositionControls'
 
-type PendingUpload = { requestId: number; sourceUrl: string | undefined }
+type PendingUpload = { requestId: number; sourceUrl: string | undefined; controller: AbortController }
 
 export function ImageUploader() {
   const {
     images,
+    resetVersion,
     setImages,
     setImageAt,
     removeImageAt,
     swapImages,
     imagePositions,
     imageScales,
+    selectedImageIndex,
     setImageScale,
     setImagePosition,
+    setSelectedImageIndex,
     isImageLocked,
     setIsImageLocked,
   } = useStore(useShallow(state => ({
     images: state.images,
+    resetVersion: state.resetVersion,
     setImages: state.setImages,
     setImageAt: state.setImageAt,
     removeImageAt: state.removeImageAt,
     swapImages: state.swapImages,
     imagePositions: state.imagePositions,
     imageScales: state.imageScales,
+    selectedImageIndex: state.selectedImageIndex,
     setImageScale: state.setImageScale,
     setImagePosition: state.setImagePosition,
+    setSelectedImageIndex: state.setSelectedImageIndex,
     isImageLocked: state.isImageLocked,
     setIsImageLocked: state.setIsImageLocked,
   })))
   const t = useTranslations('ImageUploader')
-  const [selectedIndex, setSelectedIndex] = useState(0)
   const [uploadError, setUploadError] = useState<string | null>(null)
+  const [pendingUploads, setPendingUploads] = useState<Set<number>>(() => new Set())
   const uploadRequests = useRef(new Map<number, PendingUpload>())
   const mountedRef = useRef(true)
 
@@ -56,9 +62,19 @@ export function ImageUploader() {
     mountedRef.current = true
     return () => {
       mountedRef.current = false
+      requests.forEach((pending) => pending.controller.abort())
       requests.clear()
     }
   }, [])
+
+  const lastResetVersionRef = useRef(resetVersion)
+  useEffect(() => {
+    if (lastResetVersionRef.current === resetVersion) return
+    lastResetVersionRef.current = resetVersion
+    uploadRequests.current.forEach((pending) => pending.controller.abort())
+    uploadRequests.current.clear()
+    setPendingUploads(new Set())
+  }, [resetVersion])
 
   useEffect(() => {
     const handleCanvasUploadError = (event: Event) => {
@@ -73,34 +89,57 @@ export function ImageUploader() {
   useEffect(() => {
     uploadRequests.current.forEach((pending, index) => {
       if (images[index] !== pending.sourceUrl) {
+        pending.controller.abort()
         uploadRequests.current.set(index, { ...pending, requestId: pending.requestId + 1 })
+        setPendingUploads((current) => {
+          if (!current.has(index)) return current
+          const next = new Set(current)
+          next.delete(index)
+          return next
+        })
       }
     })
   }, [images])
 
+  const setUploadPending = (index: number, pending: boolean) => {
+    setPendingUploads((current) => {
+      const next = new Set(current)
+      if (pending) next.add(index)
+      else next.delete(index)
+      return next
+    })
+  }
+
   const beginUpload = (index: number) => {
+    uploadRequests.current.get(index)?.controller.abort()
     const requestId = (uploadRequests.current.get(index)?.requestId ?? 0) + 1
-    uploadRequests.current.set(index, { requestId, sourceUrl: images[index] })
-    return requestId
+    const controller = new AbortController()
+    uploadRequests.current.set(index, { requestId, sourceUrl: images[index], controller })
+    return { requestId, signal: controller.signal }
   }
 
   const invalidateUpload = (index: number) => {
     const pending = uploadRequests.current.get(index)
     if (!pending) return
+    pending.controller.abort()
     uploadRequests.current.set(index, {
       requestId: pending.requestId + 1,
       sourceUrl: pending.sourceUrl,
+      controller: pending.controller,
     })
+    setUploadPending(index, false)
   }
 
   const invalidateAllUploads = () => {
     uploadRequests.current.forEach((pending, index) => {
+      pending.controller.abort()
       uploadRequests.current.set(index, { ...pending, requestId: pending.requestId + 1 })
     })
+    setPendingUploads(new Set())
   }
 
   const imageCount = images.filter(Boolean).length
-  const activeIndex = images[selectedIndex] ? selectedIndex : images.findIndex(Boolean)
+  const activeIndex = images[selectedImageIndex] ? selectedImageIndex : images.findIndex(Boolean)
   const activeImage = activeIndex >= 0 ? images[activeIndex] : undefined
   const activePosition = activeIndex >= 0 ? imagePositions[activeIndex] || { x: 0, y: 0 } : { x: 0, y: 0 }
   const activeScale = activeIndex >= 0 ? imageScales[activeIndex] || 1 : 1
@@ -113,11 +152,20 @@ export function ImageUploader() {
     input.onchange = (event) => {
       const file = (event.target as HTMLInputElement).files?.[0]
       if (!file) return
-      const requestId = beginUpload(index)
+      const { requestId, signal } = beginUpload(index)
+      setUploadPending(index, true)
+      const uploadVersion = useStore.getState().resetVersion
+      const currentImages = useStore.getState().images
+      const targetImageCount = currentImages.filter(Boolean).length + (currentImages[index] ? 0 : 1)
+      const maxDimension = getImagePreparationMaxDimension(targetImageCount)
 
-      void prepareImageForCanvas(file)
+      void prepareImageForCanvas(file, signal, { maxDimension })
         .then((url) => {
-          if (!mountedRef.current || uploadRequests.current.get(index)?.requestId !== requestId) {
+          if (
+            !mountedRef.current
+            || uploadRequests.current.get(index)?.requestId !== requestId
+            || useStore.getState().resetVersion !== uploadVersion
+          ) {
             revokeObjectUrl(url)
             return
           }
@@ -125,14 +173,20 @@ export function ImageUploader() {
           setImageAt(index, url)
           setImageScale(index, 1)
           setImagePosition(index, { x: 0, y: 0 })
-          setSelectedIndex(index)
+          setSelectedImageIndex(index)
           setUploadError(null)
           uploadRequests.current.delete(index)
+          setUploadPending(index, false)
         })
         .catch((error: unknown) => {
-          if (!mountedRef.current || uploadRequests.current.get(index)?.requestId !== requestId) return
+          if (
+            !mountedRef.current
+            || uploadRequests.current.get(index)?.requestId !== requestId
+            || useStore.getState().resetVersion !== uploadVersion
+          ) return
           setUploadError(error instanceof ImageUploadError && error.code === 'too-large' ? t('uploadLimit') : t('uploadError'))
           uploadRequests.current.delete(index)
+          setUploadPending(index, false)
         })
     }
     input.click()
@@ -145,19 +199,19 @@ export function ImageUploader() {
     invalidateUpload(index)
     invalidateUpload(targetIndex)
     swapImages(index, targetIndex)
-    if (selectedIndex === index) setSelectedIndex(targetIndex)
-    else if (selectedIndex === targetIndex) setSelectedIndex(index)
+    if (selectedImageIndex === index) setSelectedImageIndex(targetIndex)
+    else if (selectedImageIndex === targetIndex) setSelectedImageIndex(index)
   }
 
   const handleRemove = (event: ReactMouseEvent, index: number) => {
     event.stopPropagation()
     invalidateUpload(index)
     removeImageAt(index)
-    setSelectedIndex((current) => Math.max(0, Math.min(current, images.length - 2)))
   }
 
   const handleSelect = (index: number) => {
-    if (images[index]) setSelectedIndex(index)
+    if (pendingUploads.has(index)) return
+    if (images[index]) setSelectedImageIndex(index)
     else handleFileUpload(index)
   }
 
@@ -179,7 +233,7 @@ export function ImageUploader() {
     if (!direction || !images[index]) return
 
     event.preventDefault()
-    setSelectedIndex(index)
+    setSelectedImageIndex(index)
     if (isImageLocked) return
 
     const position = imagePositions[index] || { x: 0, y: 0 }
@@ -223,10 +277,12 @@ export function ImageUploader() {
             const image = images[index]
             if (index > 1 && !images[index - 1] && !image) return null
             const selected = Boolean(image) && activeIndex === index
+            const uploading = pendingUploads.has(index)
 
             return (
               <div
                 key={index}
+                aria-busy={uploading}
                 className={`group relative aspect-[4/3] overflow-hidden rounded-xl border bg-card transition-all ${
                   selected
                     ? 'border-primary shadow-[inset_0_0_0_2px_var(--accent),var(--shadow-subtle)]'
@@ -240,12 +296,13 @@ export function ImageUploader() {
                   aria-keyshortcuts={image ? 'ArrowUp ArrowDown ArrowLeft ArrowRight Shift+ArrowUp Shift+ArrowDown Shift+ArrowLeft Shift+ArrowRight' : undefined}
                   onClick={() => handleSelect(index)}
                   onKeyDown={(event) => handleImageKeyDown(event, index)}
+                  disabled={uploading}
                   className="absolute inset-0 z-0 flex cursor-pointer overflow-hidden rounded-[inherit] text-left focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
                 >
                   {image ? (
                     <>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={image} alt={`${t('imagePreview')} ${index + 1}`} className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" />
+                      <img src={image} alt={`${t('imagePreview')} ${index + 1}`} className={`size-full object-cover transition-[transform,filter,opacity] duration-300 group-hover:scale-[1.02] ${uploading ? 'opacity-45 blur-[1px]' : ''}`} />
                       <span className="pointer-events-none absolute inset-0 bg-primary/45 opacity-0 transition-opacity duration-200 group-hover:opacity-100" aria-hidden="true" />
                     </>
                   ) : (
@@ -258,23 +315,32 @@ export function ImageUploader() {
 
                 {image && (
                   <>
+                    {uploading && (
+                      <span role="status" className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-background/45 px-2 text-[11px] font-semibold text-foreground">
+                        <span className="inline-flex items-center gap-1.5 rounded-md border border-border/80 bg-background/95 px-2.5 py-1.5 shadow-subtle">
+                          <LoaderCircle className="size-3.5 animate-spin" aria-hidden="true" />
+                          {t('changing')}
+                        </span>
+                      </span>
+                    )}
                     <div className={`absolute inset-x-2 bottom-2 z-20 flex min-w-0 items-center justify-center gap-1.5 transition-opacity duration-200 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'}`}>
                       {index > 0 && images[index - 1] && (
-                        <button type="button" aria-label={t('movePrevious')} onClick={(event) => handleMove(event, index, 'prev')} className="grid size-[32px] shrink-0 place-items-center rounded-md border border-primary-foreground/20 bg-background/95 text-foreground shadow-subtle transition-colors hover:bg-background">
+                        <button type="button" aria-label={t('movePrevious')} disabled={uploading} onClick={(event) => handleMove(event, index, 'prev')} className="grid size-[32px] shrink-0 place-items-center rounded-md border border-primary-foreground/20 bg-background/95 text-foreground shadow-subtle transition-colors hover:bg-background disabled:pointer-events-none disabled:opacity-50">
                           <ChevronLeft className="size-4" aria-hidden="true" />
                         </button>
                       )}
-                      <button type="button" aria-label={t('change')} onClick={() => handleFileUpload(index)} className="h-[32px] min-h-[32px] min-w-0 flex-1 truncate rounded-md border border-primary-foreground/20 bg-background/95 px-2 text-[11px] font-semibold leading-none whitespace-nowrap text-foreground shadow-subtle transition-colors hover:bg-background">
-                        {t('change')}
-                      </button>
                       {index < images.length - 1 && images[index + 1] && (
-                        <button type="button" aria-label={t('moveNext')} onClick={(event) => handleMove(event, index, 'next')} className="grid size-[32px] shrink-0 place-items-center rounded-md border border-primary-foreground/20 bg-background/95 text-foreground shadow-subtle transition-colors hover:bg-background">
+                        <button type="button" aria-label={t('moveNext')} disabled={uploading} onClick={(event) => handleMove(event, index, 'next')} className="grid size-[32px] shrink-0 place-items-center rounded-md border border-primary-foreground/20 bg-background/95 text-foreground shadow-subtle transition-colors hover:bg-background disabled:pointer-events-none disabled:opacity-50">
                           <ChevronRight className="size-4" aria-hidden="true" />
                         </button>
                       )}
                     </div>
                     <span className="pointer-events-none absolute left-2 top-2 z-10 grid size-6 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 font-mono text-[10px] font-bold tabular-nums text-foreground shadow-subtle" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-                    <button type="button" aria-label={t('deleteImage')} onClick={(event) => handleRemove(event, index)} className={`absolute right-2 top-2 z-20 grid size-7 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 text-foreground shadow-subtle transition-all hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'}`}>
+                    <button type="button" data-photo-change-affordance aria-label={t('change')} title={t('change')} disabled={uploading} onClick={() => handleFileUpload(index)} className="absolute right-2 top-2 z-30 inline-flex h-7 items-center gap-1 rounded-md border border-primary-foreground/20 bg-background/95 px-2 text-[10px] font-semibold text-foreground shadow-subtle transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-60">
+                      <ImagePlus className="size-3.5" aria-hidden="true" />
+                      {t('change')}
+                    </button>
+                    <button type="button" aria-label={t('deleteImage')} disabled={uploading} onClick={(event) => handleRemove(event, index)} className={`absolute right-2 top-11 z-20 grid size-7 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 text-foreground shadow-subtle transition-all hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'}`}>
                       <X className="size-3.5" aria-hidden="true" />
                     </button>
                   </>
@@ -288,7 +354,7 @@ export function ImageUploader() {
               <Button variant="outline" size="sm" className="h-10 flex-1 rounded-md text-xs" onClick={() => swapImages(0, 1)} disabled={images.length < 2 || !images[0] || !images[1]}>
                 <ArrowLeftRight className="size-3.5" /> {t('swapOrder')}
               </Button>
-              <Button variant="outline" size="sm" className="h-10 flex-1 rounded-md text-xs hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive" onClick={() => { if (!window.confirm(t('clearConfirm'))) return; invalidateAllUploads(); setImages([]); setSelectedIndex(0) }} disabled={imageCount === 0}>
+              <Button variant="outline" size="sm" className="h-10 flex-1 rounded-md text-xs hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive" onClick={() => { if (!window.confirm(t('clearConfirm'))) return; invalidateAllUploads(); setImages([]); setSelectedImageIndex(0) }} disabled={imageCount === 0}>
                 <Trash2 className="size-3.5" /> {t('clearAll')}
               </Button>
             </div>

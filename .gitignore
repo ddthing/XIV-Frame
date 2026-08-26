@@ -12,11 +12,14 @@
 
 # testing
 /coverage
+/test-results/
+/playwright-report/
 
 # next.js
 /.next/
 /out/
 /public/vendor/transformers.web.min.js
+/public/vendor/onnxruntime/
 
 # production
 /build

@@ -1,8 +1,8 @@
 ---
 title: "Uploading large FFXIV screenshots: protect quality and browser performance"
-description: "Understand the 50 MB limit, prepare large screenshots safely, and use browser optimization without losing the details that matter in the final PNG."
+description: "Understand the 50 MB limit, prepare large screenshots safely, and use browser optimization without losing the details that matter in the exported result."
 date: "2026-08-22"
-updated: "2026-08-22"
+updated: "2026-08-26"
 category: "Files and performance"
 tags: ["ffxiv", "performance", "image-size"]
 ---
@@ -59,6 +59,6 @@ Canvas zoom changes how you inspect the work; it does not by itself increase the
 
 ## A practical export rule
 
-Keep an original archive and a lighter publishing copy. For a social preview, match the long side to the destination's real display size. For printing or future editing, keep the original separately. XIV Frame does not keep a project file on the server, so storing the source screenshots beside the exported PNG makes a later revision much easier.
+Keep an original archive and a lighter publishing copy. For a social preview, match the long side to the destination's real display size. For printing or future editing, keep the original separately. XIV Frame does not keep a project file on the server. PNG is preferred, but an opaque result over 5 MB is automatically downloaded as a high-quality JPEG; a transparent PNG that cannot fit under 5 MB shows guidance instead of downloading.
 
 Removing the limit without considering device memory would not make every device more reliable. A smaller, valid input lets the browser optimization and canvas rendering complete predictably.

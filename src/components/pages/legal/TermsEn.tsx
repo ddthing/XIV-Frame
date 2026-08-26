@@ -8,7 +8,7 @@ export function TermsEn() {
       title="Terms of Service"
       description="The service scope and user responsibilities for using XIV Frame safely and predictably."
       updatedLabel="Effective"
-      updated="August 22, 2026"
+      updated="August 26, 2026"
       asideLabel="On this page"
       sections={[
         {
@@ -17,7 +17,7 @@ export function TermsEn() {
           title: 'Service scope',
           children: (
             <>
-              <p>XIV Frame is a free web tool for composing Final Fantasy XIV screenshots in a browser and saving the result as a PNG. It currently does not provide accounts, sign-in, paid plans, or server-side project storage.</p>
+              <p>XIV Frame is a free web tool for composing Final Fantasy XIV screenshots in a browser and saving the result. PNG is preferred, but an opaque result over 5 MB may be automatically optimized as a high-quality JPEG. It currently does not provide accounts, sign-in, paid plans, or server-side project storage.</p>
               <p>The features and supported formats shown in the editor may change for operational or technical reasons.</p>
             </>
           ),
@@ -90,7 +90,7 @@ export function TermsEn() {
             <>
               <p>We may update these terms when the service, applicable requirements, or operating practices change. Revised terms will be posted on this page with an updated effective date.</p>
               <p>For questions about these terms or the service, use the <Link href="/en/contact">contact page</Link>.</p>
-              <p>Last updated: August 22, 2026.</p>
+              <p>Last updated: August 26, 2026.</p>
             </>
           ),
         },

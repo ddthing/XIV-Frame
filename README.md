@@ -1,6 +1,6 @@
 # XIV Frame
 
-파이널판타지14 스크린샷을 한 장의 PNG로 구성하는 브라우저 기반 편집기입니다. 사진을 배치하고, 레이아웃과 시그니처를 조정하고, 배경 제거가 필요한 이미지 요소를 합성한 뒤 결과물을 저장합니다.
+파이널판타지14 스크린샷을 한 장의 이미지로 구성하는 브라우저 기반 편집기입니다. 사진을 배치하고, 레이아웃과 시그니처를 조정하고, 배경 제거가 필요한 이미지 요소를 합성한 뒤 결과 파일을 저장합니다.
 
 XIV Frame의 기준은 단순합니다. 편집은 즉시 보여야 하고, 원본 이미지는 사용자의 기기를 벗어나지 않아야 하며, 데스크톱과 모바일에서 같은 작업 흐름을 제공해야 합니다.
 
@@ -8,9 +8,10 @@ XIV Frame의 기준은 단순합니다. 편집은 즉시 보여야 하고, 원�
 
 ### 사진 구성
 
-- 사진을 최대 16장까지 추가합니다. 3×3·4×4 격자 템플릿은 각각 9장·16장의 사진을 사용합니다.
-- 가로 분할, 세로 분할, 바둑판 배치를 선택합니다.
-- 자동, 16:9, 2:1 캔버스 비율을 제공합니다.
+- 사진을 최대 16장까지 추가합니다. 레이아웃을 먼저 고르면 빈 슬롯이 미리 보이며, 빈 카드를 클릭하거나 파일을 놓아 바로 채울 수 있습니다.
+- 가로 분할, 세로 분할, 2×2 네 칸의 바둑판 배치를 선택합니다. 바둑판은 3~4장에 사용하며, 3장일 때는 한 칸이 비어 있습니다.
+- 3×3·4×4 격자 템플릿은 각각 9장·16장의 사진을 사용합니다.
+- 원본 비율을 기본으로, X 타임라인용 16:9와 2:1 캔버스 비율을 제공합니다.
 - 사진별 배율과 위치를 조정하고, 순서를 바꾸거나 개별 사진을 교체합니다.
 - 사진 사이 간격, 자연스러운 연결 효과, 테두리, 배경, 필름 노이즈를 조정합니다.
 
@@ -32,7 +33,7 @@ XIV Frame의 기준은 단순합니다. 편집은 즉시 보여야 하고, 원�
 
 ### 저장과 접근성
 
-- 결과물을 PNG로 저장합니다.
+- 결과물은 PNG를 우선 저장하며, X의 5MB 제한을 넘는 불투명 결과는 고화질 JPEG로 자동 최적화합니다.
 - 미리보기 확대/축소와 저장되는 이미지의 해상도는 분리되어 있습니다.
 - 이미지 카드와 합성 요소는 키보드로 선택하고 이동할 수 있습니다.
 - 포커스 표시, 오류 알림, 처리 진행률을 보조기술에 전달합니다.
@@ -41,22 +42,22 @@ XIV Frame의 기준은 단순합니다. 편집은 즉시 보여야 하고, 원�
 ## 사용 순서
 
 1. **사진 추가**
-   이미지 탭에서 빈 카드에 사진을 추가합니다. 사진이 추가된 순서가 기본 구성 순서가 됩니다.
+   데스크톱의 **이미지 소스** 탭 또는 모바일 하단의 **사진**에서 빈 카드에 사진을 추가합니다. 레이아웃을 먼저 선택한 경우에도 미리보기의 빈 슬롯을 클릭하거나 파일을 놓아 채울 수 있으며, 사진이 추가된 순서가 기본 구성 순서가 됩니다.
 
 2. **레이아웃 선택**
-   레이아웃 탭에서 사진 수와 보여주고 싶은 흐름에 맞는 배치를 선택합니다. 3~4장은 바둑판, 9장은 3×3, 16장은 4×4 격자를 사용할 수 있습니다.
+   데스크톱의 **레이아웃** 탭 또는 모바일 하단의 **레이아웃**에서 사진 수와 보여주고 싶은 흐름에 맞는 배치를 선택합니다. 3~4장은 2×2 네 칸의 **바둑판**, 9장은 **3×3**, 16장은 **4×4** 격자를 사용할 수 있습니다. 비율은 데스크톱 미리보기 상단에서, 모바일에서는 **저장 → 비율 설정**에서 바꿉니다.
 
 3. **사진별 구도 조정**
    사진 카드를 선택하고 배율과 위치를 조정합니다. 데스크톱에서는 캔버스에서 드래그하거나 방향키를 사용할 수 있습니다.
 
 4. **합성 요소 추가**
-   이미지 탭의 합성에서 PNG 요소를 추가합니다. 필요하면 브라우저에서 배경을 제거하고, 브러시로 가장자리를 보정합니다.
+   데스크톱의 **이미지 소스 → 합성**, 모바일 **사진** 메뉴의 합성 영역에서 PNG 요소를 추가합니다. 필요하면 브라우저에서 배경을 제거하고, 브러시로 가장자리를 보정합니다. 첫 실행은 모델 준비 때문에 느릴 수 있으며, 오류 문구가 안내하는 네트워크·브라우저·메모리·파일·시간 초과 원인을 먼저 확인합니다.
 
 5. **시그니처 구성**
    시그니처 탭의 텍스트에서 이름과 서버명 등을 입력합니다. 로고는 로고 업로드에서 추가하고, 저작권 표시는 텍스트 영역에서 관리합니다.
 
-6. **PNG 저장**
-   미리보기에서 가장자리, 얼굴, 텍스트가 잘리지 않았는지 확인한 뒤 상단 또는 하단의 저장 버튼을 누릅니다.
+6. **결과 저장**
+   미리보기에서 가장자리, 얼굴, 텍스트가 잘리지 않았는지 확인한 뒤 데스크톱의 **저장 PNG**, 모바일의 **저장 → 사진 저장하기**를 누릅니다. PNG를 우선 저장하지만, 5MB를 넘는 불투명 결과는 고화질 JPEG로 자동 저장됩니다. 투명 PNG를 5MB 이하로 만들 수 없으면 파일을 만들지 않고 안내합니다.
 
 처음 사용하는 방법은 [가이드](https://xiv-frame.pages.dev/ko/blog)에서 실제 화면 순서대로 확인할 수 있습니다. 문제 해결은 [자주 묻는 질문](https://xiv-frame.pages.dev/ko/faq)을 참고하세요.
 
@@ -66,7 +67,7 @@ XIV Frame의 기준은 단순합니다. 편집은 즉시 보여야 하고, 원�
 
 - 선택한 스크린샷은 XIV Frame의 이미지 서버나 사용자 계정으로 업로드하지 않습니다.
 - 큰 이미지는 편집에 맞는 크기와 형식으로 브라우저에서 최적화합니다.
-- 배경 제거는 브라우저 Worker에서 실행되며, 데스크톱에서는 WebGPU를 우선 사용하고 필요하면 WASM으로 대체합니다.
+- 배경 제거는 브라우저 Worker에서 실행되며, 데스크톱에서는 WebGPU를 우선 사용하고 필요하면 WASM으로 대체합니다. 모델 준비·브라우저 지원·메모리·이미지 처리·시간 초과에 따라 오류 안내가 달라집니다.
 - 배경 제거 모델 파일은 첫 실행 시 외부 모델 저장소에서 내려받아 브라우저 캐시에 저장합니다. 모델 다운로드와 이미지 업로드는 서로 다른 작업입니다.
 - 스크린샷과 현재 캔버스의 Blob URL은 새로고침 후 유지되지 않습니다. 원본 파일은 사용자가 별도로 보관해야 합니다.
 - 레이아웃, 시그니처, 로고 등 일부 설정은 localStorage에 저장될 수 있습니다. 브라우저 데이터를 삭제하거나 저장공간이 부족하면 설정이 초기화될 수 있습니다.
@@ -80,10 +81,10 @@ XIV Frame은 계정, 로그인, 유료 플랜, 서버 기반 프로젝트 보관
 | 사진 개수 | 최대 16장 |
 | 파일 크기 | 파일 하나당 최대 50MB |
 | 지원 형식 | AVIF, BMP, GIF, JPG/JPEG, PNG, WebP |
-| 일반 이미지 정규화 | 긴 변 최대 4096px |
+| 일반 이미지 정규화 | 이미지 수에 따라 긴 변 최대 4096·3072·2048·1536px |
 | 합성 이미지 전처리 | 데스크톱 최대 1536px, 모바일 최대 1024px |
 | 배경 제거 | 브라우저 모델 실행, 첫 실행 시 준비 시간과 모델 다운로드 필요 |
-| 결과 저장 | PNG |
+| 결과 저장 | PNG 우선, 필요 시 고화질 JPEG로 자동 최적화 (다운로드 파일은 5MB 이하; 투명 PNG는 압축 불가 시 안내) |
 
 파일 크기와 처리 시간은 브라우저, 기기 메모리, GPU 지원 여부에 따라 달라집니다. 특히 모바일에서 처음 배경 제거를 실행할 때는 화면을 닫지 않고 완료를 기다려야 합니다.
 
@@ -117,10 +118,22 @@ XIV Frame은 계정, 로그인, 유료 플랜, 서버 기반 프로젝트 보관
 
     scripts/
     ├─ sync-transformers-worker.mjs
+    ├─ run-e2e.mjs
+    ├─ measure-upload-performance.mjs
     ├─ validate-content.mjs
-    └─ validate-static-output.mjs
+    ├─ validate-static-output.mjs
+    ├─ validate-image-render-tree.mjs
+    ├─ validate-image-layout.mjs
+    ├─ validate-character-pixels.mjs
+    ├─ validate-cancellation-gate.mjs
+    ├─ validate-fallback-queue.mjs
+    ├─ validate-pipeline-cache.mjs
+    ├─ validate-upload-concurrency.mjs
+    ├─ validate-browser-capabilities.mjs
+    ├─ verify-character-guide.mjs
+    └─ verify-character-scale.mjs
 
-`sync-transformers-worker.mjs`는 개발 서버와 빌드 전에 Transformers.js Worker 번들을 `public/vendor`에 동기화합니다. `validate-content.mjs`는 8개 가이드의 3개 언어 파일, front matter, 본문 구조와 번호 단계를 확인합니다. `validate-static-output.mjs`는 빌드 후 HTML의 색인 신호, 광고 태그, 사이트맵과 내부 링크를 확인합니다. 생성된 Worker 번들과 `out/`은 저장소에 커밋하지 않습니다.
+`sync-transformers-worker.mjs`는 개발 서버와 빌드 전에 Transformers.js Worker 번들을 `public/vendor`에 동기화합니다. `validate-content.mjs`는 8개 가이드의 3개 언어 파일, front matter, 본문 구조와 번호 단계를 확인합니다. `validate-static-output.mjs`는 빌드 후 HTML의 색인 신호, 광고 태그, 사이트맵과 내부 링크를 확인합니다. `validate-*.mjs`는 캔버스 렌더 트리, 이미지 레이아웃, 문자 픽셀 버퍼, 취소·fallback·pipeline cache, 업로드 동시성, 브라우저 메모리 정책을 점검합니다. 생성된 Worker 번들과 `out/`은 저장소에 커밋하지 않습니다.
 
 ## 로컬 개발
 
@@ -139,9 +152,20 @@ XIV Frame은 계정, 로그인, 유료 플랜, 서버 기반 프로젝트 보관
 ### 검증 명령
 
     npm run content:check
+    npm run render:check
+    npm run test:e2e
+    npm run test:background:live
     npm run lint
     npx tsc --noEmit
     npm run build
+
+`npm run render:check`는 공유 Konva 레이어, soft-blend 오프스크린 마스크와 단일 hit layer, 부분 이미지 로드 후 원본 슬롯 매핑, Blob URL과 취소 게이트를 정적으로 확인합니다. `npm run test:e2e`는 [`e2e/editor.spec.ts`](e2e/editor.spec.ts)를 Chromium에서 실행하며, 정상·혼합 비율 렌더링, 이미지 디코드 부분 실패 복구, 업로드·교체·초기화 취소, 문자·로고·Worker·export 수명 주기, 설정 보존과 반응형 셸을 회귀 확인합니다.
+
+`npm run test:background:live`는 테스트용 Worker를 사용하지 않고 실제 배경 제거 Worker와 외부 모델 저장소를 호출합니다. 모델 결과 이미지가 표시되는지, 모델 요청 실패가 없는지 확인하므로 네트워크가 필요하며, 실패하면 출력된 요청 오류와 원인별 사용자 메시지를 함께 확인합니다. 모바일 조건은 `npm run test:background:live -- --mobile`로 실행합니다. Windows Chrome에서 표시되는 `powerPreference ... ignored ... on Windows` 경고는 결과·모델 요청 실패가 없는 경우 Chrome/ONNX Runtime의 비차단 경고이며, [Chromium 이슈 369219127](https://issues.chromium.org/issues/369219127)과 연결됩니다. 일반 회귀 테스트와 분리해 외부 모델 저장소의 일시적 장애가 CI 전체를 흔들지 않도록 합니다.
+
+로컬 Chrome에서 Android User-Agent·터치·390×844 조건의 업로드 준비 시간을 확인하려면 `npm run perf:upload`를 실행합니다. 기본 3회 측정의 최소·평균·최대 처리 시간과 업로드 중 관측된 JS peak heap 변화를 출력하며, 반복 횟수와 고해상도 fixture는 `npm run perf:upload -- --runs=5 --dimension=4096`처럼 조정할 수 있습니다. 이 명령은 실제 모바일 기기의 메모리 기준을 대신하지는 않습니다.
+
+soft-blend의 레이어 수와 캔버스 backing-store 면적은 `npm run perf:soft-blend`로 확인합니다. 기본 16장 기준으로 이미지별 오프스크린 마스크를 공유 visual layer에 합성하고, 단일 interaction layer를 유지하는지 측정합니다.
 
 `npm run build`는 `prebuild`에서 Worker와 콘텐츠를 확인하고, 정적 결과물을 `out/`에 생성한 뒤 `postbuild` 검사를 실행합니다. 현재 기준으로 정적 페이지 54개, HTML 51개, 사이트맵 URL 45개를 검사합니다.
 
@@ -168,7 +192,7 @@ NEXT_PUBLIC_SITE_URL은 canonical URL, sitemap, robots, RSS, 구조화 데이터
 - /: 한국어 공개 랜딩
 - /en/landing, /ja/landing: 영어·일본어 공개 랜딩
 - /ko, /en, /ja: 기존 편집기 진입점(`noindex`, 사용자 설정·북마크 보존)
-- /{locale}/blog: 사용 가이드
+- /{locale}/blog: 사용 가이드(사진 추가·레이아웃·합성·시그니처·저장)
 - /{locale}/faq: 자주 묻는 질문
 - /{locale}/about: 서비스 소개
 - /{locale}/contact: 문의
@@ -184,7 +208,7 @@ NEXT_PUBLIC_SITE_URL은 canonical URL, sitemap, robots, RSS, 구조화 데이터
 
 ### 설정값 보존
 
-편집 설정은 Zustand `persist`로 `localStorage`에 저장됩니다. 저장소 키는 `xiv-frame-settings-v2`이며, 구현은 [`src/store/useStore.ts`](src/store/useStore.ts)에 있습니다.
+편집 설정은 Zustand `persist`로 `localStorage`에 저장됩니다. 일반 설정은 `xiv-frame-settings-v2`, 큰 로고 데이터는 `xiv-frame-logo-v1` 키를 사용하며, 구현은 [`src/store/useStore.ts`](src/store/useStore.ts)에 있습니다. 로고를 별도 키로 분리해 슬라이더나 텍스트를 조정할 때 큰 데이터 URL을 반복해서 직렬화하지 않습니다.
 
 사용자 설정과 관련된 코드를 수정할 때는 다음 순서를 지킵니다.
 
@@ -220,9 +244,19 @@ FAQ·소개·정책 문서는 `src/components/pages/`의 언어별 컴포넌트�
 
 ### 캔버스와 성능
 
-- 배경 제거 연산은 [`src/lib/backgroundRemoval.ts`](src/lib/backgroundRemoval.ts)의 Worker 우선 경로를 유지합니다.
-- 이미지 파일을 불필요하게 Base64로 복제하지 말고 Blob URL 수명을 관리합니다.
+- 배경 제거 연산은 [`src/lib/backgroundRemoval.ts`](src/lib/backgroundRemoval.ts)의 Worker 우선 경로를 유지하며, 모델은 사용자가 배경 제거를 명시적으로 실행할 때 준비합니다.
+- 초기화·탭 이탈 시 Worker와 fallback 호출을 취소하고, 두 경로의 모델은 활성 작업이 끝난 뒤 30초 유휴 상태에서 해제합니다. 모델 네트워크 오류가 발생해도 명시적인 다음 실행에서는 Worker 가용성을 다시 평가해 일시적 실패 후 회복할 수 있습니다.
+- 일반 사진과 합성 요소 업로드는 reset·교체·unmount 시 이미지 디코드를 중단하고, 진행 중인 Canvas 변환의 늦은 결과를 폐기합니다. `KonvaStage`의 pending 이미지 디코드와 비활성 URL 캐시도 같은 수명 주기를 따라 정리합니다.
+- `KonvaStage`는 캐시되었거나 먼저 끝난 이미지부터 점진적으로 렌더링하고, `Promise.allSettled`로 이미지별 성공 결과를 수집하므로 한 이미지 디코드가 실패해도 성공한 이미지는 계속 렌더링합니다. 실패 시 `PreviewCanvas`에 오류를 전달해 사용자에게 업로드 오류를 표시합니다.
+- `ImageGridLayer`는 화면에 표시된 순서와 Zustand의 원본 슬롯 인덱스를 분리합니다. 부분 로드나 실패 뒤에도 드래그·배율·교체가 올바른 원본 사진을 수정하는지 확인합니다.
+- 원본 픽셀 디코드는 모델 실행 뒤로 미뤄 peak memory를 낮춥니다.
+- 편집 설정 저장은 짧게 지연해 slider·wheel·keyboard 입력마다 동기 localStorage를 쓰지 않으며, 탭이 숨겨지거나 pagehide가 발생하면 최신 상태를 즉시 flush합니다. 사진 확대·축소도 Konva를 즉시 갱신하고 저장 상태는 프레임 단위로 합칩니다.
+- 여러 사진을 동시에 준비할 때는 데스크톱에서 2개씩 실행하고, 모바일 또는 2GB 이하 메모리 기기에서는 1개씩 실행합니다. 이미지 수가 많을수록 preview 정규화 해상도도 낮춰 decoded pixel budget을 제한하고, 단일 이미지에서는 최대 4096px을 유지합니다.
+- 내보내기 중 초기화가 발생하면 완료된 Blob을 다운로드하지 않고 결과를 무효화하며, 연속 export의 Blob 생성은 직렬화합니다. 데스크톱은 최대 4096px을 유지하고 모바일·2GB 이하 기기는 3072px로 제한해 동기 Canvas peak memory를 낮춥니다.
+- 업로드 성능 수치는 [`scripts/measure-upload-performance.mjs`](scripts/measure-upload-performance.mjs)로 같은 환경에서 비교하고, 실제 모바일 기기 측정과 구분합니다.
+- 이미지 파일을 불필요하게 Base64로 복제하지 말고 Blob URL 수명을 관리합니다. 배경 제거 결과와 브러시 편집 결과도 revocable Blob URL로 교체합니다.
 - Konva 레이어의 `listening`, `React.memo`, 선택 상태를 확인해 다른 편집 요소를 가리지 않게 합니다.
+- 반응형 편집 셸은 [`src/hooks/useMediaQuery.ts`](src/hooks/useMediaQuery.ts)로 현재 breakpoint에 맞는 데스크톱 또는 모바일 branch 하나만 mount합니다. 새 전역 상태나 이벤트를 추가할 때 branch unmount/remount와 소유권 정리를 함께 확인합니다.
 - 모바일 전처리 해상도와 Worker timeout을 임의로 늘리지 않습니다.
 - 변경 후 50MB 입력, 첫 모델 준비, 배경 제거 실패, 복원 브러시, 500% 합성 배율을 회귀 확인합니다.
 
@@ -238,12 +272,17 @@ FAQ·소개·정책 문서는 `src/components/pages/`의 언어별 컴포넌트�
 ```text
 [ ] git diff --check
 [ ] npm run content:check
+[ ] npm run render:check
+[ ] npm run upload:check
+[ ] npm run test:e2e
+[ ] 성능·메모리 변경 시 npm run perf:upload 결과 비교
 [ ] npm run lint
 [ ] npx tsc --noEmit
 [ ] npm run build
 [ ] /, /ko, /ko/blog, /ko/faq, /ko/about 실제 응답 확인
 [ ] /sitemap.xml, /robots.txt, /rss.xml, /ads.txt 확인
-[ ] 데스크톱·모바일 사진 추가 및 PNG 저장 확인
+[ ] 데스크톱·모바일 사진 추가 및 결과 저장 확인(PNG 우선, 필요 시 JPEG)
+[ ] 레이아웃 미리보기의 빈 슬롯에 클릭·드롭으로 사진을 채우고 Grid 3장/4장을 확인
 [ ] 합성 배경 제거·복원·삭제와 키보드/터치 미세조정 확인
 [ ] 기존 localStorage 설정값 보존 확인
 [ ] .env, 인증서, 토큰, 개인 키가 diff에 없는지 확인

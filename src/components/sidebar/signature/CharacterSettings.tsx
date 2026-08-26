@@ -6,12 +6,14 @@ import { useEffect, useRef, useState, type ChangeEvent, type PointerEvent } from
 import { useTranslations } from 'next-intl'
 import { useShallow } from 'zustand/react/shallow'
 import {
+  AlertCircle,
   Brush,
   Eraser,
   FlipHorizontal,
   Loader2,
   Moon,
   RotateCcw,
+  RefreshCw,
   Trash2,
   Undo2,
   Upload,
@@ -23,17 +25,66 @@ import { EditorChoice, EditorFieldHeader, EditorSection } from '@/components/ui/
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { CharacterPositionControls } from './CharacterPositionControls'
-import { imageDataToDataUrl, dataUrlToImageData, prepareCharacterImage, removeImageBackground, warmBackgroundRemovalModel } from '@/lib/backgroundRemoval'
+import { cancelBackgroundRemoval, imageDataToBlobUrl, dataUrlToImageData, prepareCharacterImage, removeImageBackground } from '@/lib/backgroundRemoval'
+import { BackgroundRemovalError, getBackgroundRemovalFailureCode } from '@/lib/backgroundRemovalErrors'
 import { CHARACTER_SCALE_MAX, CHARACTER_SCALE_MIN } from '@/lib/characterScale'
+import { createEditablePixelState, type PixelState } from '@/lib/characterPixels'
 import { ImageUploadError, revokeObjectUrl } from '@/lib/imageUpload'
 import { useStore } from '@/store/useStore'
 
 const MAX_UNDO_STEPS = 8
 
 type BrushMode = 'erase' | 'restore'
-type PixelState = { data: Uint8ClampedArray; width: number; height: number }
 type PointerPosition = { clientX: number; clientY: number }
 type BrushCursor = { x: number; y: number }
+
+const processingMessageKeys = {
+  'model-unavailable': 'characterModelUnavailableError',
+  'browser-unsupported': 'characterBrowserUnsupportedError',
+  'image-memory': 'characterProcessingMemoryError',
+  'image-processing': 'characterProcessingImageError',
+  timeout: 'characterProcessingTimeoutError',
+  unknown: 'characterProcessingGenericError',
+} as const
+
+function CharacterErrorNotice({
+  message,
+  canRetry,
+  onRetry,
+  disabled,
+  retryLabel,
+  retryAriaLabel,
+}: {
+  message: string | null
+  canRetry: boolean
+  onRetry: () => void
+  disabled: boolean
+  retryLabel: string
+  retryAriaLabel: string
+}) {
+  if (!message) return null
+
+  return (
+    <div data-character-processing-error="true" role="alert" className="flex items-start gap-2 rounded-lg border border-destructive/25 bg-destructive/5 px-3 py-2.5 text-[11px] leading-4 text-destructive">
+      <AlertCircle className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
+      <p className="min-w-0 flex-1">{message}</p>
+      {canRetry && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-7 shrink-0 px-2 text-[11px] text-destructive hover:bg-destructive/10 hover:text-destructive"
+          onClick={onRetry}
+          disabled={disabled}
+          aria-label={retryAriaLabel}
+        >
+          <RefreshCw className="size-3" aria-hidden="true" />
+          {retryLabel}
+        </Button>
+      )}
+    </div>
+  )
+}
 
 function drawPixels(canvas: HTMLCanvasElement | null, pixels: PixelState | null) {
   if (!canvas || !pixels) return
@@ -49,7 +100,8 @@ function drawPixels(canvas: HTMLCanvasElement | null, pixels: PixelState | null)
 
 function resizePixelState(pixels: PixelState, width: number, height: number): PixelState {
   if (pixels.width === width && pixels.height === height) {
-    return { data: pixels.data.slice(), width, height }
+    // This buffer is read-only source data; working pixels are cloned separately.
+    return { data: pixels.data, width, height }
   }
 
   const sourceCanvas = document.createElement('canvas')
@@ -103,6 +155,7 @@ function drawPixelsRegion(canvas: HTMLCanvasElement | null, pixels: PixelState, 
 export function CharacterSettings() {
   const {
     characterSourceUrl,
+    resetVersion,
     setCharacterSourceUrl,
     characterCutoutUrl,
     setCharacterCutoutUrl,
@@ -117,6 +170,7 @@ export function CharacterSettings() {
     setCharacterShadow,
   } = useStore(useShallow((state) => ({
     characterSourceUrl: state.characterSourceUrl,
+    resetVersion: state.resetVersion,
     setCharacterSourceUrl: state.setCharacterSourceUrl,
     characterCutoutUrl: state.characterCutoutUrl,
     setCharacterCutoutUrl: state.setCharacterCutoutUrl,
@@ -144,9 +198,11 @@ export function CharacterSettings() {
   const paintFrameRef = useRef<number | null>(null)
   const brushCursorHideTimeoutRef = useRef<number | null>(null)
   const lastPointerRef = useRef<PointerPosition | null>(null)
+  const filePreparationAbortRef = useRef<AbortController | null>(null)
+  const cutoutRenderAbortRef = useRef<AbortController | null>(null)
+  const cutoutRenderRequestRef = useRef(0)
   const fileRequestRef = useRef(0)
   const processingRequestRef = useRef(0)
-  const modelWarmupRef = useRef<Promise<void> | null>(null)
   const mountedRef = useRef(true)
   const sourcePreview = characterSourceUrl
   const [workingPixels, setWorkingPixels] = useState<PixelState | null>(null)
@@ -155,31 +211,74 @@ export function CharacterSettings() {
   const [brushMode, setBrushMode] = useState<BrushMode>('erase')
   const [brushSize, setBrushSize] = useState(72)
   const [isPreparing, setIsPreparing] = useState(false)
-  const [isModelWarming, setIsModelWarming] = useState(false)
   const [progress, setProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  const [canRetryBackgroundRemoval, setCanRetryBackgroundRemoval] = useState(false)
   const [undoCount, setUndoCount] = useState(0)
+
+  useEffect(() => {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+      cancelBackgroundRemoval()
+      filePreparationAbortRef.current?.abort()
+      filePreparationAbortRef.current = null
+      cutoutRenderAbortRef.current?.abort()
+      cutoutRenderAbortRef.current = null
+      cutoutRenderRequestRef.current += 1
+      sourceUrlRef.current = null
+      fileRequestRef.current += 1
+      processingRequestRef.current += 1
+      if (paintFrameRef.current !== null) {
+        window.cancelAnimationFrame(paintFrameRef.current)
+        paintFrameRef.current = null
+      }
+      if (brushCursorHideTimeoutRef.current !== null) {
+        window.clearTimeout(brushCursorHideTimeoutRef.current)
+        brushCursorHideTimeoutRef.current = null
+      }
+    }
+  }, [])
 
   useEffect(() => {
     if (!editorOpen) return
     drawPixels(canvasRef.current, workingPixels)
   }, [editorOpen, workingPixels])
 
-  useEffect(() => () => {
-    mountedRef.current = false
-    revokeObjectUrl(sourceUrlRef.current)
-    sourceUrlRef.current = null
+  useEffect(() => {
+    if (resetVersion === 0) return
+
+    cancelBackgroundRemoval()
+    filePreparationAbortRef.current?.abort()
+    filePreparationAbortRef.current = null
+    cutoutRenderAbortRef.current?.abort()
+    cutoutRenderAbortRef.current = null
+    cutoutRenderRequestRef.current += 1
     fileRequestRef.current += 1
     processingRequestRef.current += 1
-    if (paintFrameRef.current !== null) {
-      window.cancelAnimationFrame(paintFrameRef.current)
-      paintFrameRef.current = null
-    }
-    if (brushCursorHideTimeoutRef.current !== null) {
-      window.clearTimeout(brushCursorHideTimeoutRef.current)
-      brushCursorHideTimeoutRef.current = null
-    }
-  }, [])
+    sourceUrlRef.current = null
+    sourceBlobRef.current = null
+    sourcePixelsRef.current = null
+    originalPixelsRef.current = null
+    workingPixelsRef.current = null
+    paintingRef.current = false
+    lastPointerRef.current = null
+    undoStackRef.current = []
+
+    const frame = window.requestAnimationFrame(() => {
+      if (!mountedRef.current) return
+      setWorkingPixels(null)
+      setBrushCursor(null)
+      setEditorOpen(false)
+      setIsPreparing(false)
+      setProgress(0)
+      setError(null)
+      setCanRetryBackgroundRemoval(false)
+      setUndoCount(0)
+    })
+
+    return () => window.cancelAnimationFrame(frame)
+  }, [resetVersion])
 
   const clearBrushCursorHide = () => {
     if (brushCursorHideTimeoutRef.current === null) return
@@ -223,25 +322,6 @@ export function CharacterSettings() {
     drawPixels(canvasRef.current, next)
   }
 
-  const startModelWarmup = () => {
-    if (modelWarmupRef.current) return modelWarmupRef.current
-
-    setIsModelWarming(true)
-    const warmup = warmBackgroundRemovalModel((nextProgress) => {
-      if (mountedRef.current) setProgress(nextProgress)
-    })
-    modelWarmupRef.current = warmup
-    void warmup.catch(() => undefined).then(() => {
-      if (modelWarmupRef.current !== warmup) return
-      modelWarmupRef.current = null
-      if (mountedRef.current) {
-        setIsModelWarming(false)
-        setProgress(0)
-      }
-    })
-    return warmup
-  }
-
   const openEditorFromCutout = async () => {
     if (workingPixelsRef.current || !characterCutoutUrl) {
       setBrushCursor(null)
@@ -249,26 +329,41 @@ export function CharacterSettings() {
       return
     }
 
+    const cutoutUrlAtStart = characterCutoutUrl
+    const sourceUrlAtStart = characterSourceUrl
+    const resetVersionAtStart = useStore.getState().resetVersion
+    const isStale = () => (
+      !mountedRef.current
+      || useStore.getState().resetVersion !== resetVersionAtStart
+      || useStore.getState().characterCutoutUrl !== cutoutUrlAtStart
+    )
+
     try {
-      const pixels = await dataUrlToImageData(characterCutoutUrl)
-      const next = { data: pixels.data.slice(), width: pixels.width, height: pixels.height }
+      const pixels = await dataUrlToImageData(cutoutUrlAtStart)
+      if (isStale()) return
+      const { original, working } = createEditablePixelState(pixels.data, pixels.width, pixels.height)
       let sourcePixels: PixelState | null = null
-      if (characterSourceUrl) {
+      if (sourceUrlAtStart) {
         try {
-          const source = await dataUrlToImageData(characterSourceUrl)
+          const source = await dataUrlToImageData(sourceUrlAtStart)
+          if (isStale()) return
           sourcePixels = resizePixelState({ data: source.data, width: source.width, height: source.height }, pixels.width, pixels.height)
         } catch {
           sourcePixels = null
         }
       }
-      originalPixelsRef.current = next
+      if (isStale()) return
+      originalPixelsRef.current = original
       sourcePixelsRef.current = sourcePixels
       undoStackRef.current = []
-      syncWorkingPixels(next)
+      syncWorkingPixels(working)
       setBrushCursor(null)
       setEditorOpen(true)
     } catch {
-      setError(t('characterEditorError'))
+      if (!isStale()) {
+        setError(t('characterEditorError'))
+        setCanRetryBackgroundRemoval(false)
+      }
     }
   }
 
@@ -276,22 +371,32 @@ export function CharacterSettings() {
     const file = event.currentTarget.files?.[0]
     event.currentTarget.value = ''
     if (!file) return
+    filePreparationAbortRef.current?.abort()
+    cutoutRenderAbortRef.current?.abort()
+    cutoutRenderAbortRef.current = null
+    cutoutRenderRequestRef.current += 1
+    cancelBackgroundRemoval()
+    const controller = new AbortController()
+    filePreparationAbortRef.current = controller
     const requestId = ++fileRequestRef.current
     processingRequestRef.current += 1
+    const resetVersionAtStart = useStore.getState().resetVersion
 
     setError(null)
+    setCanRetryBackgroundRemoval(false)
 
     try {
-      const prepared = await prepareCharacterImage(file)
-      if (requestId !== fileRequestRef.current) {
+      const prepared = await prepareCharacterImage(file, controller.signal)
+      if (
+        requestId !== fileRequestRef.current
+        || useStore.getState().resetVersion !== resetVersionAtStart
+      ) {
         revokeObjectUrl(prepared.dataUrl)
         return
       }
 
-      revokeObjectUrl(sourceUrlRef.current)
       sourceUrlRef.current = prepared.dataUrl
       sourceBlobRef.current = prepared.blob
-      void startModelWarmup().catch(() => undefined)
       setCharacterSourceUrl(prepared.dataUrl)
       setCharacterCutoutUrl(null)
       setCharacterPosition(null)
@@ -304,7 +409,10 @@ export function CharacterSettings() {
       undoStackRef.current = []
       setUndoCount(0)
     } catch (cause) {
-      if (requestId !== fileRequestRef.current) return
+      if (
+        requestId !== fileRequestRef.current
+        || useStore.getState().resetVersion !== resetVersionAtStart
+      ) return
       if (cause instanceof ImageUploadError && cause.code === 'invalid-type') {
         setError(t('characterFileTypeError'))
       } else if (cause instanceof ImageUploadError && cause.code === 'too-large') {
@@ -312,52 +420,76 @@ export function CharacterSettings() {
       } else {
         setError(t('characterEditorError'))
       }
+    } finally {
+      if (filePreparationAbortRef.current === controller) filePreparationAbortRef.current = null
     }
   }
 
   const handleRemoveBackground = async () => {
     if (!sourcePreview || isPreparing) return
     const requestId = ++processingRequestRef.current
+    const resetVersionAtStart = useStore.getState().resetVersion
+    const isStale = () => (
+      requestId !== processingRequestRef.current
+      || useStore.getState().resetVersion !== resetVersionAtStart
+    )
     const sourceUrl = sourcePreview
     const sourceBlob = sourceBlobRef.current
+    cutoutRenderAbortRef.current?.abort()
+    const cutoutController = new AbortController()
+    cutoutRenderAbortRef.current = cutoutController
+    const cutoutRequestId = ++cutoutRenderRequestRef.current
 
     setIsPreparing(true)
     setProgress(3)
     setError(null)
+    setCanRetryBackgroundRemoval(false)
 
     try {
-      // If the upload-triggered warm-up is still running, reuse it instead of
-      // starting a second model initialization when the user clicks quickly.
-      await modelWarmupRef.current?.catch(() => undefined)
       const blob = sourceBlob ?? await (async () => {
-        const response = await fetch(sourceUrl)
-        if (!response.ok) throw new Error('이미지를 읽지 못했습니다.')
-        return response.blob()
+        try {
+          const response = await fetch(sourceUrl)
+          if (!response.ok) throw new Error('이미지를 읽지 못했습니다.')
+          return await response.blob()
+        } catch {
+          throw new BackgroundRemovalError('image-processing', '이미지를 읽지 못했습니다.')
+        }
       })()
-      const source = await dataUrlToImageData(sourceUrl)
-      if (requestId !== processingRequestRef.current) return
       const result = await removeImageBackground(blob, (nextProgress) => {
-        if (requestId === processingRequestRef.current) setProgress(nextProgress)
+        if (!isStale()) setProgress(nextProgress)
       })
-      if (requestId !== processingRequestRef.current) return
+      if (isStale()) return
+      const source = await dataUrlToImageData(sourceUrl)
+      if (isStale()) return
 
-      const original = { data: result.data.slice(), width: result.width, height: result.height }
+      const { original, working } = createEditablePixelState(result.data, result.width, result.height)
       const sourcePixels = resizePixelState({ data: source.data, width: source.width, height: source.height }, result.width, result.height)
       originalPixelsRef.current = original
       sourcePixelsRef.current = sourcePixels
       undoStackRef.current = []
       setUndoCount(0)
-      syncWorkingPixels({ data: result.data.slice(), width: result.width, height: result.height })
-      setCharacterCutoutUrl(imageDataToDataUrl(result.data, result.width, result.height))
+      syncWorkingPixels(working)
+      const cutoutUrl = await imageDataToBlobUrl(result.data, result.width, result.height, cutoutController.signal)
+      if (
+        isStale()
+        || cutoutRequestId !== cutoutRenderRequestRef.current
+        || cutoutController.signal.aborted
+      ) {
+        revokeObjectUrl(cutoutUrl)
+        return
+      }
+      setCharacterCutoutUrl(cutoutUrl)
       setCharacterPosition(null)
       setBrushCursor(null)
       setEditorOpen(true)
     } catch (cause) {
-      if (requestId !== processingRequestRef.current) return
-      console.error('Background removal failed', cause)
-      setError(t('characterProcessingError'))
+      if (isStale()) return
+      const failureCode = getBackgroundRemovalFailureCode(cause)
+      setError(t(processingMessageKeys[failureCode]))
+      setCanRetryBackgroundRemoval(true)
     } finally {
-      if (requestId === processingRequestRef.current) {
+      if (cutoutRenderAbortRef.current === cutoutController) cutoutRenderAbortRef.current = null
+      if (!isStale()) {
         setIsPreparing(false)
         setProgress(0)
       }
@@ -366,7 +498,32 @@ export function CharacterSettings() {
 
   const saveWorkingPixels = (pixels: PixelState | null) => {
     if (!pixels) return
-    setCharacterCutoutUrl(imageDataToDataUrl(pixels.data, pixels.width, pixels.height))
+    cutoutRenderAbortRef.current?.abort()
+    const controller = new AbortController()
+    cutoutRenderAbortRef.current = controller
+    const requestId = ++cutoutRenderRequestRef.current
+    void imageDataToBlobUrl(pixels.data, pixels.width, pixels.height, controller.signal)
+      .then((url) => {
+        if (
+          !mountedRef.current
+          || controller.signal.aborted
+          || requestId !== cutoutRenderRequestRef.current
+        ) {
+          revokeObjectUrl(url)
+          return
+        }
+        setCharacterCutoutUrl(url)
+      })
+      .catch((cause: unknown) => {
+        if (cause instanceof Error && cause.name === 'AbortError') return
+        if (mountedRef.current && requestId === cutoutRenderRequestRef.current) {
+          setError(t('characterEditorError'))
+          setCanRetryBackgroundRemoval(false)
+        }
+      })
+      .finally(() => {
+        if (cutoutRenderAbortRef.current === controller) cutoutRenderAbortRef.current = null
+      })
   }
 
   const paintAt = (point: PointerPosition) => {
@@ -499,11 +656,15 @@ export function CharacterSettings() {
   }
 
   const handleClear = () => {
+    cancelBackgroundRemoval()
+    cutoutRenderAbortRef.current?.abort()
+    cutoutRenderAbortRef.current = null
+    cutoutRenderRequestRef.current += 1
     fileRequestRef.current += 1
     processingRequestRef.current += 1
+    setCanRetryBackgroundRemoval(false)
     setCharacterSourceUrl(null)
     setCharacterCutoutUrl(null)
-    revokeObjectUrl(sourceUrlRef.current)
     sourceUrlRef.current = null
     sourceBlobRef.current = null
     sourcePixelsRef.current = null
@@ -564,21 +725,11 @@ export function CharacterSettings() {
                 <Button type="button" variant="outline" size="sm" className="h-10 rounded-md" onClick={() => fileInputRef.current?.click()} disabled={isPreparing}>
                   <Upload className="size-3.5" aria-hidden="true" /> {t('characterChange')}
                 </Button>
-                <Button type="button" size="sm" className="h-10 rounded-md" onClick={handleRemoveBackground} disabled={isPreparing || isModelWarming}>
-                  {isPreparing || isModelWarming ? <Loader2 className="size-3.5 animate-spin" aria-hidden="true" /> : <WandSparkles className="size-3.5" aria-hidden="true" />}
-                  {isPreparing ? t('characterProcessing') : isModelWarming ? t('characterModelPreparing') : t('characterRemoveBackground')}
+                <Button type="button" size="sm" className="h-10 rounded-md" onClick={handleRemoveBackground} disabled={isPreparing}>
+                  {isPreparing ? <Loader2 className="size-3.5 animate-spin" aria-hidden="true" /> : <WandSparkles className="size-3.5" aria-hidden="true" />}
+                  {isPreparing ? t('characterProcessing') : t('characterRemoveBackground')}
                 </Button>
               </div>
-
-              {isModelWarming && !isPreparing && (
-                <div role="status" aria-live="polite" className="space-y-2 rounded-lg border border-border bg-card px-3 py-3">
-                  <div className="flex items-center justify-between gap-3 font-body text-[11px] text-muted-foreground">
-                    <span>{t('characterModelPreparingHint')}</span>
-                    <span className="font-mono tabular-nums">{progress}%</span>
-                  </div>
-                  <div className="h-1 overflow-hidden rounded-full bg-muted"><div className="h-full bg-primary transition-[width]" style={{ width: `${Math.max(4, progress)}%` }} /></div>
-                </div>
-              )}
 
               {isPreparing && (
                 <div role="status" aria-live="polite" aria-atomic="true" className="space-y-2 rounded-lg border border-border bg-card px-3 py-3">
@@ -612,6 +763,14 @@ export function CharacterSettings() {
               </Button>
             </div>
           )}
+          <CharacterErrorNotice
+            message={error}
+            canRetry={canRetryBackgroundRemoval}
+            onRetry={() => void handleRemoveBackground()}
+            disabled={isPreparing}
+            retryLabel={t('characterRetry')}
+            retryAriaLabel={t('characterRetryAria')}
+          />
         </div>
       </EditorSection>
 
@@ -715,7 +874,6 @@ export function CharacterSettings() {
         </EditorSection>
       )}
 
-      {error && <p role="alert" className="font-body text-[11px] leading-4 text-destructive">{error}</p>}
       <p className="font-body text-[11px] leading-4 text-muted-foreground">{t('characterModelNote')}</p>
     </div>
   )

@@ -2,7 +2,7 @@
 title: "XIV Frame compositing guide: remove backgrounds and place PNG elements"
 description: "Remove a background from a character, light, or effect image in your browser, refine its edges, and place the element naturally over your screenshot."
 date: "2026-08-22"
-updated: "2026-08-22"
+updated: "2026-08-26"
 category: "Compositing"
 tags: ["ffxiv", "composite", "background-removal"]
 ---
@@ -39,6 +39,21 @@ If the source is already a transparent PNG, skip background removal. Add it as a
 3. The image is processed in the current browser rather than uploaded to an XIV Frame image server. Processing time still depends on the device's memory and browser performance.
 4. Review the result before deleting it. Small leftover areas are often faster to fix with the refinement brush than to recreate from another source.
 
+## Read the error message first
+
+Background-removal failures are separated by likely cause. Match the message you see to the recovery step instead of retrying the same file without a change.
+
+| Message type | What it usually means | First action |
+| --- | --- | --- |
+| Model could not be prepared | The model files could not be downloaded or initialized | Check the connection, reload the page, and try again |
+| Browser cannot run background removal | The available WebGPU/WASM runtime is not supported | Try the latest Chrome or Edge |
+| Not enough memory | Decoding or model execution exceeded available memory | Use a smaller image and process one image at a time on mobile |
+| Could not read or process image | File format, decode, or canvas processing issue | Save it again as PNG, JPG, or WebP and select it again |
+| Processing took too long | The Worker did not finish within its time limit | Keep the page open, reduce the image size, and retry one image |
+| Something went wrong | No more specific category was detected | Select **Try again**; if it repeats, include the browser, file type, and steps in a report |
+
+If there is no error message and the result only looks empty, check the result preview, selected state, opacity, and canvas position first.
+
 ## 4. Refine with erase and restore
 
 1. Choose **Erase** and drag over background that remains around the subject.
@@ -71,4 +86,4 @@ If the element looks like it is floating, check its position and opacity before 
 | The element is too small | Image size value | Increase it within the 500% range |
 | The element is no longer needed | Composite controls | Select **Remove composite**; photo and signature settings remain |
 
-Before exporting, inspect the edge at close range, then return to a full-canvas view. Check that the element does not cover a face, weapon, signature, or other important detail. Export with **Save PNG** on desktop or **Export → Save photo** on mobile.
+Before exporting, inspect the edge at close range, then return to a full-canvas view. Check that the element does not cover a face, weapon, signature, or other important detail. Export with **Save PNG** on desktop or **Export → Save photo** on mobile. PNG is preferred; an opaque result over 5 MB is automatically downloaded as a high-quality JPEG, while a transparent PNG that cannot fit under 5 MB shows guidance instead of downloading.

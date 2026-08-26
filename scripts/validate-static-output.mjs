@@ -34,6 +34,18 @@ if (!fs.existsSync(outputRoot)) {
 } else {
   const landing = readOutput('index.html')
   const editorPages = ['ko.html', 'en.html', 'ja.html']
+  const runtimeAssets = [
+    'vendor/transformers.web.min.js',
+    'vendor/onnxruntime/ort-wasm-simd-threaded.asyncify.mjs',
+    'vendor/onnxruntime/ort-wasm-simd-threaded.asyncify.wasm',
+    'vendor/onnxruntime/ort-wasm-simd-threaded.mjs',
+    'vendor/onnxruntime/ort-wasm-simd-threaded.wasm',
+  ]
+  for (const relativePath of runtimeAssets) {
+    if (!fs.existsSync(path.join(outputRoot, relativePath))) {
+      fail(`Missing runtime asset in static output: ${relativePath}`)
+    }
+  }
   const publicPages = [
     'ko/blog.html',
     'ko/faq.html',

@@ -3,34 +3,38 @@ import { Image as KonvaImage } from 'react-konva'
 import { useStore } from '@/store/useStore'
 import { useShallow } from 'zustand/react/shallow'
 
-function LogoLayerComponent({ contentWidth, contentHeight }: { contentWidth: number, contentHeight: number }) {
-  const { logoUrl, logoScale, logoPosition, logoOpacity } = useStore(useShallow(state => ({
-    logoUrl: state.logoUrl,
-    logoScale: state.logoScale,
-    logoPosition: state.logoPosition,
-    logoOpacity: state.logoOpacity
-  })))
+function LoadedLogoLayer({
+  logoUrl,
+  contentWidth,
+  contentHeight,
+  logoScale,
+  logoPosition,
+  logoOpacity,
+}: {
+  logoUrl: string
+  contentWidth: number
+  contentHeight: number
+  logoScale: number
+  logoPosition: string
+  logoOpacity: number
+}) {
   const [logoImg, setLogoImg] = useState<HTMLImageElement | null>(null)
-  const [prevUrl, setPrevUrl] = useState<string | null>(null)
-
-  if (logoUrl !== prevUrl) {
-    setPrevUrl(logoUrl)
-    setLogoImg(null)
-  }
 
   useEffect(() => {
-    if (!logoUrl) return
-    
     let active = true
     const img = new window.Image()
     img.src = logoUrl
     img.onload = () => {
       if (active) setLogoImg(img)
     }
+    img.onerror = () => {
+      if (active) setLogoImg(null)
+    }
     
     return () => {
       active = false
       img.onload = null
+      img.onerror = null
       img.src = ''
     }
   }, [logoUrl])
@@ -67,6 +71,29 @@ function LogoLayerComponent({ contentWidth, contentHeight }: { contentWidth: num
       height={height}
       opacity={logoOpacity / 100}
       listening={false}
+    />
+  )
+}
+
+function LogoLayerComponent({ contentWidth, contentHeight }: { contentWidth: number, contentHeight: number }) {
+  const { logoUrl, logoScale, logoPosition, logoOpacity } = useStore(useShallow(state => ({
+    logoUrl: state.logoUrl,
+    logoScale: state.logoScale,
+    logoPosition: state.logoPosition,
+    logoOpacity: state.logoOpacity
+  })))
+
+  if (!logoUrl) return null
+
+  return (
+    <LoadedLogoLayer
+      key={logoUrl}
+      logoUrl={logoUrl}
+      contentWidth={contentWidth}
+      contentHeight={contentHeight}
+      logoScale={logoScale}
+      logoPosition={logoPosition}
+      logoOpacity={logoOpacity}
     />
   )
 }

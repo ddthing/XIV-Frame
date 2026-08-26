@@ -8,6 +8,8 @@ export interface ImageSlice {
   setImagePosition: (index: number, pos: { x: number; y: number }) => void
   imageScales: number[]
   setImageScale: (index: number, scale: number) => void
+  selectedImageIndex: number
+  setSelectedImageIndex: (index: number) => void
   setImageAt: (index: number, url: string) => void
   removeImageAt: (index: number) => void
   swapImages: (idx1: number, idx2: number) => void
@@ -19,6 +21,7 @@ export const initialImageState = {
   images: [],
   imagePositions: [],
   imageScales: [],
+  selectedImageIndex: 0,
   isImageLocked: false,
 }
 
@@ -39,6 +42,7 @@ export const createImageSlice: StateCreator<ImageSlice, [], [], ImageSlice> = (s
       images,
       imagePositions: images.map((_, i) => state.imagePositions[i] || { x: 0, y: 0 }),
       imageScales: images.map((_, i) => state.imageScales[i] || 1),
+      selectedImageIndex: images.length === 0 ? 0 : Math.min(state.selectedImageIndex, images.length - 1),
     }
   }),
   
@@ -53,6 +57,8 @@ export const createImageSlice: StateCreator<ImageSlice, [], [], ImageSlice> = (s
     newScales[index] = scale
     return { imageScales: newScales }
   }),
+
+  setSelectedImageIndex: (index) => set({ selectedImageIndex: Math.max(0, index) }),
   
   setImageAt: (index, url) => set((state) => {
     const newImages = [...state.images]
@@ -74,7 +80,12 @@ export const createImageSlice: StateCreator<ImageSlice, [], [], ImageSlice> = (s
     newPositions.splice(index, 1)
     const newScales = [...state.imageScales]
     newScales.splice(index, 1)
-    return { images: newImages, imagePositions: newPositions, imageScales: newScales }
+    const selectedImageIndex = state.selectedImageIndex === index
+      ? Math.max(0, Math.min(index, newImages.length - 1))
+      : state.selectedImageIndex > index
+        ? state.selectedImageIndex - 1
+        : state.selectedImageIndex
+    return { images: newImages, imagePositions: newPositions, imageScales: newScales, selectedImageIndex }
   }),
   
   swapImages: (idx1, idx2) => set((state) => {
@@ -95,7 +106,12 @@ export const createImageSlice: StateCreator<ImageSlice, [], [], ImageSlice> = (s
     newScales[idx1] = newScales[idx2]
     newScales[idx2] = tempScale
     
-    return { images: newImages, imagePositions: newPositions, imageScales: newScales }
+    const selectedImageIndex = state.selectedImageIndex === idx1
+      ? idx2
+      : state.selectedImageIndex === idx2
+        ? idx1
+        : state.selectedImageIndex
+    return { images: newImages, imagePositions: newPositions, imageScales: newScales, selectedImageIndex }
   }),
   
   setIsImageLocked: (locked) => set({ isImageLocked: locked }),

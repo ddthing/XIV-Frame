@@ -1,12 +1,13 @@
 ---
 title: "XIV Frame: A Complete Start-to-Finish Editing Guide"
-description: "Follow the real workflow from uploading screenshots to choosing a layout, compositing an image, adding a signature, and saving a PNG."
+description: "Follow the real workflow from uploading screenshots to choosing a layout, compositing an image, adding a signature, and saving the result."
 date: "2026-06-03"
+updated: "2026-08-26"
 category: "Getting started"
 tags: ["ffxiv", "screenshot", "tutorial"]
 ---
 
-XIV Frame is a browser-based tool for arranging screenshots and exporting the finished canvas as a PNG. Use the numbered workflow below instead of guessing which control to use first.
+XIV Frame is a browser-based tool for arranging screenshots and exporting the finished canvas. Use the numbered workflow below instead of guessing which control to use first.
 
 ## Before you start
 
@@ -35,16 +36,16 @@ XIV Frame is a browser-based tool for arranging screenshots and exporting the fi
 
 ## 3. Choose a composition
 
-1. Open the **Layout** tab on desktop. On mobile, open the bottom **Layout** menu, labelled **Ratio** in the compact navigation.
+1. Open the **Layout** tab on desktop or the bottom **Layout** menu on mobile.
 2. Choose **Split** for images placed side by side.
 3. Choose **Vertical** to stack images from top to bottom.
-4. Choose **Grid** for a 2×2-style arrangement when you have three or four images. For exactly 9 or 16 images, choose the **3×3** or **4×4 grid** template.
+4. Choose **Grid** for its four-slot 2×2 arrangement when you have three or four images. With three images, one slot remains empty. For exactly 9 or 16 images, choose the **3×3** or **4×4 grid** template.
 
 ## 4. Set the canvas ratio
 
 1. On desktop, use the **Ratio** controls above the preview. On mobile, open **Export** and find **Ratio Settings**.
-2. Choose **Auto** when you want the canvas to follow the current composition.
-3. Choose **16:9** for a standard wide canvas.
+2. The default **Original ratio** preserves the natural composition.
+3. Choose the **X timeline** profile when you want a 16:9 wide canvas.
 4. Choose **2:1** for a long, banner-like composition.
 
 ## 5. Tune each image
@@ -83,9 +84,9 @@ XIV Frame is a browser-based tool for arranging screenshots and exporting the fi
 
 1. On desktop, click **Save PNG** in the top-right toolbar.
 2. On mobile, open **Export**, confirm the ratio, and tap **Save Photo**.
-3. The browser downloads a file named like `ffxiv-screenshot-date-time.png`.
+3. PNG is preferred. If an opaque result exceeds 5 MB, the browser downloads a high-quality JPEG instead; transparent PNGs that cannot fit are reported without a download.
 4. If you want to start a completely different edit, use **Reset** in the desktop toolbar or **Reset to Default** in the mobile export sheet. Save anything you want to keep first because reset restores all settings.
 
 ## How settings are saved
 
-XIV Frame stores your editor settings locally in the browser. They may still be available when you return in the same browser, but the finished image should always be exported as a PNG if you need a permanent copy.
+XIV Frame stores your editor settings locally in the browser. They may still be available when you return in the same browser, but keep the downloaded PNG or JPEG separately if you need a permanent copy.

@@ -19,6 +19,11 @@ export function CanvasToolbar({ className = '' }: { className?: string }) {
   } = useCanvasActions()
   const t = useTranslations('DesktopToolbar')
   const layoutT = useTranslations('LayoutSettings')
+  const ratioOptions = [
+    { value: 'x' as const, label: layoutT('ratioX'), compactLabel: 'X · 16:9' },
+    { value: 'original' as const, label: layoutT('ratioOriginal'), compactLabel: layoutT('ratioOriginalShort') },
+    { value: '2:1' as const, label: layoutT('ratio2_1'), compactLabel: '2:1' },
+  ]
 
   return (
     <div className={`flex min-h-[76px] shrink-0 flex-wrap items-end justify-between gap-x-6 gap-y-3 border-b border-border bg-background px-7 py-4 ${className}`}>
@@ -33,19 +38,21 @@ export function CanvasToolbar({ className = '' }: { className?: string }) {
         <div className="hidden items-center gap-3 lg:flex">
           <span className="text-xs font-semibold text-muted-foreground">{t('ratio')}</span>
           <div className="flex items-center gap-0.5 rounded-md border border-border bg-surface-inset/70 p-1" role="group" aria-label={t('ratio')}>
-            {(['auto', '16:9', '2:1'] as const).map((ratio) => (
+            {ratioOptions.map((ratio) => (
               <button
-                key={ratio}
+                key={ratio.value}
                 type="button"
-                aria-pressed={canvasRatio === ratio}
-                onClick={() => handleRatioChange(ratio as CanvasRatio)}
+                aria-label={ratio.label}
+                title={ratio.label}
+                aria-pressed={canvasRatio === ratio.value}
+                onClick={() => handleRatioChange(ratio.value as CanvasRatio)}
                 className={`min-w-12 rounded-sm px-3 py-1.5 text-[11px] font-semibold transition-all ${
-                  canvasRatio === ratio
+                  canvasRatio === ratio.value
                     ? 'bg-card text-foreground shadow-subtle'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                {ratio === 'auto' ? layoutT('ratioAuto') : ratio}
+                {ratio.compactLabel}
               </button>
             ))}
           </div>
@@ -59,9 +66,7 @@ export function CanvasToolbar({ className = '' }: { className?: string }) {
             aria-label={t('ratio')}
             className="h-8 rounded-md border border-border bg-surface-inset/70 px-2 text-[11px] font-semibold text-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/50"
           >
-            <option value="auto">{layoutT('ratioAuto')}</option>
-            <option value="16:9">16:9</option>
-            <option value="2:1">2:1</option>
+            {ratioOptions.map((ratio) => <option key={ratio.value} value={ratio.value}>{ratio.label}</option>)}
           </select>
         </label>
 

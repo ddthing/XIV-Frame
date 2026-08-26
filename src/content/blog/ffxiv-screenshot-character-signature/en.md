@@ -2,6 +2,7 @@
 title: "How to Add a Character Name and Server to an FFXIV Screenshot"
 description: "Enter two lines of signature text, then tune the font, weight, spacing, position, color, and opacity before exporting."
 date: "2026-06-03"
+updated: "2026-08-26"
 category: "Signature"
 tags: ["ffxiv", "signature", "tutorial"]
 ---
@@ -61,3 +62,4 @@ The Signature panel adds a two-line text overlay to your screenshot. Use it for 
 3. Click **Save PNG** on desktop.
 4. On mobile, open **Export** and tap **Save Photo**.
 5. If the signature competes with the subject, return to the panel and adjust position or opacity instead of adding more decoration.
+6. PNG is preferred. If an opaque result exceeds 5 MB, it is downloaded as a high-quality JPEG; a transparent PNG that cannot fit under 5 MB is not downloaded and shows guidance instead.

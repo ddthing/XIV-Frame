@@ -1,8 +1,8 @@
 ---
 title: "Before publishing an FFXIV screenshot: rights, readability, and quality checklist"
-description: "Review image rights, personal information, text readability, composite edges, and the downloaded PNG before sharing a XIV Frame result."
+description: "Review image rights, personal information, text readability, composite edges, and the downloaded result file before sharing a XIV Frame image."
 date: "2026-08-22"
-updated: "2026-08-22"
+updated: "2026-08-26"
 category: "Publishing checklist"
 tags: ["ffxiv", "publishing", "checklist"]
 ---
@@ -27,7 +27,7 @@ Game screenshots can include chat, friends lists, server names, character names,
 - Discord, streaming, or social notifications reveal an account name; and
 - a logo or signature could be mistaken for someone else's identity.
 
-If a region should not be shown, change the crop by adjusting image position and scale or capture a cleaner source. Open the final PNG after saving; do not rely only on what you believe was outside the crop.
+If a region should not be shown, change the crop by adjusting image position and scale or capture a cleaner source. Open the final result file after saving; do not rely only on what you believe was outside the crop.
 
 ## 3. Separate signature and copyright information
 
@@ -50,7 +50,7 @@ Text is information, not just decoration. Check that names remain visible agains
 
 ## 6. Inspect the downloaded file
 
-Open the saved PNG and confirm the four corners, transparency, text, logo, composite edges, shadow, and film texture. Also check the destination platform's image dimension and file-size limits. Keep the original screenshots and publishing copy separately so the frame can be revised later.
+Open the saved result file and confirm the four corners, transparency, text, logo, composite edges, shadow, and film texture. PNG is preferred, but an opaque result over 5 MB may be downloaded as a high-quality JPEG, so check the extension as well as the image. Also check the destination platform's image dimension and file-size limits. Keep the original screenshots and publishing copy separately so the frame can be revised later.
 
 ### Ten-second checklist
 
@@ -61,7 +61,7 @@ Open the saved PNG and confirm the four corners, transparency, text, logo, compo
 - [ ] Composite edges and shadows look natural.
 - [ ] Names and logos remain readable on a small screen.
 - [ ] Important faces, equipment, and text are not covered.
-- [ ] I opened the downloaded PNG and checked its edges.
+- [ ] I opened the downloaded result file and checked its edges.
 - [ ] The file fits the destination platform's limits.
 - [ ] I kept the source images separately from the publishing copy.
 
