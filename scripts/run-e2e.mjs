@@ -2,7 +2,10 @@ import { spawn, spawnSync } from 'node:child_process'
 import path from 'node:path'
 
 const projectRoot = process.cwd()
-const baseUrl = 'http://127.0.0.1:3000/ko'
+const configuredPort = Number(process.env.E2E_PORT ?? 3000)
+const port = Number.isInteger(configuredPort) && configuredPort > 0 ? configuredPort : 3000
+const baseUrl = `http://127.0.0.1:${port}/ko`
+const skipServer = process.env.E2E_SKIP_SERVER === '1'
 const nextEntrypoint = path.join(projectRoot, 'node_modules', 'next', 'dist', 'bin', 'next')
 const playwrightEntrypoint = path.join(projectRoot, 'node_modules', '@playwright', 'test', 'cli.js')
 
@@ -62,15 +65,17 @@ function runPlaywright(args) {
   })
 }
 
-const server = spawn(process.execPath, [nextEntrypoint, 'dev', '--hostname', '127.0.0.1'], {
-  cwd: projectRoot,
-  env: process.env,
-  stdio: 'inherit',
-  windowsHide: true,
-})
+const server = skipServer
+  ? null
+  : spawn(process.execPath, [nextEntrypoint, 'dev', '--hostname', '127.0.0.1', '--port', String(port)], {
+      cwd: projectRoot,
+      env: process.env,
+      stdio: 'inherit',
+      windowsHide: true,
+    })
 
 try {
-  await waitForServer(server)
+  if (server) await waitForServer(server)
   process.exitCode = await runPlaywright(process.argv.slice(2))
 } catch (error) {
   console.error(error instanceof Error ? error.message : error)

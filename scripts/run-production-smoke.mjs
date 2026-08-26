@@ -75,6 +75,17 @@ function assertNoHorizontalOverflow(metrics, deviceName) {
   }
 }
 
+function isExpectedStaticPrefetchAbort(request, errorText) {
+  if (errorText !== 'net::ERR_ABORTED') return false
+  if (request.method() === 'HEAD') return true
+
+  try {
+    return new URL(request.url()).pathname.includes('/__next._')
+  } catch {
+    return false
+  }
+}
+
 async function readViewportMetrics(page) {
   return page.evaluate(() => ({
     documentScrollWidth: document.documentElement.scrollWidth,
@@ -130,7 +141,7 @@ async function runEdgeDeviceSmoke(browser, baseUrl, profile, fixtureBase64) {
   page.on('pageerror', (error) => pageErrors.push(error.message))
   page.on('requestfailed', (request) => {
     const errorText = request.failure()?.errorText ?? 'unknown'
-    if (request.method() === 'HEAD' && errorText === 'net::ERR_ABORTED') return
+    if (isExpectedStaticPrefetchAbort(request, errorText)) return
     requestFailures.push(`${request.method()} ${request.url()} — ${errorText}`)
   })
 
@@ -272,8 +283,8 @@ async function runDeviceSmoke(browser, baseUrl, profile) {
   page.on('pageerror', (error) => pageErrors.push(error.message))
   page.on('requestfailed', (request) => {
     const errorText = request.failure()?.errorText ?? 'unknown'
-    // Chromium may abort a speculative HEAD prefetch after its response is no longer needed.
-    if (request.method() === 'HEAD' && errorText === 'net::ERR_ABORTED') return
+    // Chromium may abort speculative static metadata prefetches after the response is no longer needed.
+    if (isExpectedStaticPrefetchAbort(request, errorText)) return
     requestFailures.push(`${request.method()} ${request.url()} — ${errorText}`)
   })
 
@@ -371,7 +382,7 @@ let browser
 try {
   if (server) await waitForServer(server, `${baseUrl}/en`)
   browser = await chromium.launch({
-    channel: 'chrome',
+    channel: process.env.PLAYWRIGHT_CHANNEL ?? 'chrome',
     headless: true,
   })
 

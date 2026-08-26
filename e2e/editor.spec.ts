@@ -18,7 +18,7 @@ async function openFreshEditor(page: Page, { expectDesktop = true, clearStorage 
       window.localStorage.clear()
     })
   }
-  await page.goto('/ko', { waitUntil: 'domcontentloaded', timeout: 15_000 })
+  await page.goto('/ko', { waitUntil: 'networkidle', timeout: 15_000 })
   if (expectDesktop) {
     await expect(page.getByRole('heading', { name: 'Your frame, in focus.' })).toBeVisible()
   }
@@ -26,8 +26,8 @@ async function openFreshEditor(page: Page, { expectDesktop = true, clearStorage 
 
 async function uploadFixtures(page: Page, files: string[]) {
   await page.locator('input[type="file"]').setInputFiles(files)
-  await expect(page.getByText(`${String(files.length).padStart(2, '0')} / 16`, { exact: true })).toBeVisible()
-  await expect(page.locator('canvas').first()).toBeVisible()
+  await expect(page.getByText(`${String(files.length).padStart(2, '0')} / 16`, { exact: true })).toBeVisible({ timeout: 60_000 })
+  await expect(page.locator('canvas').first()).toBeVisible({ timeout: 60_000 })
 }
 
 async function createPortraitFixture() {

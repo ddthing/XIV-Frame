@@ -417,6 +417,8 @@ export function CharacterSettings() {
         setError(t('characterFileTypeError'))
       } else if (cause instanceof ImageUploadError && cause.code === 'too-large') {
         setError(t('characterFileTooLarge'))
+      } else if (cause instanceof ImageUploadError && (cause.code === 'decode' || cause.code === 'prepare')) {
+        setError(t('characterProcessingImageError'))
       } else {
         setError(t('characterEditorError'))
       }

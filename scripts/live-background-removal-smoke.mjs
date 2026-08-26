@@ -63,7 +63,10 @@ let context
 
 try {
   await waitForServer(server)
-  browser = await chromium.launch({ channel: 'chrome', headless: true })
+  browser = await chromium.launch({
+    channel: process.env.PLAYWRIGHT_CHANNEL ?? 'chrome',
+    headless: true,
+  })
   context = await browser.newContext(useMobileDevice ? devices['iPhone 16 Pro Max'] : undefined)
   const page = await context.newPage()
   const requestFailures = []

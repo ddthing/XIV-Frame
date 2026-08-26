@@ -116,6 +116,9 @@ XIV Frame은 계정, 로그인, 유료 플랜, 서버 기반 프로젝트 보관
     ├─ messages/            한국어·영어·일본어 번역
     └─ store/               Zustand 상태와 로컬 저장소 정책
 
+    .github/workflows/quality.yml
+                            main push·PR 배포 전 품질 검증
+
     scripts/
     ├─ sync-transformers-worker.mjs
     ├─ run-e2e.mjs
@@ -161,7 +164,13 @@ XIV Frame은 계정, 로그인, 유료 플랜, 서버 기반 프로젝트 보관
     npm run test:production:smoke
     npm run test:production:edge
 
-`npm run render:check`는 공유 Konva 레이어, soft-blend 오프스크린 마스크와 단일 hit layer, 부분 이미지 로드 후 원본 슬롯 매핑, Blob URL과 취소 게이트를 정적으로 확인합니다. `npm run test:e2e`는 [`e2e/editor.spec.ts`](e2e/editor.spec.ts)를 Chromium에서 실행하며, 정상·혼합 비율 렌더링, 이미지 디코드 부분 실패 복구, 업로드·교체·초기화 취소, 문자·로고·Worker·export 수명 주기, 설정 보존과 반응형 셸을 회귀 확인합니다.
+`npm run render:check`는 공유 Konva 레이어, soft-blend 오프스크린 마스크와 단일 hit layer, 부분 이미지 로드 후 원본 슬롯 매핑, Blob URL과 취소 게이트를 정적으로 확인합니다. `npm run test:e2e`는 [`e2e/editor.spec.ts`](e2e/editor.spec.ts)와 [`e2e/background-removal-errors.spec.ts`](e2e/background-removal-errors.spec.ts)를 Chromium에서 실행하며, 정상·혼합 비율 렌더링, 이미지 디코드 부분 실패 복구, 업로드·교체·초기화 취소, 배경 제거의 파일·모델·브라우저·메모리·처리·시간 초과 오류, 문자·로고·Worker·export 수명 주기, 설정 보존과 반응형 셸을 회귀 확인합니다. 이미 개발 서버가 실행 중인 Windows PowerShell에서는 다음처럼 기존 서버를 재사용합니다.
+
+    $env:E2E_SKIP_SERVER = '1'
+    $env:PLAYWRIGHT_BASE_URL = 'http://127.0.0.1:3000'
+    npm run test:e2e
+
+별도 실행 환경에서 테스트 서버 포트를 바꿔야 하면 PowerShell에서 `$env:E2E_PORT = '3101'`과 `$env:PLAYWRIGHT_BASE_URL = 'http://127.0.0.1:3101'`을 지정합니다.
 
 `npm run test:background:live`는 테스트용 Worker를 사용하지 않고 실제 배경 제거 Worker와 외부 모델 저장소를 호출합니다. 모델 결과 이미지가 표시되는지, 모델 요청 실패가 없는지 확인하므로 네트워크가 필요하며, 실패하면 출력된 요청 오류와 원인별 사용자 메시지를 함께 확인합니다. 모바일 조건은 `npm run test:background:live -- --mobile`로 실행합니다. Windows Chrome에서 표시되는 `powerPreference ... ignored ... on Windows` 경고는 결과·모델 요청 실패가 없는 경우 Chrome/ONNX Runtime의 비차단 경고이며, [Chromium 이슈 369219127](https://issues.chromium.org/issues/369219127)과 연결됩니다. 일반 회귀 테스트와 분리해 외부 모델 저장소의 일시적 장애가 CI 전체를 흔들지 않도록 합니다.
 
@@ -172,6 +181,8 @@ soft-blend의 레이어 수와 캔버스 backing-store 면적은 `npm run perf:s
 `npm run build`는 `prebuild`에서 Worker와 콘텐츠를 확인하고, 정적 결과물을 `out/`에 생성한 뒤 `postbuild` 검사를 실행합니다. 현재 기준으로 정적 페이지 54개, HTML 51개, 사이트맵 URL 45개를 검사합니다.
 
 `npm run test:production:smoke`는 `out/` 정적 export를 별도 로컬 서버로 제공하고 iPhone 16 Pro Max·Android Chrome 조건에서 사진 추가, 레이아웃, Original ratio, 저장을 확인합니다. `npm run test:production:edge`는 같은 조건에서 15장 업로드 후 마지막 슬롯 선택, drag & drop, 테두리·필름 노이즈, 16장 저장과 5MB 제한까지 확인합니다. 이미 배포된 주소를 직접 확인하려면 PowerShell에서 `$env:SMOKE_BASE_URL='https://xiv-frame.pages.dev'; npm run test:production:edge`를 실행합니다. 두 명령 모두 콘솔 오류, 페이지 오류, 요청 실패, 모바일 가로 넘침을 실패 조건으로 처리합니다.
+
+`.github/workflows/quality.yml`은 `main` push, pull request, 수동 실행에서 lint·TypeScript·render contract·static build·Chromium E2E·production edge smoke를 순서대로 실행합니다. `npm run test:background:live`는 외부 모델 저장소에 의존하므로 일반 CI 게이트에서 분리하고, 모델 다운로드·실제 Worker 결과 확인이 필요할 때만 수동 실행합니다.
 
 ## 정적 배포
 
@@ -283,6 +294,7 @@ FAQ·소개·정책 문서는 `src/components/pages/`의 언어별 컴포넌트�
 [ ] npm run lint
 [ ] npx tsc --noEmit
 [ ] npm run build
+[ ] npm run test:production:edge
 [ ] /, /ko, /ko/blog, /ko/faq, /ko/about 실제 응답 확인
 [ ] /sitemap.xml, /robots.txt, /rss.xml, /ads.txt 확인
 [ ] 데스크톱·모바일 사진 추가 및 결과 저장 확인(PNG 우선, 필요 시 JPEG)
