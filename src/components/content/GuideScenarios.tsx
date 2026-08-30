@@ -31,10 +31,11 @@ const scenarioIcons: Record<ScenarioKind, LucideIcon> = {
 function ScenarioPreview({ kind }: { kind: ScenarioKind }) {
   if (kind === 'showcase') {
     return (
-      <div className="grid h-full grid-cols-2 gap-1.5 p-3">
-        <div className="row-span-2 rounded-md border border-primary/20 bg-primary/15" />
+      <div className="grid h-full grid-cols-2 grid-rows-2 gap-1.5 p-3">
+        <div className="rounded-md border border-primary/20 bg-primary/15" />
         <div className="rounded-md border border-primary/15 bg-primary/5" />
         <div className="rounded-md border border-primary/15 bg-accent/70" />
+        <div className="rounded-md border border-primary/15 bg-primary/10" />
       </div>
     )
   }

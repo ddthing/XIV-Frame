@@ -2,7 +2,7 @@
 title: "Uploading large FFXIV screenshots: protect quality and browser performance"
 description: "Understand the 50 MB limit, prepare large screenshots safely, and use browser optimization without losing the details that matter in the exported result."
 date: "2026-08-22"
-updated: "2026-08-26"
+updated: "2026-08-31"
 category: "Files and performance"
 tags: ["ffxiv", "performance", "image-size"]
 ---
@@ -13,7 +13,7 @@ High-resolution GPose screenshots look great, but a browser editor uses both the
 
 - Each photo or composite image must be **50 MB or smaller**.
 - A canvas can contain up to 16 photos. The 3×3 and 4×4 grid templates use 9 and 16 photos.
-- Large photo dimensions may be optimized in the browser into an editing size up to 4096 px on the long side.
+- Editing dimensions are optimized by image count: up to 4096 px for one image, 3072 px for two, 2048 px for three or four, and 1536 px for five or more.
 - Background removal needs additional memory because a model runs on the device.
 - A file over 50 MB is rejected before browser optimization can begin.
 

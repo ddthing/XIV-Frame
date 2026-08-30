@@ -2,7 +2,7 @@
 title: "XIV Frame compositing guide: remove backgrounds and place PNG elements"
 description: "Remove a background from a character, light, or effect image in your browser, refine its edges, and place the element naturally over your screenshot."
 date: "2026-08-22"
-updated: "2026-08-26"
+updated: "2026-08-31"
 category: "Compositing"
 tags: ["ffxiv", "composite", "background-removal"]
 ---
@@ -27,7 +27,7 @@ If the source is already a transparent PNG, skip background removal. Add it as a
 
 ## 2. Add a composite image
 
-1. On desktop, open **Image → Composite**. On mobile, open the photo sheet and find the composite section.
+1. On desktop, open the top **Image** tab, then choose **Composite** inside the **Image source** panel. On mobile, open the photo sheet and find the composite section.
 2. Select **Add composite image** and choose the file.
 3. Compare the **Original** preview with the **Background removal result** area.
 4. If an element seems invisible on the canvas, check its preview, selected state, opacity, and position. A transparent result or an element placed outside the visible crop can look like a failed upload.
@@ -86,4 +86,4 @@ If the element looks like it is floating, check its position and opacity before 
 | The element is too small | Image size value | Increase it within the 500% range |
 | The element is no longer needed | Composite controls | Select **Remove composite**; photo and signature settings remain |
 
-Before exporting, inspect the edge at close range, then return to a full-canvas view. Check that the element does not cover a face, weapon, signature, or other important detail. Export with **Save PNG** on desktop or **Export → Save photo** on mobile. PNG is preferred; an opaque result over 5 MB is automatically downloaded as a high-quality JPEG, while a transparent PNG that cannot fit under 5 MB shows guidance instead of downloading.
+Before exporting, inspect the edge at close range, then return to a full-canvas view. Check that the element does not cover a face, weapon, signature, or other important detail. Export with **Export PNG** on desktop or **Export → Save Photo** on mobile. PNG is preferred; an opaque result over 5 MB is automatically downloaded as a high-quality JPEG, while a transparent PNG that cannot fit under 5 MB shows guidance instead of downloading.

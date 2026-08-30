@@ -9,7 +9,7 @@ export function AboutEn() {
       title="About XIV Frame"
       description="Learn what XIV Frame does and how it handles your images and editor settings."
       updatedLabel="Last updated"
-      updated="August 26, 2026"
+      updated="August 31, 2026"
       asideLabel="On this page"
       sections={[
         {
@@ -21,7 +21,7 @@ export function AboutEn() {
               <p>XIV Frame is a browser-based editor for composing Final Fantasy XIV (FF14) screenshots into one finished image. You can arrange several screenshots, add a character name, server label, or logo, and save the finished frame without opening a full image-editing suite.</p>
               <ul>
                 <li>Add up to 16 screenshots and change their order. The four-slot 2×2 Grid uses three or four images; the 3×3 and 4×4 grids use 9 and 16.</li>
-                <li>Choose split, vertical, or grid layouts and set the canvas ratio.</li>
+                <li>Choose split, vertical, grid, feature, and equal row/column layouts, then set the canvas ratio.</li>
                 <li>Adjust each image&apos;s scale and position, then place a text signature or logo.</li>
               </ul>
             </>
@@ -34,7 +34,7 @@ export function AboutEn() {
           children: (
             <>
               <p>Use it when you want to show a character from multiple angles, document a glamour or housing project, or prepare a single showcase image for a community post.</p>
-              <p>The simplest path is <strong>add images → choose a layout → tune each crop → tune the signature → export</strong>. You can also choose a layout first and fill its empty preview slots. Original ratio is the default, with the X timeline 16:9 profile and 2:1 available as options. The <Link href="/en/blog">guides</Link> follow that same order and explain the controls using the labels in the editor.</p>
+              <p>Start by adding a photo. With one photo, the canvas does not split automatically, so you can skip layout selection, tune the signature, and export immediately. For multiple images, the simplest path is <strong>add images → choose a layout → tune each crop → tune the signature → export</strong>. You can also choose a layout first and fill its empty preview slots. Original ratio is the default, with the X timeline 16:9 profile and 2:1 available as options. The <Link href="/en/blog">guides</Link> follow that same order and explain the controls using the labels in the editor.</p>
             </>
           ),
         },
@@ -77,7 +77,7 @@ export function AboutEn() {
           title: 'Recommended workflow and limits',
           children: (
             <>
-              <p>For a predictable first edit, add photos, choose a layout, then move through compositing, signature, and export. On mobile, process one background-removal image at a time. PNG is preferred, while opaque results over X&apos;s 5 MB limit are automatically optimized as high-quality JPEG files.</p>
+              <p>For one photo, skip layout selection and move straight to the signature and export steps. For multiple images, add photos and choose a layout before moving through compositing, signature, and export. On mobile, process one background-removal image at a time. PNG is preferred, while opaque results over X&apos;s 5 MB limit are automatically optimized as high-quality JPEG files.</p>
               <p>XIV Frame is an editing tool, not a service that decides image ownership or publishing permission. Check rights and consent yourself when another person&apos;s character, logo, or conversation appears in an image.</p>
             </>
           ),
@@ -88,13 +88,13 @@ export function AboutEn() {
           title: 'Verified feature coverage',
           children: (
             <FeatureCoverageTable
-              intro="This feature and limitation list reflects the review build checked on August 26, 2026. The public deployment is checked again after release. Processing time can vary with the browser, device memory, and source file."
+              intro="This feature and limitation list reflects the review build checked on August 31, 2026. The public deployment is checked again after release. Processing time can vary with the browser, device memory, and source file."
               areaLabel="Area"
               supportLabel="Supported feature"
               notesLabel="Usage notes"
               rows={[
-                { area: 'Input images', support: 'AVIF · BMP · GIF · JPG · PNG · WebP', notes: 'Up to 50 MB per file and 16 photos. Large dimensions may be optimized in the browser.' },
-                { area: 'Layouts', support: 'Split · vertical · 2×2 Grid · 3×3 · 4×4', notes: 'The four-slot 2×2 Grid uses 3–4 images; with three, one slot stays empty. The 3×3 and 4×4 grids use 9 and 16. Adjust X timeline, Original ratio, and 2:1 plus spacing, border, and background.' },
+                { area: 'Input images', support: 'AVIF · BMP · GIF · JPG · PNG · WebP', notes: 'Up to 50 MB per file and 16 photos. Editing dimensions are optimized by image count across 4096, 3072, 2048, or 1536 px.' },
+                { area: 'Layouts', support: 'Split · vertical · 2×2 Grid · feature · equal rows/columns · 3×3 · 4×4', notes: 'The 2×2 Grid, feature, and equal 3-row/3-column layouts use 3–4 images; equal 4-row/4-column layouts use 4. With three in a 2×2 Grid, one slot stays empty. The 3×3 and 4×4 grids use 9 and 16. A single image in 2:1 can also use Default, Circle, Heart, or Star. Adjust X timeline, Original ratio, and 2:1 plus spacing, border, and White, Black, Light Gray, Transparent, or Custom background.' },
                 { area: 'Compositing', support: 'Remove · erase · restore · shadow', notes: 'Runs in the browser; element size can be tuned from 25% to 500%.' },
                 { area: 'Fine movement', support: 'Desktop arrows · mobile nudge', notes: 'Desktop supports 1 px/10 px steps; mobile uses buttons and long press.' },
                 { area: 'Export and storage', support: 'PNG · JPEG download', notes: "PNG is preferred; opaque results over X's 5 MB limit are optimized as high-quality JPEG. Screenshots are not stored on the server." },

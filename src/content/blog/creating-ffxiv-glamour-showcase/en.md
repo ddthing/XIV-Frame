@@ -2,7 +2,7 @@
 title: "Build an FFXIV Glamour Showcase: Front, Back, and Detail in One Image"
 description: "Arrange three or four GPose screenshots in a grid, correct each crop, add a restrained signature, and export a polished showcase image."
 date: "2026-06-03"
-updated: "2026-08-26"
+updated: "2026-08-31"
 category: "Showcase"
 tags: ["ffxiv", "glamour", "tutorial"]
 ---
@@ -69,4 +69,4 @@ A useful glamour board gives every image a job. The example below uses a front v
 - Are the name, server, and logo separate from the main subject?
 - Is the text contrast strong enough at the size where you will post it?
 
-When the checklist is clear, click **Save PNG** on desktop or **Export → Save Photo** on mobile. PNG is preferred; an opaque result over 5 MB is automatically saved as a high-quality JPEG.
+When the checklist is clear, click **Export PNG** on desktop or **Export → Save Photo** on mobile. PNG is preferred; an opaque result over 5 MB is automatically saved as a high-quality JPEG.

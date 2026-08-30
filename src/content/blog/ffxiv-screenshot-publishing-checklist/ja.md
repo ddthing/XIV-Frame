@@ -2,7 +2,7 @@
 title: "FFXIVスクリーンショット公開前チェック：権利・可読性・品質"
 description: "XIV Frameで作った画像を共有する前に、画像の権利、個人情報、文字の読みやすさ、合成の端、保存した結果ファイルを確認するチェックリストです。"
 date: "2026-08-22"
-updated: "2026-08-26"
+updated: "2026-08-31"
 category: "公開前チェック"
 tags: ["ffxiv", "publishing", "checklist"]
 ---

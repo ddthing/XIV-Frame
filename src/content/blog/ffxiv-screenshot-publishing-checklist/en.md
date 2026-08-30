@@ -2,7 +2,7 @@
 title: "Before publishing an FFXIV screenshot: rights, readability, and quality checklist"
 description: "Review image rights, personal information, text readability, composite edges, and the downloaded result file before sharing a XIV Frame image."
 date: "2026-08-22"
-updated: "2026-08-26"
+updated: "2026-08-31"
 category: "Publishing checklist"
 tags: ["ffxiv", "publishing", "checklist"]
 ---

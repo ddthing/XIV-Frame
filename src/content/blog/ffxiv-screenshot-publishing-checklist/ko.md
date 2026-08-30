@@ -2,7 +2,7 @@
 title: "파판14 스크린샷 게시 전 체크리스트: 권리·가독성·이미지 품질 확인하기"
 description: "XIV Frame으로 만든 결과 파일을 커뮤니티와 SNS에 게시하기 전에 저작권, 개인정보, 텍스트 가독성, 합성 경계를 확인하는 실전 점검표입니다."
 date: "2026-08-22"
-updated: "2026-08-26"
+updated: "2026-08-31"
 category: "게시 전 검수"
 tags: ["ffxiv", "publishing", "checklist"]
 ---

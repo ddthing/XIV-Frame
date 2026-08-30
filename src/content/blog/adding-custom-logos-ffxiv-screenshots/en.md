@@ -2,7 +2,7 @@
 title: "How to Add a Free Company or Custom Logo to an FFXIV Screenshot"
 description: "Upload a logo, place it with the nine-position grid, tune its scale and opacity, and export it with your screenshot."
 date: "2026-06-03"
-updated: "2026-08-26"
+updated: "2026-08-31"
 category: "Logo"
 tags: ["ffxiv", "logo", "tutorial"]
 ---
@@ -12,7 +12,7 @@ XIV Frame treats a logo as an overlay layer. A transparent PNG is the best choic
 ## 1. Prepare the logo
 
 1. Use a transparent PNG when possible.
-2. Keep logo files at 10MB or smaller. Logos use a separate storage optimization, so a lightweight transparent PNG is recommended instead of a large photo.
+2. The file-selection limit is 10MB. The resized data is checked too, so a lightweight transparent PNG is recommended instead of a large photo.
 3. Crop unnecessary empty space around the artwork before uploading. Extra padding makes the logo appear farther from the canvas edge.
 
 ## 2. Open Logo Upload
@@ -51,6 +51,6 @@ XIV Frame treats a logo as an overlay layer. A transparent PNG is the best choic
 ## 7. Export
 
 1. Check the logo edge, transparency, and overlap with the subject.
-2. Click **Save PNG** on desktop or use **Export → Save Photo** on mobile.
+2. Click **Export PNG** on desktop or use **Export → Save Photo** on mobile.
 3. If you chose a transparent canvas background, inspect the downloaded PNG to confirm that the area outside the composition remains transparent.
 4. PNG is preferred, but an opaque result over 5 MB is automatically downloaded as a high-quality JPEG. If a transparent PNG cannot fit under 5 MB, the editor shows guidance instead of downloading it.

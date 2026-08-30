@@ -20,11 +20,12 @@ interface GuideWorkflowProps {
 function StepPreview({ number }: { number: string }) {
   if (number === '01') {
     return (
-      <div className="grid h-full grid-cols-3 gap-1.5 p-3">
-        <div className="rounded-md border border-primary/15 bg-primary/10" />
-        <div className="rounded-md border border-primary/15 bg-accent/70" />
-        <div className="grid place-items-center rounded-md border border-dashed border-primary/25 bg-card text-primary/65">
-          <ImagePlus className="size-4" aria-hidden="true" />
+      <div className="h-full p-3">
+        <div className="relative h-full overflow-hidden rounded-md border border-primary/20 bg-primary/10">
+          <div className="absolute inset-3 grid place-items-center rounded border border-dashed border-primary/25 bg-card/70 text-primary/65">
+            <ImagePlus className="size-4" aria-hidden="true" />
+          </div>
+          <div className="absolute inset-x-5 bottom-2 h-1 rounded-full bg-primary/25" />
         </div>
       </div>
     )

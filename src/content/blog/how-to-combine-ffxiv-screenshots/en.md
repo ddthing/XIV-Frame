@@ -2,12 +2,12 @@
 title: "How to Combine 2–16 FFXIV Screenshots in XIV Frame"
 description: "Choose the right composition for two to sixteen images, reorder the cards, tune each crop, and export a clean combined image."
 date: "2026-06-03"
-updated: "2026-08-26"
+updated: "2026-08-31"
 category: "Layout"
 tags: ["ffxiv", "screenshot", "tutorial"]
 ---
 
-Combining screenshots works best when you decide what each image contributes before adjusting the controls. You can choose a layout first to see its empty slots, then fill them with photos. This guide covers the complete process for two to sixteen images.
+Combining screenshots works best when you decide what each image contributes before adjusting the controls. This guide covers the multi-image process for two to sixteen images; with one photo, the canvas stays single and you can add a signature without choosing a layout. You can also choose a layout first to see its empty slots, then fill them with photos.
 
 ## 1. Decide the viewing order
 
@@ -56,7 +56,7 @@ Combining screenshots works best when you decide what each image contributes bef
 
 ## 7. Add the finishing layers
 
-1. Choose a background under **Surface finish**: **White**, **Light Gray**, or **Transparent**.
+1. Choose a background under **Surface finish**: **White**, **Black**, **Light Gray**, **Transparent**, or **Custom**.
 2. Keep **Film Grain** at 0% unless a small amount of texture helps unify the screenshots.
 3. If needed, open **Signature → Text** and add a character name and server label.
 4. If you have a Free Company mark, add it from **Signature → Logo Upload** and keep it away from the main subject.
@@ -64,5 +64,5 @@ Combining screenshots works best when you decide what each image contributes bef
 ## 8. Save and review
 
 1. Check that the first card is still the visual lead and that no face or important detail is clipped.
-2. Click **Save PNG** on desktop or use **Export → Save Photo** on mobile. PNG is preferred; if an opaque result exceeds 5 MB, the editor saves a high-quality JPEG instead.
+2. Click **Export PNG** on desktop or use **Export → Save Photo** on mobile. PNG is preferred; if an opaque result exceeds 5 MB, the editor saves a high-quality JPEG instead.
 3. Open the downloaded file once before posting. If an edge is clipped, return to the active image card and correct its scale or position.

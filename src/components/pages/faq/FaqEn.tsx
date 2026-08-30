@@ -33,7 +33,7 @@ export function FaqEn() {
           items: [
             {
               question: 'Where do I change the image order and layout?',
-              answer: <p>Use the <strong>Image</strong> tab to reorder cards or clear them. Use the <strong>Layout</strong> tab to choose split, vertical, or grid and set the canvas ratio. Grid is a four-slot 2×2 layout for three or four images; with three images, one slot stays empty.</p>,
+              answer: <p>Use the <strong>Image</strong> tab to reorder cards or clear them. For multiple images, use the <strong>Layout</strong> tab to choose split, vertical, grid, and other composition presets, then set the canvas ratio. Grid is a four-slot 2×2 layout for three or four images; with three images, one slot stays empty. With one photo, the canvas does not split automatically, so you can add a signature without choosing a layout.</p>,
             },
             {
               question: 'How do I fix a crop or move an image?',
@@ -51,7 +51,7 @@ export function FaqEn() {
           items: [
             {
               question: 'How do I save the finished frame?',
-              answer: <p>On desktop, select <strong>Save PNG</strong> in the top bar. On mobile, open <strong>Export</strong> from the bottom bar and choose the photo-saving action. PNG is preferred, but an opaque result over 5 MB is saved as a high-quality JPEG. If a transparent PNG cannot fit under 5 MB, the editor shows guidance instead of downloading it.</p>,
+              answer: <p>On desktop, select <strong>Export PNG</strong> in the top bar. On mobile, open <strong>Export</strong> from the bottom bar and choose <strong>Save Photo</strong>. PNG is preferred, but an opaque result over 5 MB is saved as a high-quality JPEG. If a transparent PNG cannot fit under 5 MB, the editor shows guidance instead of downloading it.</p>,
             },
             {
               question: 'I selected an image, but it is not visible.',

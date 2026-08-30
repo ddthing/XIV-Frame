@@ -96,7 +96,7 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
             number: '01',
             label: t('flowStepUpload'),
             description: t('flowStepUploadDescription'),
-            href: `/${locale}/blog/how-to-combine-ffxiv-screenshots`,
+            href: `/${locale}/blog/edit-ffxiv-screenshots-without-photoshop`,
             icon: ImagePlus,
           },
           {

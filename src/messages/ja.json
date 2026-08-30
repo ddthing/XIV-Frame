@@ -1,10 +1,4 @@
 {
-  "SettingsPanel": {
-    "title": "設定",
-    "tabImage": "画像",
-    "tabLayout": "レイアウト",
-    "tabSignature": "署名"
-  },
   "ImageUploader": {
     "close": "閉じる",
     "sourceTitle": "画像ソース",
@@ -383,11 +377,11 @@
     "title": "ガイド",
     "description": "画像配置、合成、背景削除、署名、大容量ファイル、公開前確認まで、実際の結果を作る手順ガイドです。",
     "flowTitle": "XIV Frameの使い方",
-    "flowDescription": "次の5ステップを順番に進めてください。画像の配置から合成、署名、結果の保存までの流れを確認できます。",
+    "flowDescription": "初めて使う場合は、この流れに沿って進めてください。画像1枚ならレイアウト選択を飛ばし、署名と保存へ進めます。",
     "flowStepUpload": "SSを追加",
-    "flowStepUploadDescription": "最大16枚の画像をアップロードします。2×2グリッドは3～4枚、3×3・4×4グリッドはそれぞれ9枚・16枚を使います。",
+    "flowStepUploadDescription": "画像1枚は自動分割されず、1枚のキャンバスで始まります。複数画像は最大16枚まで追加でき、2×2グリッドは3～4枚、3×3・4×4グリッドはそれぞれ9枚・16枚を使います。",
     "flowStepArrange": "レイアウトを選ぶ",
-    "flowStepArrangeDescription": "分割・縦分割・2×2グリッドと比率を決めます。",
+    "flowStepArrangeDescription": "複数画像では、分割・縦分割・グリッド・強調・均等配置と比率を選びます。",
     "flowStepComposite": "合成画像を追加",
     "flowStepCompositeDescription": "背景を削除し、画像要素をキャンバスに配置します。",
     "flowStepStyle": "署名を調整",

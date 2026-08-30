@@ -1,10 +1,4 @@
 {
-  "SettingsPanel": {
-    "title": "Settings",
-    "tabImage": "Image",
-    "tabLayout": "Layout",
-    "tabSignature": "Signature"
-  },
   "ImageUploader": {
     "close": "Close",
     "uploadLimit": "Image files must be 50MB or smaller. Larger dimensions are optimized in your browser.",
@@ -384,11 +378,11 @@
     "title": "Guide",
     "description": "Step-by-step guides for layouts, compositing, background removal, signatures, large files, and publishing checks in XIV Frame.",
     "flowTitle": "Editor flow",
-    "flowDescription": "Follow these five steps in order. The flow covers photo layout, image compositing, signatures, and saving the result.",
+    "flowDescription": "Follow this flow when you are new. With one photo, skip layout selection and go straight to the signature and export steps.",
     "flowStepUpload": "Add photos",
-    "flowStepUploadDescription": "Upload up to 16 images. The 2×2 Grid uses 3–4 images; the 3×3 and 4×4 grids use 9 and 16.",
+    "flowStepUploadDescription": "One photo starts as a single canvas without an automatic split. Add up to 16 images for a multi-image composition; the 2×2 Grid uses 3–4, while the 3×3 and 4×4 grids use 9 and 16.",
     "flowStepArrange": "Choose layout",
-    "flowStepArrangeDescription": "Set split, vertical, 2×2 grid, and ratio.",
+    "flowStepArrangeDescription": "For multiple images, choose split, vertical, grid, feature, equal-row/column presets, and the ratio.",
     "flowStepComposite": "Add a composite image",
     "flowStepCompositeDescription": "Remove a background and place an image element over the canvas.",
     "flowStepStyle": "Tune the signature",
