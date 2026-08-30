@@ -13,6 +13,7 @@ const backgroundRemovalSource = fs.readFileSync(path.join(process.cwd(), 'src', 
 const backgroundRemovalWorkerSource = fs.readFileSync(path.join(process.cwd(), 'src', 'lib', 'backgroundRemoval.worker.js'), 'utf8')
 const exportSource = fs.readFileSync(path.join(process.cwd(), 'src', 'lib', 'export.ts'), 'utf8')
 const storeSource = fs.readFileSync(path.join(process.cwd(), 'src', 'store', 'useStore.ts'), 'utf8')
+const imageSliceSource = fs.readFileSync(path.join(process.cwd(), 'src', 'store', 'slices', 'imageSlice.ts'), 'utf8')
 const errors = []
 
 function fail(message) {
@@ -23,15 +24,20 @@ if (!/<Layer>\{images\.map\(renderImageGroup\)\}<\/Layer>/.test(source)) {
   fail('ImageGridLayer should share one Konva Layer across non-blended images.')
 }
 
-if (!source.includes('<Layer listening={false}>{images.map(renderSoftBlendGroup)}</Layer>')
-  || !source.includes('<Layer>{images.map(renderSoftBlendInteraction)}</Layer>')) {
-  fail('Soft-blended images must share one visual layer and one interaction layer.')
+if (!source.includes('<SoftBlendCompositeVisual')
+  || !source.includes('<SoftBlendActiveVisual')
+  || !source.includes('{images.map(renderSoftBlendInteraction)}')) {
+  fail('Soft-blended images must use one cached composite layer, one active overlay layer, and one interaction layer.')
 }
 
 if (!source.includes('drawSoftBlendMask')
   || !source.includes("context.globalCompositeOperation = 'destination-in'")
-  || !source.includes('canvasRef.current ?? document.createElement')) {
-  fail('Soft-blend masks must be isolated in per-image offscreen canvases before entering the shared visual layer.')
+  || !source.includes('canvasRef.current ?? document.createElement')
+  || !source.includes('scratchCanvasRef')
+  || !source.includes('scratchContext.clearRect')
+  || !source.includes('offscreenContext.drawImage(')
+  || !source.includes('rasterScale')) {
+  fail('Soft-blend output must isolate each masked image in bounded reusable surfaces before compositing.')
 }
 
 if (!/settleWithConcurrency\([\s\S]*filesToPrepare[\s\S]*prepareImageForCanvas[\s\S]*preparationConcurrency/.test(previewSource)
@@ -62,8 +68,15 @@ if (!stageSource.includes('Promise.allSettled')
   || !stageSource.includes('pending.cancel()')
   || !stageSource.includes("canvas-image-error")
   || !stageSource.includes('const syncLoadedImages = () =>')
-  || !stageSource.includes('void promise.then(syncLoadedImages, syncLoadedImages)')) {
+  || !stageSource.includes('const scheduleLoadedImageSync = () =>')
+  || !stageSource.includes('void promise.then(scheduleLoadedImageSync, scheduleLoadedImageSync)')) {
   fail('KonvaStage must progressively paint decoded images while preserving source slots and failure cleanup.')
+}
+
+if (!imageSliceSource.includes('setPreparedImages:')
+  || !previewSource.includes('setPreparedImages(')
+  || !imageUploaderSource.includes('setPreparedImages(')) {
+  fail('Prepared uploads must commit image URLs, positions, scales, and selection through one store action.')
 }
 
 if (!previewSource.includes("canvas-image-error")) {

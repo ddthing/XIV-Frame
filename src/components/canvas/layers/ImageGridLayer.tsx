@@ -18,7 +18,7 @@ type DragContext = {
 
 type SoftBlendMaskDirection = 'horizontal' | 'vertical'
 
-const SOFT_BLEND_MASK_CACHE_LIMIT = 12
+const SOFT_BLEND_MASK_CACHE_LIMIT = 6
 const softBlendMaskCache = new Map<string, HTMLCanvasElement>()
 
 export type LoadedCanvasImage = {
@@ -71,53 +71,110 @@ function drawSoftBlendMask(
   height: number,
   blendWidth: number,
   direction: SoftBlendMaskDirection,
+  rasterScale: number,
 ) {
-  const mask = getSoftBlendMask(width, height, blendWidth, direction)
+  const rasterWidth = Math.max(1, Math.ceil(width * rasterScale))
+  const rasterHeight = Math.max(1, Math.ceil(height * rasterScale))
+  const mask = getSoftBlendMask(rasterWidth, rasterHeight, blendWidth * rasterScale, direction)
   if (!mask) return
   context.globalCompositeOperation = 'destination-in'
-  context.drawImage(mask, 0, 0, width, height)
+  context.drawImage(mask, 0, 0, rasterWidth, rasterHeight)
   context.globalCompositeOperation = 'source-over'
 }
 
-function SoftBlendVisual({
-  id,
-  sourceIndex,
+function drawSoftBlendImage({
+  context,
   image,
-  width,
-  height,
+  cell,
+  borderWidth,
+  position,
+  scale,
   blendWidth,
   applyHorizontalMask,
   applyVerticalMask,
   imageShape,
-  getPosition,
-  getScale,
-  activeInteractionIndexRef,
-  renderOnlyWhenActive = false,
+  rasterScale,
 }: {
-  id: string
-  sourceIndex: number
+  context: CanvasRenderingContext2D
   image: HTMLImageElement
-  width: number
-  height: number
+  cell: ReturnType<typeof getImageCellGeometry>
+  borderWidth: number
+  position: ImagePosition
+  scale: number
   blendWidth: number
   applyHorizontalMask: boolean
   applyVerticalMask: boolean
   imageShape: ImageShape
-  getPosition: () => ImagePosition
-  getScale: () => number
+  rasterScale: number
+}) {
+  const cellWidth = Math.max(1, Math.ceil(cell.width * rasterScale))
+  const cellHeight = Math.max(1, Math.ceil(cell.height * rasterScale))
+  const cellX = Math.ceil((borderWidth + cell.x) * rasterScale)
+  const cellY = Math.ceil((borderWidth + cell.y) * rasterScale)
+
+  context.save()
+  context.translate(cellX, cellY)
+  clipImageShape(context, imageShape, cellWidth, cellHeight)
+  context.drawImage(
+    image,
+    position.x * rasterScale,
+    position.y * rasterScale,
+    image.width * scale * rasterScale,
+    image.height * scale * rasterScale,
+  )
+
+  if (blendWidth > 0) {
+    if (applyHorizontalMask) drawSoftBlendMask(context, cell.width, cell.height, blendWidth, 'horizontal', rasterScale)
+    if (applyVerticalMask) drawSoftBlendMask(context, cell.width, cell.height, blendWidth, 'vertical', rasterScale)
+  }
+  context.restore()
+}
+
+function SoftBlendCompositeVisual({
+  id,
+  images,
+  contentWidth,
+  contentHeight,
+  borderWidth,
+  gap,
+  geometry,
+  imageCount,
+  blendWidth,
+  imageShape,
+  imagePositions,
+  imageScales,
+  transientPositions,
+  wheelScales,
+  activeInteractionIndexRef,
+  rasterScale,
+}: {
+  id: string
+  images: readonly LoadedCanvasImage[]
+  contentWidth: number
+  contentHeight: number
+  borderWidth: number
+  gap: number
+  geometry: ReturnType<typeof getLayoutGeometry>
+  imageCount: number
+  blendWidth: number
+  imageShape: ImageShape
+  imagePositions: readonly ImagePosition[]
+  imageScales: readonly number[]
+  transientPositions: React.MutableRefObject<Map<number, ImagePosition>>
+  wheelScales: React.MutableRefObject<Map<number, number>>
   activeInteractionIndexRef: React.RefObject<number | null>
-  renderOnlyWhenActive?: boolean
+  rasterScale: number
 }) {
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null)
+  const scratchCanvasRef = React.useRef<HTMLCanvasElement | null>(null)
+  const outerWidth = contentWidth + (borderWidth * 2)
+  const outerHeight = contentHeight + (borderWidth * 2)
   const sceneFunc = React.useCallback((context: Konva.Context) => {
-    const isActive = activeInteractionIndexRef.current === sourceIndex
-    if (renderOnlyWhenActive !== isActive) return
-
     const canvas = canvasRef.current ?? document.createElement('canvas')
     canvasRef.current = canvas
 
-    const canvasWidth = Math.max(1, Math.ceil(width))
-    const canvasHeight = Math.max(1, Math.ceil(height))
+    const canvasWidth = Math.max(1, Math.ceil(outerWidth * rasterScale))
+    const canvasHeight = Math.max(1, Math.ceil(outerHeight * rasterScale))
     if (canvas.width !== canvasWidth || canvas.height !== canvasHeight) {
       canvas.width = canvasWidth
       canvas.height = canvasHeight
@@ -125,28 +182,141 @@ function SoftBlendVisual({
 
     const offscreenContext = canvas.getContext('2d')
     if (!offscreenContext) return
-
     offscreenContext.clearRect(0, 0, canvasWidth, canvasHeight)
-    offscreenContext.save()
-    clipImageShape(offscreenContext, imageShape, width, height)
-    const position = getPosition()
-    const scale = getScale()
-    offscreenContext.drawImage(
-      image,
-      position.x,
-      position.y,
-      image.width * scale,
-      image.height * scale,
-    )
-    offscreenContext.restore()
 
-    if (blendWidth > 0) {
-      if (applyHorizontalMask) drawSoftBlendMask(offscreenContext, width, height, blendWidth, 'horizontal')
-      if (applyVerticalMask) drawSoftBlendMask(offscreenContext, width, height, blendWidth, 'vertical')
+    const renderedImages = images.flatMap(({ image, sourceIndex }) => {
+      if (activeInteractionIndexRef.current === sourceIndex) return []
+
+      return [{
+        image,
+        sourceIndex,
+        cell: getImageCellGeometry({
+          contentWidth,
+          contentHeight,
+          gap,
+          geometry,
+          imageCount,
+          index: sourceIndex,
+        }),
+      }]
+    })
+    const scratchWidth = Math.max(1, ...renderedImages.map(({ cell }) => Math.ceil(cell.width * rasterScale)))
+    const scratchHeight = Math.max(1, ...renderedImages.map(({ cell }) => Math.ceil(cell.height * rasterScale)))
+    const scratchCanvas = scratchCanvasRef.current ?? document.createElement('canvas')
+    scratchCanvasRef.current = scratchCanvas
+    if (scratchCanvas.width !== scratchWidth || scratchCanvas.height !== scratchHeight) {
+      scratchCanvas.width = scratchWidth
+      scratchCanvas.height = scratchHeight
     }
 
-    context.drawImage(canvas, 0, 0, width, height)
-  }, [activeInteractionIndexRef, applyHorizontalMask, applyVerticalMask, blendWidth, getPosition, getScale, height, image, imageShape, renderOnlyWhenActive, sourceIndex, width])
+    const scratchContext = scratchCanvas.getContext('2d')
+    if (!scratchContext) return
+
+    renderedImages.forEach(({ image, sourceIndex, cell }) => {
+      const baseScale = Math.max(cell.width / image.width, cell.height / image.height)
+      const userScale = wheelScales.current.get(sourceIndex) ?? imageScales[sourceIndex] ?? 1
+      const position = transientPositions.current.get(sourceIndex) ?? imagePositions[sourceIndex] ?? { x: 0, y: 0 }
+      const cellWidth = Math.max(1, Math.ceil(cell.width * rasterScale))
+      const cellHeight = Math.max(1, Math.ceil(cell.height * rasterScale))
+      scratchContext.clearRect(0, 0, scratchWidth, scratchHeight)
+
+      drawSoftBlendImage({
+        context: scratchContext,
+        image,
+        cell: { ...cell, x: 0, y: 0 },
+        borderWidth: 0,
+        position,
+        scale: baseScale * userScale,
+        blendWidth,
+        applyHorizontalMask: cell.column > 0,
+        applyVerticalMask: cell.row > 0,
+        imageShape: images.length === 1 ? imageShape : 'rectangle',
+        rasterScale,
+      })
+
+      offscreenContext.drawImage(
+        scratchCanvas,
+        0,
+        0,
+        cellWidth,
+        cellHeight,
+        Math.ceil((borderWidth + cell.x) * rasterScale),
+        Math.ceil((borderWidth + cell.y) * rasterScale),
+        cellWidth,
+        cellHeight,
+      )
+    })
+
+    context.drawImage(canvas, 0, 0, outerWidth, outerHeight)
+  }, [activeInteractionIndexRef, blendWidth, borderWidth, contentHeight, contentWidth, gap, geometry, imageCount, imagePositions, imageScales, imageShape, images, outerHeight, outerWidth, rasterScale, transientPositions, wheelScales])
+
+  return <Shape id={id} listening={false} sceneFunc={sceneFunc} />
+}
+
+function SoftBlendActiveVisual({
+  id,
+  entry,
+  cell,
+  imageCount,
+  imageShape,
+  blendWidth,
+  imagePositions,
+  imageScales,
+  transientPositions,
+  wheelScales,
+  activeInteractionIndexRef,
+  rasterScale,
+}: {
+  id: string
+  entry: LoadedCanvasImage
+  cell: ReturnType<typeof getImageCellGeometry>
+  imageCount: number
+  imageShape: ImageShape
+  blendWidth: number
+  imagePositions: readonly ImagePosition[]
+  imageScales: readonly number[]
+  transientPositions: React.MutableRefObject<Map<number, ImagePosition>>
+  wheelScales: React.MutableRefObject<Map<number, number>>
+  activeInteractionIndexRef: React.RefObject<number | null>
+  rasterScale: number
+}) {
+  const canvasRef = React.useRef<HTMLCanvasElement | null>(null)
+  const { image, sourceIndex } = entry
+  const sceneFunc = React.useCallback((context: Konva.Context) => {
+    if (activeInteractionIndexRef.current !== sourceIndex) return
+
+    const canvas = canvasRef.current ?? document.createElement('canvas')
+    canvasRef.current = canvas
+    const canvasWidth = Math.max(1, Math.ceil(cell.width * rasterScale))
+    const canvasHeight = Math.max(1, Math.ceil(cell.height * rasterScale))
+    if (canvas.width !== canvasWidth || canvas.height !== canvasHeight) {
+      canvas.width = canvasWidth
+      canvas.height = canvasHeight
+    }
+
+    const offscreenContext = canvas.getContext('2d')
+    if (!offscreenContext) return
+    offscreenContext.clearRect(0, 0, canvasWidth, canvasHeight)
+
+    const baseScale = Math.max(cell.width / image.width, cell.height / image.height)
+    const userScale = wheelScales.current.get(sourceIndex) ?? imageScales[sourceIndex] ?? 1
+    const position = transientPositions.current.get(sourceIndex) ?? imagePositions[sourceIndex] ?? { x: 0, y: 0 }
+    drawSoftBlendImage({
+      context: offscreenContext,
+      image,
+      cell: { ...cell, x: 0, y: 0 },
+      borderWidth: 0,
+      position,
+      scale: baseScale * userScale,
+      blendWidth,
+      applyHorizontalMask: cell.column > 0,
+      applyVerticalMask: cell.row > 0,
+      imageShape: imageCount === 1 ? imageShape : 'rectangle',
+      rasterScale,
+    })
+
+    context.drawImage(canvas, 0, 0, cell.width, cell.height)
+  }, [activeInteractionIndexRef, blendWidth, cell, image, imageCount, imagePositions, imageScales, imageShape, rasterScale, sourceIndex, transientPositions, wheelScales])
 
   return <Shape id={id} listening={false} sceneFunc={sceneFunc} />
 }
@@ -162,6 +332,7 @@ function ImageGridLayerComponent({
   layoutPreset,
   layoutImageCount,
   imageShape = 'rectangle',
+  renderScale = 1,
   onImageSlotSelect,
 }: {
   images: LoadedCanvasImage[],
@@ -174,6 +345,7 @@ function ImageGridLayerComponent({
   layoutPreset?: string
   layoutImageCount: number
   imageShape?: ImageShape
+  renderScale?: number
   onImageSlotSelect?: (index: number) => void
 }) {
   const { imagePositions, imageScales, isImageLocked, setImagePosition, setImageScale, setSelectedImageIndex } = useStore(useShallow(state => ({
@@ -192,6 +364,8 @@ function ImageGridLayerComponent({
   const wheelScales = React.useRef(new Map<number, number>())
   const wheelCommitFrames = React.useRef(new Map<number, number>())
   const activeInteractionIndexRef = React.useRef<number | null>(null)
+  const activeInteractionTimeoutRef = React.useRef<number | null>(null)
+  const [activeInteractionIndex, setActiveInteractionIndex] = React.useState<number | null>(null)
   const mountedRef = React.useRef(true)
 
   React.useEffect(() => {
@@ -211,6 +385,10 @@ function ImageGridLayerComponent({
       activeInteractionIndexRef.current = null
       transientPositionMap.clear()
       dragContexts.current = {}
+      if (activeInteractionTimeoutRef.current !== null) {
+        window.clearTimeout(activeInteractionTimeoutRef.current)
+        activeInteractionTimeoutRef.current = null
+      }
       commitFrames.forEach((frame) => window.cancelAnimationFrame(frame))
       commitFrames.clear()
       pendingScales.clear()
@@ -241,6 +419,20 @@ function ImageGridLayerComponent({
 
   const resolvedLayoutImageCount = Math.max(images.length, layoutImageCount)
   const geometry = getLayoutGeometry(layoutPreset, resolvedLayoutImageCount)
+
+  const activeImage = activeInteractionIndex === null
+    ? null
+    : images.find(({ sourceIndex }) => sourceIndex === activeInteractionIndex) ?? null
+  const activeImageCell = activeImage
+    ? getImageCellGeometry({
+        contentWidth,
+        contentHeight,
+        gap,
+        geometry,
+        imageCount: resolvedLayoutImageCount,
+        index: activeImage.sourceIndex,
+      })
+    : null
 
   const renderImageGroup = ({ image: img, sourceIndex }: LoadedCanvasImage) => {
         const cell = getImageCellGeometry({
@@ -380,40 +572,6 @@ function ImageGridLayerComponent({
         )
   }
 
-  const renderSoftBlendGroup = ({ image: img, sourceIndex }: LoadedCanvasImage) => {
-    const cell = getImageCellGeometry({
-      contentWidth,
-      contentHeight,
-      gap,
-      geometry,
-      imageCount: resolvedLayoutImageCount,
-      index: sourceIndex,
-    })
-    const { x: xPos, y: yPos, width: itemWidth, height: itemHeight } = cell
-    const baseScale = Math.max(itemWidth / img.width, itemHeight / img.height)
-    const getPosition = () => transientPositions.current.get(sourceIndex) ?? imagePositions[sourceIndex] ?? { x: 0, y: 0 }
-    const getScale = () => baseScale * (wheelScales.current.get(sourceIndex) ?? imageScales[sourceIndex] ?? 1)
-
-    return (
-      <Group key={sourceIndex} x={borderWidth + xPos} y={borderWidth + yPos}>
-        <SoftBlendVisual
-          id={`soft-blend-visual-${sourceIndex}`}
-          sourceIndex={sourceIndex}
-          image={img}
-          width={itemWidth}
-          height={itemHeight}
-          blendWidth={blendWidth}
-          applyHorizontalMask={cell.column > 0}
-          applyVerticalMask={cell.row > 0}
-          imageShape={images.length === 1 ? imageShape : 'rectangle'}
-          getPosition={getPosition}
-          getScale={getScale}
-          activeInteractionIndexRef={activeInteractionIndexRef}
-        />
-      </Group>
-    )
-  }
-
   const renderSoftBlendInteraction = ({ image: img, sourceIndex }: LoadedCanvasImage) => {
     const cell = getImageCellGeometry({
       contentWidth,
@@ -428,16 +586,22 @@ function ImageGridLayerComponent({
     const getScale = () => baseScale * (wheelScales.current.get(sourceIndex) ?? imageScales[sourceIndex] ?? 1)
     const savedPos = transientPositions.current.get(sourceIndex) ?? imagePositions[sourceIndex] ?? { x: 0, y: 0 }
     const hasShapeMask = images.length === 1 && imageShape !== 'rectangle'
-    const redrawVisual = (node: Konva.Node) => {
-      const visual = node.getStage()?.findOne(`#soft-blend-visual-${sourceIndex}`)
+    const redrawComposite = (node: Konva.Node) => {
+      const visual = node.getStage()?.findOne('#soft-blend-composite')
+      visual?.getLayer()?.batchDraw()
+    }
+
+    const redrawActiveOverlay = (node: Konva.Node) => {
+      const visual = node.getStage()?.findOne('#soft-blend-active-overlay')
       visual?.getLayer()?.batchDraw()
     }
 
     const beginInteractionPreview = (node: Konva.Node) => {
       activeInteractionIndexRef.current = sourceIndex
+      setActiveInteractionIndex(sourceIndex)
       // While an image is being moved, only its masked preview is redrawn;
       // the other soft-blended images keep their existing raster.
-      redrawVisual(node)
+      redrawComposite(node)
       node.getLayer()?.batchDraw()
     }
 
@@ -445,8 +609,19 @@ function ImageGridLayerComponent({
       if (activeInteractionIndexRef.current === sourceIndex) {
         activeInteractionIndexRef.current = null
       }
-      redrawVisual(node)
+      setActiveInteractionIndex(null)
+      redrawComposite(node)
       node.getLayer()?.batchDraw()
+    }
+
+    const scheduleWheelInteractionEnd = (node: Konva.Node) => {
+      if (activeInteractionTimeoutRef.current !== null) {
+        window.clearTimeout(activeInteractionTimeoutRef.current)
+      }
+      activeInteractionTimeoutRef.current = window.setTimeout(() => {
+        activeInteractionTimeoutRef.current = null
+        endInteractionPreview(node)
+      }, 160)
     }
 
     return (
@@ -467,21 +642,6 @@ function ImageGridLayerComponent({
               clipHeight: itemHeight,
             })}
       >
-        <SoftBlendVisual
-          id={`soft-blend-interaction-preview-${sourceIndex}`}
-          sourceIndex={sourceIndex}
-          image={img}
-          width={itemWidth}
-          height={itemHeight}
-          blendWidth={blendWidth}
-          applyHorizontalMask={cell.column > 0}
-          applyVerticalMask={cell.row > 0}
-          imageShape={images.length === 1 ? imageShape : 'rectangle'}
-          getPosition={() => transientPositions.current.get(sourceIndex) ?? imagePositions[sourceIndex] ?? { x: 0, y: 0 }}
-          getScale={getScale}
-          activeInteractionIndexRef={activeInteractionIndexRef}
-          renderOnlyWhenActive
-        />
         <Rect
           id={`soft-blend-interaction-${sourceIndex}`}
           x={savedPos.x}
@@ -512,6 +672,7 @@ function ImageGridLayerComponent({
           onDragMove={(e) => {
             const position = { x: e.target.x(), y: e.target.y() }
             transientPositions.current.set(sourceIndex, position)
+            redrawActiveOverlay(e.target)
             e.target.getLayer()?.batchDraw()
           }}
           onDragEnd={(e) => {
@@ -523,6 +684,7 @@ function ImageGridLayerComponent({
           }}
           onWheel={(e) => {
             e.evt.preventDefault()
+            beginInteractionPreview(e.target)
             const scaleBy = 1.05
             const oldScale = wheelScales.current.get(sourceIndex) ?? imageScales[sourceIndex] ?? 1
             const newScale = e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy
@@ -531,7 +693,8 @@ function ImageGridLayerComponent({
             e.target.width(img.width * baseScale * nextScale)
             e.target.height(img.height * baseScale * nextScale)
             e.target.getLayer()?.batchDraw()
-            redrawVisual(e.target)
+            redrawActiveOverlay(e.target)
+            scheduleWheelInteractionEnd(e.target)
 
             if (!wheelCommitFrames.current.has(sourceIndex)) {
               const frame = window.requestAnimationFrame(() => {
@@ -582,8 +745,47 @@ function ImageGridLayerComponent({
   return isSoftBlend
     ? (
       <>
-        <Layer listening={false}>{images.map(renderSoftBlendGroup)}</Layer>
-        <Layer>{images.map(renderSoftBlendInteraction)}</Layer>
+        <Layer listening={false}>
+          <SoftBlendCompositeVisual
+            id="soft-blend-composite"
+            images={images}
+            contentWidth={contentWidth}
+            contentHeight={contentHeight}
+            borderWidth={borderWidth}
+            gap={gap}
+            geometry={geometry}
+            imageCount={resolvedLayoutImageCount}
+            blendWidth={blendWidth}
+            imageShape={imageShape}
+            imagePositions={imagePositions}
+            imageScales={imageScales}
+            transientPositions={transientPositions}
+            wheelScales={wheelScales}
+            activeInteractionIndexRef={activeInteractionIndexRef}
+            rasterScale={renderScale}
+          />
+        </Layer>
+        <Layer>
+          {activeImage && activeImageCell && (
+            <Group x={borderWidth + activeImageCell.x} y={borderWidth + activeImageCell.y}>
+              <SoftBlendActiveVisual
+                id="soft-blend-active-overlay"
+                entry={activeImage}
+                cell={activeImageCell}
+                imageCount={images.length}
+                imageShape={imageShape}
+                blendWidth={blendWidth}
+                imagePositions={imagePositions}
+                imageScales={imageScales}
+                transientPositions={transientPositions}
+                wheelScales={wheelScales}
+                activeInteractionIndexRef={activeInteractionIndexRef}
+                rasterScale={renderScale}
+              />
+            </Group>
+          )}
+          {images.map(renderSoftBlendInteraction)}
+        </Layer>
       </>
     )
     : <Layer>{images.map(renderImageGroup)}</Layer>

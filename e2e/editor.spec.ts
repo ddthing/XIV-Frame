@@ -30,11 +30,76 @@ async function uploadFixtures(page: Page, files: string[]) {
   await expect(page.locator('canvas').first()).toBeVisible({ timeout: 60_000 })
 }
 
+async function chooseLayoutFilter(page: Page, filter: 'all' | 'basic' | 'focus' | 'matrix') {
+  await page.locator(`[data-layout-filter="${filter}"]`).click()
+}
+
 async function createPortraitFixture() {
   return sharp(squareFixture)
     .resize({ width: 800, height: 1200, fit: 'fill' })
     .jpeg()
     .toBuffer()
+}
+
+async function createOpaqueColorFixture({ r, g, b }: { r: number; g: number; b: number }) {
+  return sharp({
+    create: {
+      width: 256,
+      height: 256,
+      channels: 3,
+      background: { r, g, b },
+    },
+  }).png().toBuffer()
+}
+
+type PixelBounds = {
+  minX: number
+  minY: number
+  maxX: number
+  maxY: number
+  width: number
+  height: number
+  imageWidth: number
+  imageHeight: number
+}
+
+async function findMagentaBounds(imageBuffer: Buffer): Promise<PixelBounds | null> {
+  const { data, info } = await sharp(imageBuffer).raw().toBuffer({ resolveWithObject: true })
+  let minX = info.width
+  let minY = info.height
+  let maxX = -1
+  let maxY = -1
+
+  for (let y = 0; y < info.height; y += 1) {
+    for (let x = 0; x < info.width; x += 1) {
+      const offset = (y * info.width + x) * info.channels
+      const red = data[offset] ?? 0
+      const green = data[offset + 1] ?? 0
+      const blue = data[offset + 2] ?? 0
+      if (red < 200 || green > 120 || blue < 200) continue
+      minX = Math.min(minX, x)
+      minY = Math.min(minY, y)
+      maxX = Math.max(maxX, x)
+      maxY = Math.max(maxY, y)
+    }
+  }
+
+  if (maxX < 0 || maxY < 0) return null
+  return {
+    minX,
+    minY,
+    maxX,
+    maxY,
+    width: maxX - minX + 1,
+    height: maxY - minY + 1,
+    imageWidth: info.width,
+    imageHeight: info.height,
+  }
+}
+
+function requirePixelBounds(bounds: PixelBounds | null): PixelBounds {
+  if (!bounds) throw new Error('The expected composite pixels were not rendered.')
+  return bounds
 }
 
 test('presents the editor workflow as photos, layout, then signature', async ({ page }) => {
@@ -199,6 +264,7 @@ test('exports a two-photo original-ratio composition without scroll or browser e
 test('previews the selected layout slots before photos are uploaded', async ({ page }) => {
   await openFreshEditor(page)
   await page.getByRole('tab', { name: '02 레이아웃 구성' }).click()
+  await chooseLayoutFilter(page, 'focus')
 
   const gridButton = page.getByRole('button', { name: /^바둑판 배치/ })
   await expect(gridButton).toBeVisible()
@@ -214,9 +280,151 @@ test('previews the selected layout slots before photos are uploaded', async ({ p
   await expect(canvasFrame.locator('canvas').last()).toBeVisible()
 })
 
+test('starts with a neutral single upload canvas before a layout is chosen', async ({ page }) => {
+  await openFreshEditor(page)
+
+  const canvasFrame = page.locator('[data-layout-effective-preset]')
+  await expect(canvasFrame).toHaveAttribute('data-layout-image-count', '0')
+  await expect(canvasFrame).toHaveAttribute('data-layout-slot-count', '1')
+  await expect(canvasFrame).toHaveAttribute('data-layout-empty-slot-count', '1')
+})
+
+test('does not turn a direct single-photo upload into a split before a layout is chosen', async ({ page }) => {
+  await openFreshEditor(page)
+  await page.locator('input[type="file"]').setInputFiles(wideFixture)
+
+  const canvasFrame = page.locator('[data-layout-effective-preset]')
+  await expect(page.getByText('01 / 16', { exact: true })).toBeVisible()
+  await expect(canvasFrame).toHaveAttribute('data-layout-image-count', '1')
+  await expect(canvasFrame).toHaveAttribute('data-layout-slot-count', '1')
+  await expect(canvasFrame).toHaveAttribute('data-layout-empty-slot-count', '0')
+})
+
+test('does not reuse a previous split choice for the first photo in a new session', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.localStorage.setItem('xiv-frame-settings-v2', JSON.stringify({
+      state: { layoutPreset: 'split', hasChosenLayout: true },
+      version: 4,
+    }))
+  })
+  await openFreshEditor(page, { clearStorage: false })
+  await page.locator('input[type="file"]').setInputFiles(wideFixture)
+
+  const canvasFrame = page.locator('[data-layout-effective-preset]')
+  await expect(page.getByText('01 / 16', { exact: true })).toBeVisible()
+  await expect(canvasFrame).toHaveAttribute('data-layout-slot-count', '1')
+  await expect(canvasFrame).toHaveAttribute('data-layout-empty-slot-count', '0')
+})
+
+test('makes layout choices scannable and mirrors loaded photos in the current preview', async ({ page }) => {
+  await openFreshEditor(page)
+  await uploadFixtures(page, [wideFixture, squareFixture, wideFixture])
+  await page.getByRole('tab', { name: '02 레이아웃 구성' }).click()
+
+  const currentPreview = page.locator('[data-layout-current-preview]')
+  await expect(currentPreview).toBeVisible()
+  await expect(currentPreview.locator('img')).toHaveCount(3)
+
+  const filterGroup = page.getByRole('group', { name: '레이아웃 범위', exact: true })
+  await expect(filterGroup.getByRole('button', { name: '전체', exact: true })).toBeVisible()
+  await expect(filterGroup.getByRole('button', { name: '3–4장', exact: true })).toBeVisible()
+
+  const templateCards = page.locator('[data-layout-template-card]')
+  await expect.poll(() => templateCards.first().evaluate((element) => {
+    const group = element.parentElement
+    return group ? group.scrollWidth <= group.clientWidth : false
+  })).toBe(true)
+
+  await filterGroup.getByRole('button', { name: '3–4장', exact: true }).click()
+  await expect(page.getByRole('group', { name: '3장 패턴', exact: true })).toBeVisible()
+  await expect(page.getByRole('group', { name: '4장 패턴', exact: true })).toBeVisible()
+  await expect(page.getByRole('group', { name: '기본 분할', exact: true })).toHaveCount(0)
+
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.reload({ waitUntil: 'networkidle' })
+  await page.getByRole('button', { name: '레이아웃', exact: true }).click()
+  await expect(page.locator('[data-layout-current-preview]')).toBeVisible()
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1)).toBe(true)
+})
+
+test('keeps the full workflow available for a single photo', async ({ page }) => {
+  await openFreshEditor(page)
+  await uploadFixtures(page, [wideFixture])
+  await page.getByRole('tab', { name: '02 레이아웃 구성' }).click()
+
+  await expect(page.locator('[data-layout-filter="all"]')).toHaveAttribute('aria-pressed', 'true')
+  const basicGroup = page.getByRole('group', { name: '기본 분할', exact: true })
+  await expect(basicGroup).toBeVisible()
+  await expect(basicGroup.getByRole('button', { name: '가로 분할', exact: true })).toBeVisible()
+  await expect(basicGroup.getByRole('button', { name: '세로 분할', exact: true })).toBeVisible()
+  await expect(page.getByRole('group', { name: '3장 패턴', exact: true })).toBeVisible()
+
+  await page.getByRole('tab', { name: '03 시그니처 오버레이' }).click()
+  await expect(page.locator('#signature-upper-text')).toBeVisible()
+})
+
+test('keeps empty preview instructions readable on a small screen', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await openFreshEditor(page, { expectDesktop: false })
+
+  const emptySlotLayer = page.locator('[data-layout-effective-preset] canvas').last()
+  await expect(emptySlotLayer).toBeVisible()
+
+  const primaryLabelHeight = await emptySlotLayer.evaluate((element) => {
+    if (!(element instanceof HTMLCanvasElement)) throw new Error('Empty slot layer is not a canvas')
+    const context = element.getContext('2d')
+    if (!context) throw new Error('Empty slot layer context is unavailable')
+
+    const pixels = context.getImageData(20, 60, Math.floor(element.width / 2) - 20, 65).data
+    let minY = Infinity
+    let maxY = -Infinity
+    const regionWidth = Math.floor(element.width / 2) - 20
+    for (let index = 0; index < pixels.length; index += 4) {
+      const alpha = pixels[index + 3]
+      if (alpha === 0 || pixels[index] >= 170 || pixels[index + 1] >= 180 || pixels[index + 2] >= 180) continue
+      const y = Math.floor(index / 4 / regionWidth) + 60
+      minY = Math.min(minY, y)
+      maxY = Math.max(maxY, y)
+    }
+
+    return Number.isFinite(minY) && Number.isFinite(maxY) ? maxY - minY + 1 : 0
+  })
+
+  expect(primaryLabelHeight).toBeGreaterThanOrEqual(10)
+})
+
+test('shows a readable upload status while a single photo is being prepared', async ({ page }) => {
+  await page.addInitScript(() => {
+    const descriptor = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src')
+    const nativeSet = descriptor?.set
+    if (!descriptor || !nativeSet) return
+
+    let delayed = false
+    Object.defineProperty(HTMLImageElement.prototype, 'src', {
+      configurable: descriptor.configurable,
+      enumerable: descriptor.enumerable,
+      get: descriptor.get,
+      set(value: string) {
+        if (!delayed && value.startsWith('blob:')) {
+          delayed = true
+          window.setTimeout(() => nativeSet.call(this, value), 750)
+          return
+        }
+        nativeSet.call(this, value)
+      },
+    })
+  })
+
+  await openFreshEditor(page)
+  await page.locator('input[type="file"]').setInputFiles(wideFixture)
+
+  await expect(page.locator('[data-preview-upload-status]')).toContainText('사진 준비 중...')
+})
+
 test('places the four-slot grid template in the four-image group', async ({ page }) => {
   await openFreshEditor(page)
   await page.getByRole('tab', { name: '02 레이아웃 구성' }).click()
+  await chooseLayoutFilter(page, 'focus')
 
   const fourImageGroup = page.locator('aside').getByRole('group', { name: '4장 패턴', exact: true })
   await expect(fourImageGroup.getByRole('button', { name: /^바둑판 배치/ })).toBeVisible()
@@ -237,6 +445,8 @@ test('keeps the selected two-slot preview when the first photo is uploaded', asy
   await expect(canvasFrame).toHaveAttribute('data-layout-effective-preset', 'split')
   await expect(canvasFrame).toHaveAttribute('data-layout-slot-count', '2')
   await expect(canvasFrame).toHaveAttribute('data-layout-empty-slot-count', '1')
+  await expect.poll(() => canvasFrame.getAttribute('data-layout-loaded-image-count')).toBe('1')
+  await expect(canvasFrame).toHaveAttribute('data-layout-loading-slot-count', '0')
 })
 
 test('keeps an original-ratio two-slot preview wide with one portrait photo', async ({ page }) => {
@@ -261,7 +471,7 @@ test('keeps an original-ratio two-slot preview wide with one portrait photo', as
   }).toBeGreaterThan(1)
 })
 
-test('keeps the default preview slots when a photo is added from an empty slot', async ({ page }) => {
+test('keeps the initial canvas neutral when a photo is added from its upload target', async ({ page }) => {
   await openFreshEditor(page)
 
   const canvasFrame = page.locator('[data-layout-effective-preset]')
@@ -274,13 +484,14 @@ test('keeps the default preview slots when a photo is added from an empty slot',
   await (await fileChooserPromise).setFiles(wideFixture)
 
   await expect(canvasFrame).toHaveAttribute('data-layout-effective-preset', 'split')
-  await expect(canvasFrame).toHaveAttribute('data-layout-slot-count', '2')
-  await expect(canvasFrame).toHaveAttribute('data-layout-empty-slot-count', '1')
+  await expect(canvasFrame).toHaveAttribute('data-layout-slot-count', '1')
+  await expect(canvasFrame).toHaveAttribute('data-layout-empty-slot-count', '0')
 })
 
 test('highlights an empty layout slot while the pointer is over it', async ({ page }) => {
   await openFreshEditor(page)
   await page.getByRole('tab', { name: '02 레이아웃 구성' }).click()
+  await chooseLayoutFilter(page, 'focus')
   await page.getByRole('button', { name: /^바둑판 배치/ }).click()
 
   const canvas = page.locator('[data-layout-effective-preset] canvas').last()
@@ -304,6 +515,7 @@ test('highlights an empty layout slot while the pointer is over it', async ({ pa
 test('keeps the selected layout while it is partially filled', async ({ page }) => {
   await openFreshEditor(page)
   await page.getByRole('tab', { name: '02 레이아웃 구성' }).click()
+  await chooseLayoutFilter(page, 'focus')
   await page.getByRole('button', { name: /^바둑판 배치/ }).click()
   await page.getByRole('tab', { name: '01 사진 소스' }).click()
 
@@ -405,6 +617,7 @@ test('keeps the document viewport fixed when sixteen photos are selected', async
 test('adds multiple photos through the drag and drop path', async ({ page }) => {
   await openFreshEditor(page)
   await page.getByRole('tab', { name: '02 레이아웃 구성' }).click()
+  await chooseLayoutFilter(page, 'focus')
   await page.getByRole('button', { name: /^바둑판 배치/ }).click()
 
   const dragFiles = [wideFixture, squareFixture].map((filePath) => ({
@@ -432,6 +645,7 @@ test('adds multiple photos through the drag and drop path', async ({ page }) => 
 test('uploads directly from an empty layout slot and selects the new photo', async ({ page }) => {
   await openFreshEditor(page)
   await page.getByRole('tab', { name: '02 레이아웃 구성' }).click()
+  await chooseLayoutFilter(page, 'focus')
   await page.getByRole('button', { name: /^바둑판 배치/ }).click()
 
   const fileChooserPromise = page.waitForEvent('filechooser')
@@ -449,6 +663,7 @@ test('uploads directly from an empty layout slot and selects the new photo', asy
 test('uploads into the final visible layout slot without collapsing the canvas', async ({ page }) => {
   await openFreshEditor(page)
   await page.getByRole('tab', { name: '02 레이아웃 구성' }).click()
+  await chooseLayoutFilter(page, 'focus')
   await page.getByRole('button', { name: /^바둑판 배치/ }).click()
   await page.getByRole('tab', { name: '01 사진 소스' }).click()
   await uploadFixtures(page, [wideFixture, squareFixture])
@@ -666,6 +881,83 @@ test('keeps soft-blend image interaction after consolidating render layers', asy
   await expect(page.getByText('0,0', { exact: true })).toBeHidden()
 })
 
+test('does not expose white seams between soft-blended grid images', async ({ page }) => {
+  await openFreshEditor(page)
+  const fixtures = await Promise.all([
+    createOpaqueColorFixture({ r: 220, g: 50, b: 50 }),
+    createOpaqueColorFixture({ r: 50, g: 90, b: 220 }),
+    createOpaqueColorFixture({ r: 50, g: 180, b: 100 }),
+    createOpaqueColorFixture({ r: 220, g: 170, b: 40 }),
+  ])
+  await page.locator('input[type="file"]').setInputFiles(fixtures.map((buffer, index) => ({
+    name: `soft-blend-${index}.png`,
+    mimeType: 'image/png',
+    buffer,
+  })))
+  await expect(page.getByText('04 / 16', { exact: true })).toBeVisible()
+  await expect(page.locator('canvas').first()).toBeVisible()
+
+  await page.getByRole('tab', { name: '02 레이아웃 구성' }).click()
+  await page.getByRole('button', { name: '바둑판 배치', exact: true }).click()
+  await page.getByRole('button', { name: '자연스럽게', exact: true }).click()
+
+  const canvasSamples = await page.locator('[data-layout-effective-preset] canvas').evaluateAll((canvases) => canvases.map((canvas) => {
+    if (!(canvas instanceof HTMLCanvasElement)) return null
+    const context = canvas.getContext('2d')
+    if (!context) return null
+    const width = canvas.width
+    const height = canvas.height
+    const horizontalX = Math.max(0, Math.floor(width * 0.25))
+    const allPixels = context.getImageData(0, 0, width, height).data
+    let nonTransparent = 0
+    let nonWhite = 0
+    let minX = width
+    let minY = height
+    let maxX = -1
+    let maxY = -1
+    for (let index = 0; index < allPixels.length; index += 4) {
+      if (allPixels[index + 3] === 0) continue
+      nonTransparent += 1
+      if (allPixels[index] < 245 || allPixels[index + 1] < 245 || allPixels[index + 2] < 245) {
+        nonWhite += 1
+      }
+      const pixel = index / 4
+      const x = pixel % width
+      const y = Math.floor(pixel / width)
+      minX = Math.min(minX, x)
+      minY = Math.min(minY, y)
+      maxX = Math.max(maxX, x)
+      maxY = Math.max(maxY, y)
+    }
+    const seamX = Math.floor(width * 0.5)
+    const seamY = Math.floor(height * 0.25)
+    const verticalSweep = Array.from({ length: 41 }, (_, offset) => {
+      const x = Math.max(0, Math.min(width - 1, seamX - 20 + offset))
+      const [red, green, blue, alpha] = context.getImageData(x, seamY, 1, 1).data
+      return { red, green, blue, alpha }
+    })
+    const horizontalSweep = Array.from({ length: 41 }, (_, offset) => {
+      const y = Math.max(0, Math.min(height - 1, Math.floor(height * 0.5) - 20 + offset))
+      const [red, green, blue, alpha] = context.getImageData(horizontalX, y, 1, 1).data
+      return { red, green, blue, alpha }
+    })
+    return { width, height, nonTransparent, nonWhite, bounds: [minX, minY, maxX, maxY], verticalSweep, horizontalSweep }
+  }))
+
+  const imageCanvas = canvasSamples.find((sample) => (
+    sample !== null
+    && sample.nonTransparent > 100_000
+    && sample.nonWhite > 1_000
+  ))
+  expect(imageCanvas).toBeDefined()
+  if (!imageCanvas) return
+
+  expect(Math.min(...imageCanvas.verticalSweep.map(({ alpha }) => alpha))).toBeGreaterThanOrEqual(240)
+  expect(Math.min(...imageCanvas.horizontalSweep.map(({ alpha }) => alpha))).toBeGreaterThanOrEqual(240)
+  expect(imageCanvas.verticalSweep.every(({ red, green, blue }) => red < 245 || green < 245 || blue < 245)).toBe(true)
+  expect(imageCanvas.horizontalSweep.every(({ red, green, blue }) => red < 245 || green < 245 || blue < 245)).toBe(true)
+})
+
 test('keeps the preview available when a later image fails to decode', async ({ page }) => {
   await page.addInitScript(() => {
     const state = { failedStageLoads: 0, armed: false, blobAssignmentsAfterArm: 0 }
@@ -766,6 +1058,95 @@ test('supports pointer dragging and image scaling for the selected image', async
   await scaleInput.press('Enter')
   await expect(page.getByText('120%', { exact: true })).toBeVisible()
   await expect(page.getByRole('button', { name: '저장 PNG', exact: true })).toBeEnabled()
+})
+
+test('moves a background-removed composite directly with a pointer drag', async ({ page }) => {
+  await page.addInitScript(() => {
+    class ControlledWorker {
+      private listeners = new Map<string, Set<(event: unknown) => void>>()
+
+      addEventListener(type: string, listener: (event: unknown) => void) {
+        const listeners = this.listeners.get(type) ?? new Set()
+        listeners.add(listener)
+        this.listeners.set(type, listeners)
+      }
+
+      postMessage(message: { type: string; requestId: number }) {
+        if (message.type !== 'remove') return
+        const data = new Uint8ClampedArray(100 * 100 * 4)
+        for (let y = 0; y < 100; y += 1) {
+          for (let x = 0; x < 100; x += 1) {
+            const offset = (y * 100 + x) * 4
+            const isForeground = x >= 10 && x < 30 && y >= 10 && y < 30
+            data[offset] = 255
+            data[offset + 1] = 0
+            data[offset + 2] = 255
+            data[offset + 3] = isForeground ? 255 : 0
+          }
+        }
+        const listeners = this.listeners.get('message') ?? new Set()
+        listeners.forEach((listener) => listener({
+          data: {
+            type: 'result',
+            requestId: message.requestId,
+            data: data.buffer,
+            width: 100,
+            height: 100,
+            channels: 4,
+          },
+        }))
+      }
+
+      terminate() {}
+    }
+
+    Object.defineProperty(window, 'Worker', {
+      configurable: true,
+      writable: true,
+      value: ControlledWorker,
+    })
+  })
+
+  await openFreshEditor(page)
+  await page.locator('input[type="file"]').first().setInputFiles(wideFixture)
+  await expect(page.getByText('01 / 16', { exact: true })).toBeVisible()
+  await page.getByRole('tab', { name: '01 사진 소스' }).click()
+  await page.getByRole('tab', { name: '합성', exact: true }).click()
+  await page.locator('#character-file-input').setInputFiles(wideFixture)
+  await page.getByRole('button', { name: '배경 제거', exact: true }).click()
+  await expect(page.getByRole('img', { name: '배경 제거 결과', exact: true })).toBeVisible()
+
+  const canvas = page.locator('canvas').first()
+  const canvasBox = await canvas.boundingBox()
+  expect(canvasBox).not.toBeNull()
+  if (!canvasBox) return
+
+  let beforeBounds: PixelBounds | null = null
+  await expect.poll(async () => {
+    beforeBounds = await findMagentaBounds(await canvas.screenshot())
+    return beforeBounds !== null
+  }, { timeout: 10_000 }).toBe(true)
+  const initialBounds = requirePixelBounds(beforeBounds)
+
+  const toCanvasPoint = (x: number, y: number) => ({
+    x: canvasBox.x + (x / initialBounds.imageWidth) * canvasBox.width,
+    y: canvasBox.y + (y / initialBounds.imageHeight) * canvasBox.height,
+  })
+  const transparentPaddingCenter = toCanvasPoint(
+    initialBounds.minX + initialBounds.width * 2,
+    initialBounds.minY + initialBounds.height * 2,
+  )
+
+  await page.mouse.move(transparentPaddingCenter.x, transparentPaddingCenter.y)
+  await page.mouse.down()
+  await page.mouse.move(transparentPaddingCenter.x + 70, transparentPaddingCenter.y + 20, { steps: 6 })
+  await page.mouse.up()
+
+  const afterBounds = await findMagentaBounds(await canvas.screenshot())
+  expect(afterBounds).not.toBeNull()
+  const finalBounds = requirePixelBounds(afterBounds)
+  expect(finalBounds.minX).toBeGreaterThan(initialBounds.minX + 20)
+  expect(finalBounds.minY).toBeGreaterThan(initialBounds.minY + 5)
 })
 
 test('does not restore an upload that finishes after reset', async ({ page }) => {

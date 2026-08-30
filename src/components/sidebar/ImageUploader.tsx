@@ -24,7 +24,7 @@ export function ImageUploader() {
     images,
     resetVersion,
     setImages,
-    setImageAt,
+    setPreparedImages,
     removeImageAt,
     swapImages,
     imagePositions,
@@ -39,7 +39,7 @@ export function ImageUploader() {
     images: state.images,
     resetVersion: state.resetVersion,
     setImages: state.setImages,
-    setImageAt: state.setImageAt,
+    setPreparedImages: state.setPreparedImages,
     removeImageAt: state.removeImageAt,
     swapImages: state.swapImages,
     imagePositions: state.imagePositions,
@@ -170,10 +170,7 @@ export function ImageUploader() {
             return
           }
 
-          setImageAt(index, url)
-          setImageScale(index, 1)
-          setImagePosition(index, { x: 0, y: 0 })
-          setSelectedImageIndex(index)
+          setPreparedImages([{ index, url }], index)
           setUploadError(null)
           uploadRequests.current.delete(index)
           setUploadPending(index, false)

@@ -8,12 +8,12 @@ XIV Frame의 기준은 단순합니다. 편집은 즉시 보여야 하고, 원�
 
 ### 사진 구성
 
-- 사진을 최대 16장까지 추가합니다. 레이아웃을 먼저 고르면 빈 슬롯이 미리 보이며, 빈 카드를 클릭하거나 파일을 놓아 바로 채울 수 있습니다.
+- 사진을 최대 16장까지 추가합니다. 처음 사진을 바로 넣으면 레이아웃을 선택하기 전까지 1장 캔버스로 보여주며, 2분할이나 격자는 사용자가 레이아웃을 고른 뒤 적용됩니다. 레이아웃을 먼저 고르면 빈 슬롯이 미리 보이며, 빈 카드를 클릭하거나 파일을 놓아 바로 채울 수 있습니다.
 - 가로 분할, 세로 분할, 2×2 네 칸의 바둑판 배치를 선택합니다. 바둑판은 3~4장에 사용하며, 3장일 때는 한 칸이 비어 있습니다.
 - 3×3·4×4 격자 템플릿은 각각 9장·16장의 사진을 사용합니다.
 - 원본 비율을 기본으로, X 타임라인용 16:9와 2:1 캔버스 비율을 제공합니다.
 - 사진별 배율과 위치를 조정하고, 순서를 바꾸거나 개별 사진을 교체합니다.
-- 사진 사이 간격, 자연스러운 연결 효과, 테두리, 배경, 필름 노이즈를 조정합니다.
+- 사진 사이 간격, 자연스러운 연결 효과, 테두리, 배경, 필름 노이즈를 조정합니다. 테두리는 캔버스 외곽에 적용되며, 자연스러운 연결 효과는 사진 사이를 겹쳐 연결합니다.
 
 ### 오버레이와 시그니처
 
@@ -27,7 +27,7 @@ XIV Frame의 기준은 단순합니다. 편집은 즉시 보여야 하고, 원�
 - 캐릭터뿐 아니라 햇빛, 이펙트, 장식 등 모든 이미지 요소를 합성할 수 있습니다.
 - ORMBG ONNX 모델로 이미지 배경을 브라우저에서 제거합니다.
 - 지우기·복원 브러시로 결과를 세밀하게 보정합니다.
-- 합성 요소의 크기, 위치, 투명도, 좌우 반전, 그림자를 조정합니다.
+- 합성 요소의 크기, 위치, 투명도, 좌우 반전, 그림자를 조정하고 미리보기에서 마우스나 터치로 직접 이동합니다.
 - 데스크톱에서는 방향키와 Shift+방향키로 1px 또는 10px 단위 이동을 지원합니다.
 - 모바일에서는 방향 버튼과 길게 누르기로 미세 조정합니다.
 
@@ -42,7 +42,7 @@ XIV Frame의 기준은 단순합니다. 편집은 즉시 보여야 하고, 원�
 ## 사용 순서
 
 1. **사진 추가**
-   데스크톱의 **이미지 소스** 탭 또는 모바일 하단의 **사진**에서 빈 카드에 사진을 추가합니다. 레이아웃을 먼저 선택한 경우에도 미리보기의 빈 슬롯을 클릭하거나 파일을 놓아 채울 수 있으며, 사진이 추가된 순서가 기본 구성 순서가 됩니다.
+   데스크톱의 **이미지 소스** 탭 또는 모바일 하단의 **사진**에서 빈 카드에 사진을 추가합니다. 처음 사진을 바로 넣으면 1장 미리보기를 유지하며, 레이아웃을 먼저 선택한 경우에는 미리보기의 빈 슬롯을 클릭하거나 파일을 놓아 채울 수 있습니다. 사진이 추가된 순서가 기본 구성 순서가 됩니다.
 
 2. **레이아웃 선택**
    데스크톱의 **레이아웃** 탭 또는 모바일 하단의 **레이아웃**에서 사진 수와 보여주고 싶은 흐름에 맞는 배치를 선택합니다. 3~4장은 2×2 네 칸의 **바둑판**, 9장은 **3×3**, 16장은 **4×4** 격자를 사용할 수 있습니다. 비율은 데스크톱 미리보기 상단에서, 모바일에서는 **저장 → 비율 설정**에서 바꿉니다.
@@ -120,9 +120,16 @@ XIV Frame은 계정, 로그인, 유료 플랜, 서버 기반 프로젝트 보관
                             main push·PR 배포 전 품질 검증
 
     scripts/
+    ├─ generate-og-image.mjs
     ├─ sync-transformers-worker.mjs
     ├─ run-e2e.mjs
     ├─ measure-upload-performance.mjs
+    ├─ measure-soft-blend-performance.mjs
+    ├─ measure-export-performance.mjs
+    ├─ perf-port.mjs
+    ├─ serve-static.mjs
+    ├─ run-production-smoke.mjs
+    ├─ live-background-removal-smoke.mjs
     ├─ validate-content.mjs
     ├─ validate-static-output.mjs
     ├─ validate-image-render-tree.mjs
@@ -133,6 +140,11 @@ XIV Frame은 계정, 로그인, 유료 플랜, 서버 기반 프로젝트 보관
     ├─ validate-pipeline-cache.mjs
     ├─ validate-upload-concurrency.mjs
     ├─ validate-browser-capabilities.mjs
+    ├─ validate-wasm-assets.mjs
+    ├─ validate-image-memory-policy.mjs
+    ├─ validate-background-model-loading-policy.mjs
+    ├─ validate-deferred-storage.mjs
+    ├─ validate-background-removal-errors.mjs
     ├─ verify-character-guide.mjs
     └─ verify-character-scale.mjs
 
@@ -164,7 +176,7 @@ XIV Frame은 계정, 로그인, 유료 플랜, 서버 기반 프로젝트 보관
     npm run test:production:smoke
     npm run test:production:edge
 
-`npm run render:check`는 공유 Konva 레이어, soft-blend 오프스크린 마스크와 단일 hit layer, 부분 이미지 로드 후 원본 슬롯 매핑, Blob URL과 취소 게이트를 정적으로 확인합니다. `npm run test:e2e`는 [`e2e/editor.spec.ts`](e2e/editor.spec.ts)와 [`e2e/background-removal-errors.spec.ts`](e2e/background-removal-errors.spec.ts)를 Chromium에서 실행하며, 정상·혼합 비율 렌더링, 이미지 디코드 부분 실패 복구, 업로드·교체·초기화 취소, 배경 제거의 파일·모델·브라우저·메모리·처리·시간 초과 오류, 문자·로고·Worker·export 수명 주기, 설정 보존과 반응형 셸을 회귀 확인합니다. 이미 개발 서버가 실행 중인 Windows PowerShell에서는 다음처럼 기존 서버를 재사용합니다.
+`npm run render:check`는 공유 Konva 레이어, soft-blend의 마스크 캐시·전체 합성 캔버스·재사용 스크래치 캔버스와 단일 interaction layer, 부분 이미지 로드 후 원본 슬롯 매핑, Blob URL과 취소 게이트를 정적으로 확인합니다. `npm run test:e2e`는 [`e2e/editor.spec.ts`](e2e/editor.spec.ts)와 [`e2e/background-removal-errors.spec.ts`](e2e/background-removal-errors.spec.ts)를 Chromium에서 실행하며, 정상·혼합 비율 렌더링, soft-blend 겹침 경계, 이미지 디코드 부분 실패 복구, 업로드·교체·초기화 취소, 배경 제거의 파일·모델·브라우저·메모리·처리·시간 초과 오류, 문자·로고·Worker·export 수명 주기, 설정 보존과 반응형 셸을 회귀 확인합니다. 이미 개발 서버가 실행 중인 Windows PowerShell에서는 다음처럼 기존 서버를 재사용합니다.
 
     $env:E2E_SKIP_SERVER = '1'
     $env:PLAYWRIGHT_BASE_URL = 'http://127.0.0.1:3000'
@@ -176,7 +188,9 @@ XIV Frame은 계정, 로그인, 유료 플랜, 서버 기반 프로젝트 보관
 
 로컬 Chrome에서 Android User-Agent·터치·390×844 조건의 업로드 준비 시간을 확인하려면 `npm run perf:upload`를 실행합니다. 기본 3회 측정의 최소·평균·최대 처리 시간과 업로드 중 관측된 JS peak heap 변화를 출력하며, 반복 횟수와 고해상도 fixture는 `npm run perf:upload -- --runs=5 --dimension=4096`처럼 조정할 수 있습니다. 이 명령은 실제 모바일 기기의 메모리 기준을 대신하지는 않습니다.
 
-soft-blend의 레이어 수와 캔버스 backing-store 면적은 `npm run perf:soft-blend`로 확인합니다. 기본 16장 기준으로 이미지별 오프스크린 마스크를 공유 visual layer에 합성하고, 단일 interaction layer를 유지하는지 측정합니다.
+soft-blend의 레이어 수와 캔버스 backing-store 면적은 `npm run perf:soft-blend`로 확인합니다. 정적 합성은 전체 캔버스와 셀 단위 마스크를 처리하는 재사용 스크래치 캔버스 1개를 사용하고, 드래그 중에는 활성 셀 overlay만 갱신하며 단일 interaction layer를 유지합니다. 기본 16장 측정으로 합성·드래그 시간, `drawImage` 호출 수, 실제 Canvas 수를 비교합니다.
+
+내보내기 해상도·PNG/JPEG 최적화 시간과 파일 크기는 `npm run perf:export`로 확인합니다. 화면 미리보기의 축소 raster와 저장용 원본 raster를 구분하므로, 성능 변경 시 soft-blend와 export 결과를 따로 비교합니다.
 
 `npm run build`는 `prebuild`에서 Worker와 콘텐츠를 확인하고, 정적 결과물을 `out/`에 생성한 뒤 `postbuild` 검사를 실행합니다. 현재 기준으로 정적 페이지 54개, HTML 51개, 사이트맵 URL 45개를 검사합니다.
 
@@ -264,6 +278,8 @@ FAQ·소개·정책 문서는 `src/components/pages/`의 언어별 컴포넌트�
 - 일반 사진과 합성 요소 업로드는 reset·교체·unmount 시 이미지 디코드를 중단하고, 진행 중인 Canvas 변환의 늦은 결과를 폐기합니다. `KonvaStage`의 pending 이미지 디코드와 비활성 URL 캐시도 같은 수명 주기를 따라 정리합니다.
 - `KonvaStage`는 캐시되었거나 먼저 끝난 이미지부터 점진적으로 렌더링하고, `Promise.allSettled`로 이미지별 성공 결과를 수집하므로 한 이미지 디코드가 실패해도 성공한 이미지는 계속 렌더링합니다. 실패 시 `PreviewCanvas`에 오류를 전달해 사용자에게 업로드 오류를 표시합니다.
 - `ImageGridLayer`는 화면에 표시된 순서와 Zustand의 원본 슬롯 인덱스를 분리합니다. 부분 로드나 실패 뒤에도 드래그·배율·교체가 올바른 원본 사진을 수정하는지 확인합니다.
+- 첫 업로드에서 `hasChosenLayout`이 아직 false이면 `getLayoutGeometryImageCount`가 기본 레이아웃을 1장으로 유지합니다. 따라서 첫 사진이 자동으로 2분할의 왼쪽 슬롯에 들어가지 않으며, 사용자가 레이아웃을 선택한 뒤에만 빈 슬롯과 분할 구성이 활성화됩니다.
+- soft-blend의 `destination-in` 마스크는 전체 합성 캔버스에 직접 적용하지 않습니다. 이미지별로 재사용 스크래치 캔버스에서 마스크를 적용한 뒤 전체 캔버스에 `source-over`로 합성해야 겹침 영역의 이전 사진이 지워지지 않고 흰색 seam이 생기지 않습니다.
 - 원본 픽셀 디코드는 모델 실행 뒤로 미뤄 peak memory를 낮춥니다.
 - 편집 설정 저장은 짧게 지연해 slider·wheel·keyboard 입력마다 동기 localStorage를 쓰지 않으며, 탭이 숨겨지거나 pagehide가 발생하면 최신 상태를 즉시 flush합니다. 사진 확대·축소도 Konva를 즉시 갱신하고 저장 상태는 프레임 단위로 합칩니다.
 - 여러 사진을 동시에 준비할 때는 데스크톱에서 2개씩 실행하고, 모바일 또는 2GB 이하 메모리 기기에서는 1개씩 실행합니다. 이미지 수가 많을수록 preview 정규화 해상도도 낮춰 decoded pixel budget을 제한하고, 단일 이미지에서는 최대 4096px을 유지합니다.

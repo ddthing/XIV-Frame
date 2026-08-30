@@ -315,7 +315,9 @@ export function getLayoutGeometryImageCount(
   preserveSelectedPreview = false,
 ) {
   const count = Math.max(0, Math.min(MAX_IMAGE_COUNT, Math.floor(imageCount)))
-  if (count === 0) return 2
+  // Before the first upload, keep the canvas neutral instead of implying
+  // that the default split is the only way to start.
+  if (count === 0) return 1
 
   // A selected two-slot composition must not collapse into a full-canvas
   // single image while the user is filling its preview.

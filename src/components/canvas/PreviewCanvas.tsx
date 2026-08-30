@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 
-import { AlertCircle, Upload } from 'lucide-react'
+import { AlertCircle, LoaderCircle, Upload } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -20,23 +20,11 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
   const {
     zoom,
     resetVersion,
-    layoutPreset,
-    hasChosenLayout,
-    setImageAt,
-    setImageScale,
-    setImagePosition,
-    setSelectedImageIndex,
-    setLayoutPreset,
+    setPreparedImages,
   } = useStore(useShallow(state => ({
     zoom: state.zoom,
     resetVersion: state.resetVersion,
-    layoutPreset: state.layoutPreset,
-    hasChosenLayout: state.hasChosenLayout,
-    setImageAt: state.setImageAt,
-    setImageScale: state.setImageScale,
-    setImagePosition: state.setImagePosition,
-    setSelectedImageIndex: state.setSelectedImageIndex,
-    setLayoutPreset: state.setLayoutPreset,
+    setPreparedImages: state.setPreparedImages,
   })))
   const t = useTranslations('ImageUploader')
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -134,14 +122,12 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
 
       let uploadedCount = 0
       let hadTooLargeFile = false
+      const preparedImages: { index: number; url: string }[] = []
 
       results.forEach((result, offset) => {
         if (result.status === 'fulfilled') {
           const slot = targetSlots[offset]
-          setImageAt(slot, result.value)
-          setImageScale(slot, 1)
-          setImagePosition(slot, { x: 0, y: 0 })
-          if (targetSlot !== undefined) setSelectedImageIndex(slot)
+          preparedImages.push({ index: slot, url: result.value })
           uploadedCount += 1
           return
         }
@@ -150,6 +136,11 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
           hadTooLargeFile = true
         }
       })
+
+      setPreparedImages(
+        preparedImages,
+        targetSlot !== undefined && preparedImages.length > 0 ? preparedImages[0].index : undefined,
+      )
 
       if (uploadedCount === 0) {
         setUploadError(hadTooLargeFile ? t('uploadLimit') : t('uploadError'))
@@ -173,14 +164,10 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
     if (isUploading) return
     const input = fileInputRef.current
     if (!input) return
-    // Clicking an empty slot is an explicit choice to fill the visible
-    // layout preview, even when the default composition has not been
-    // confirmed from the layout panel yet.
-    if (!hasChosenLayout) setLayoutPreset(layoutPreset)
     targetSlotRef.current = index
     input.multiple = false
     input.click()
-  }, [hasChosenLayout, isUploading, layoutPreset, setLayoutPreset])
+  }, [isUploading])
 
   const handleFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.currentTarget.files ? Array.from(event.currentTarget.files) : []
@@ -226,8 +213,22 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
             emptySlotLabel={isUploading ? t('uploading') : t('emptySlotLabel')}
             emptySlotHint={isUploading ? '' : t('emptySlotHint')}
             emptySlotDisabled={isUploading}
+            loadingSlotLabel={t('uploading')}
           />
         </div>
+
+        {isUploading && (
+          <div
+            data-preview-upload-status
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-4 top-4 z-20 flex justify-center"
+          >
+            <div className="inline-flex min-h-9 items-center gap-2 rounded-md border border-border bg-card/95 px-3 py-2 text-xs font-semibold text-foreground shadow-subtle">
+              <LoaderCircle className="size-3.5 animate-spin motion-reduce:animate-none" />
+              <span>{t('uploading')}</span>
+            </div>
+          </div>
+        )}
 
         {isDragActive && (
           <div className="pointer-events-none absolute inset-5 z-20 flex items-center justify-center rounded-lg border border-primary/45 bg-accent/45 px-6 text-center">

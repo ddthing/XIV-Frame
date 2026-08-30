@@ -190,7 +190,7 @@ export const useStore = create<AppState>()(
     {
       name: SETTINGS_STORAGE_KEY,
       storage: createJSONStorage(() => deferredSettingsStorage),
-      version: 4, // v4 names the X timeline and original-ratio profiles
+      version: 5, // v5 keeps layout selection scoped to the photo session
       migrate: (persistedState: unknown) => {
         const state: PersistedAppState = persistedState && typeof persistedState === 'object'
           ? { ...(persistedState as PersistedAppState) }
@@ -204,6 +204,9 @@ export const useStore = create<AppState>()(
         delete state.imageScales
         delete state.characterSourceUrl
         delete state.characterCutoutUrl
+        // Images are session-only, so a previous layout selection must not
+        // turn the first photo in a new session into a partially filled split.
+        delete state.hasChosenLayout
         
         // Migrate legacy 'blend' preset
         if (state.layoutPreset === 'blend') {
@@ -234,6 +237,7 @@ export const useStore = create<AppState>()(
         delete persistedState.isImageLocked
         delete persistedState.selectedImageIndex
         delete persistedState.isExporting
+        delete persistedState.hasChosenLayout
         delete persistedState.characterSourceUrl
         delete persistedState.characterCutoutUrl
         delete persistedState.logoUrl

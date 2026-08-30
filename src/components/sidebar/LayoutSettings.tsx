@@ -1,9 +1,12 @@
-import { Blend, Circle, Heart, Sparkles, Square, Star } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Blend, Check, Circle, Heart, Sparkles, Square, Star } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useShallow } from 'zustand/react/shallow'
 
 import { EditorChoice, EditorFieldHeader, EditorSection } from '@/components/ui/editor'
 import {
+  getLayoutGeometry,
+  getLayoutGeometryImageCount,
   getLayoutPreviewGeometry,
   getRecommendedLayoutPreset,
   LAYOUT_TEMPLATE_GROUPS,
@@ -13,7 +16,131 @@ import {
 } from '@/lib/layoutTemplates'
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
+import { settleWithConcurrency } from '@/lib/asyncPool'
+import { revokeObjectUrl } from '@/lib/imageUpload'
 import { useStore, type BackgroundColor } from '@/store/useStore'
+
+const LAYOUT_PREVIEW_THUMBNAIL_SIZE = 320
+
+function loadLayoutPreviewImage(source: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new window.Image()
+    image.onload = () => resolve(image)
+    image.onerror = () => reject(new Error('Failed to load layout preview image'))
+    image.src = source
+  })
+}
+
+function canvasToLayoutPreviewBlob(canvas: HTMLCanvasElement) {
+  return new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob((webpBlob) => {
+      if (webpBlob) {
+        resolve(webpBlob)
+        return
+      }
+
+      canvas.toBlob((pngBlob) => {
+        if (pngBlob) resolve(pngBlob)
+        else reject(new Error('Failed to create layout preview thumbnail'))
+      }, 'image/png')
+    }, 'image/webp', 0.82)
+  })
+}
+
+async function createLayoutPreviewThumbnail(source: string) {
+  const image = await loadLayoutPreviewImage(source)
+  const sourceWidth = image.naturalWidth || image.width
+  const sourceHeight = image.naturalHeight || image.height
+  if (!sourceWidth || !sourceHeight) throw new Error('Layout preview image has no dimensions')
+
+  const scale = Math.min(1, LAYOUT_PREVIEW_THUMBNAIL_SIZE / Math.max(sourceWidth, sourceHeight))
+  const width = Math.max(1, Math.round(sourceWidth * scale))
+  const height = Math.max(1, Math.round(sourceHeight * scale))
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const context = canvas.getContext('2d')
+  if (!context) throw new Error('Failed to create layout preview canvas')
+
+  context.imageSmoothingEnabled = true
+  context.imageSmoothingQuality = 'high'
+  context.drawImage(image, 0, 0, width, height)
+  const blob = await canvasToLayoutPreviewBlob(canvas)
+  return URL.createObjectURL(blob)
+}
+
+function useLayoutPreviewThumbnails(sources: readonly string[]) {
+  const thumbnailCacheRef = useRef(new Map<string, string>())
+  const activeSourcesRef = useRef(new Set<string>())
+  const mountedRef = useRef(false)
+  const [thumbnailMap, setThumbnailMap] = useState<Record<string, string>>({})
+  const sourceKey = sources.join('\u0001')
+
+  useEffect(() => {
+    mountedRef.current = true
+    const cache = thumbnailCacheRef.current
+    return () => {
+      mountedRef.current = false
+      cache.forEach(revokeObjectUrl)
+      cache.clear()
+    }
+  }, [])
+
+  useEffect(() => {
+    const cache = thumbnailCacheRef.current
+    const activeSources = new Set(sources)
+    activeSourcesRef.current = activeSources
+
+    let pruned = false
+    cache.forEach((thumbnail, source) => {
+      if (!activeSources.has(source)) {
+        revokeObjectUrl(thumbnail)
+        cache.delete(source)
+        pruned = true
+      }
+    })
+    if (pruned) {
+      setThumbnailMap((current) => {
+        const next = { ...current }
+        Object.keys(next).forEach((source) => {
+          if (!activeSources.has(source)) delete next[source]
+        })
+        return next
+      })
+    }
+
+    const missingSources = sources.filter((source) => !cache.has(source))
+    if (missingSources.length === 0) return
+
+    void settleWithConcurrency(missingSources, createLayoutPreviewThumbnail, 2).then((results) => {
+      const additions: [string, string][] = []
+      results.forEach((result, index) => {
+        if (result.status !== 'fulfilled') return
+        const source = missingSources[index]
+        if (!mountedRef.current || !activeSourcesRef.current.has(source)) {
+          revokeObjectUrl(result.value)
+          return
+        }
+        if (cache.has(source)) {
+          revokeObjectUrl(result.value)
+          return
+        }
+        cache.set(source, result.value)
+        additions.push([source, result.value])
+      })
+
+      if (additions.length > 0 && mountedRef.current) {
+        setThumbnailMap((current) => {
+          const next = { ...current }
+          additions.forEach(([source, thumbnail]) => { next[source] = thumbnail })
+          return next
+        })
+      }
+    })
+  }, [sourceKey, sources])
+
+  return sources.map((source) => thumbnailMap[source])
+}
 
 export function LayoutSettings() {
   const {
@@ -69,7 +196,23 @@ export function LayoutSettings() {
     ? LAYOUT_TEMPLATE_OPTIONS.find((option) => option.id === recommendedPreset)
     : undefined
   const selectedTemplate = LAYOUT_TEMPLATE_OPTIONS.find((option) => option.id === layoutPreset)
+  const [layoutFilter, setLayoutFilter] = useState<LayoutFilter | null>(null)
   const hasTemplateOverflow = Boolean(selectedTemplate && imageCount > selectedTemplate.maxImages)
+  const previewImages = useMemo(() => images.filter(Boolean), [images])
+  const previewThumbnails = useLayoutPreviewThumbnails(previewImages)
+  const currentPreviewImageCount = getLayoutGeometryImageCount(layoutPreset, imageCount, hasChosenLayout)
+  const currentPreviewSlotCount = selectedTemplate
+    ? getLayoutGeometry(selectedTemplate.id, currentPreviewImageCount).cells.length
+    : 0
+  const filterOptions: LayoutFilterOption[] = [
+    { value: 'all', label: t('filterAll'), groups: LAYOUT_TEMPLATE_GROUPS },
+    { value: 'basic', label: t('filterBasic'), groups: ['two'] },
+    { value: 'focus', label: t('filterFocus'), groups: ['three', 'four'] },
+    { value: 'matrix', label: t('filterMatrix'), groups: ['matrix'] },
+  ]
+  const activeFilterValue = layoutFilter ?? 'all'
+  const activeFilter = filterOptions.find((option) => option.value === activeFilterValue) ?? filterOptions[0]
+  const visibleGroups = activeFilter.groups
   const safeCustomBackgroundColor = getSafeCustomBackgroundColor(customBackgroundColor)
   const backgroundOptions: BackgroundOption[] = [
     { value: 'white', label: t('bgWhite'), swatch: '#ffffff' },
@@ -89,7 +232,36 @@ export function LayoutSettings() {
 
   return (
     <div className="space-y-6">
-      <EditorSection title={t('compositionTitle')} description={t('compositionDescription')}>
+      <EditorSection title={t('compositionTitle')}>
+        {selectedTemplate && (
+          <div data-layout-current-preview className="editor-control-surface overflow-hidden p-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="editor-meta">{t('currentLayout')}</p>
+                <div className="mt-1 flex min-w-0 items-center gap-2">
+                  <h4 className="truncate text-sm font-semibold text-foreground">{t(selectedTemplate.labelKey)}</h4>
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/20 bg-accent/55 px-2 py-0.5 font-mono text-[10px] font-semibold text-accent-foreground">
+                    <Check className="size-3" aria-hidden="true" />
+                    {t(hasChosenLayout ? 'selectedShort' : 'defaultShort')}
+                  </span>
+                </div>
+              </div>
+              <span className="shrink-0 rounded-full border border-border bg-surface-inset/70 px-2 py-1 font-mono text-[10px] font-semibold tabular-nums text-muted-foreground">
+                {t('templateSlotCount', { count: currentPreviewSlotCount })}
+              </span>
+            </div>
+
+            <div className="mt-3 overflow-hidden rounded-md border border-border bg-muted/35 p-2">
+              <LayoutTemplatePreview
+                option={selectedTemplate}
+                variant="hero"
+                images={previewThumbnails}
+                imageCount={currentPreviewImageCount}
+              />
+            </div>
+          </div>
+        )}
+
         {recommendedTemplate && !hasChosenLayout && (
           <div
             role="status"
@@ -115,8 +287,37 @@ export function LayoutSettings() {
             </EditorChoice>
           </div>
         )}
-        <div className="space-y-4">
-          {LAYOUT_TEMPLATE_GROUPS.map((group) => {
+        <div className="space-y-3">
+          <div className="flex items-end justify-between gap-3">
+            <div className="min-w-0">
+              <p className="editor-meta">{t('chooseLayout')}</p>
+            </div>
+            <span className="shrink-0 font-mono text-[10px] tabular-nums text-muted-foreground">
+              {LAYOUT_TEMPLATE_OPTIONS.length} {t('templateCountSuffix')}
+            </span>
+          </div>
+
+          <div role="group" aria-label={t('filterLabel')} className="grid grid-cols-4 gap-1 rounded-lg border border-border bg-muted/55 p-1">
+            {filterOptions.map((option) => (
+              <EditorChoice
+                key={option.value}
+                active={activeFilterValue === option.value}
+                onClick={() => setLayoutFilter(option.value)}
+                aria-label={option.label}
+                data-layout-filter={option.value}
+                className="min-h-9 min-w-0 flex-col gap-0.5 rounded-md px-1.5 py-1 text-[10px] leading-3"
+              >
+                <span className="truncate">{option.label}</span>
+                <span className="font-mono text-[9px] font-medium tabular-nums opacity-65">
+                  {option.groups.reduce((total, group) => total + LAYOUT_TEMPLATE_OPTIONS.filter((template) => template.group === group).length, 0)}
+                </span>
+              </EditorChoice>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-5">
+          {visibleGroups.map((group) => {
             const options = LAYOUT_TEMPLATE_OPTIONS.filter((option) => option.group === group)
 
             return (
@@ -125,7 +326,7 @@ export function LayoutSettings() {
                   <span className="editor-meta min-w-0 truncate">{t(GROUP_LABEL_KEYS[group])}</span>
                   <span className="min-w-0 truncate font-body text-[11px] text-muted-foreground">{t(GROUP_HINT_KEYS[group])}</span>
                 </div>
-                <div role="group" aria-label={t(GROUP_LABEL_KEYS[group])} className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+                <div role="group" aria-label={t(GROUP_LABEL_KEYS[group])} className="grid grid-cols-2 gap-2">
                   {options.map((option) => {
                     const requirement = getTemplateRequirement(t, option, imageCount)
 
@@ -137,10 +338,24 @@ export function LayoutSettings() {
                         aria-label={`${t(option.labelKey)}${requirement ? `, ${requirement}` : ''}`}
                         title={requirement || undefined}
                         data-layout-template-card="true"
-                        className="h-auto min-h-[104px] w-[92px] max-w-[92px] min-w-[92px] shrink-0 snap-start flex-col justify-start gap-2 px-2 py-3"
+                        className="group h-auto min-h-[150px] w-full min-w-0 flex-col items-stretch justify-start gap-2 overflow-hidden p-2.5 text-left"
                       >
-                        <LayoutTemplatePreview option={option} />
-                        <span className="block min-w-0 max-w-full line-clamp-2 break-words text-center text-[11px] leading-4 whitespace-normal">{t(option.labelKey)}</span>
+                        <span className="relative block w-full overflow-hidden rounded-md border border-border bg-muted/35 p-1">
+                          <LayoutTemplatePreview option={option} />
+                          {layoutPreset === option.id && (
+                            <span className="absolute right-1.5 top-1.5 inline-flex items-center gap-1 rounded-full border border-primary/20 bg-background/95 px-1.5 py-0.5 font-mono text-[9px] font-semibold text-foreground shadow-subtle">
+                              <Check className="size-2.5 text-primary" aria-hidden="true" />
+                              {t('selectedShort')}
+                            </span>
+                          )}
+                        </span>
+                        <span className="flex w-full min-w-0 items-start justify-between gap-2">
+                          <span className="min-w-0 line-clamp-2 break-words text-[12px] font-semibold leading-4 text-foreground">{t(option.labelKey)}</span>
+                          <span className="shrink-0 pt-0.5 font-mono text-[9px] tabular-nums text-muted-foreground">{getTemplateSlotLabel(t, option)}</span>
+                        </span>
+                        <span className={`w-full truncate font-body text-[10px] leading-4 ${requirement ? 'text-muted-foreground' : 'text-primary'}`}>
+                          {getTemplateStatus(t, option, imageCount)}
+                        </span>
                       </EditorChoice>
                     )
                   })}
@@ -149,9 +364,6 @@ export function LayoutSettings() {
             )
           })}
         </div>
-        <p className="font-body text-[11px] leading-4 text-muted-foreground">
-          {t('templateHint', { count: imageCount })}
-        </p>
         {hasTemplateOverflow && selectedTemplate && (
           <p className="rounded-md border border-border bg-muted/50 px-3 py-2 font-body text-[11px] leading-4 text-muted-foreground">
             {t('templateOverflow', { count: imageCount, max: selectedTemplate.maxImages })}
@@ -328,34 +540,88 @@ const GROUP_HINT_KEYS: Record<LayoutTemplateGroup, string> = {
   matrix: 'templateGroupMatrixHint',
 }
 
+type LayoutFilter = 'all' | 'basic' | 'focus' | 'matrix'
+
+type LayoutFilterOption = {
+  value: LayoutFilter
+  label: string
+  groups: readonly LayoutTemplateGroup[]
+}
+
 function getTemplateRequirement(t: ReturnType<typeof useTranslations<'LayoutSettings'>>, option: LayoutTemplateOption, imageCount: number) {
   if (imageCount < option.minImages) return t('templateNeedsImages', { count: option.minImages })
   if (imageCount > option.maxImages) return t('templateMaxImages', { count: option.maxImages })
   return ''
 }
 
-function LayoutTemplatePreview({ option }: { option: LayoutTemplateOption }) {
-  const geometry = getLayoutPreviewGeometry(option.id)
+function getTemplateStatus(t: ReturnType<typeof useTranslations<'LayoutSettings'>>, option: LayoutTemplateOption, imageCount: number) {
+  if (imageCount < option.minImages) return t('templateNeedsShort', { count: option.minImages })
+  if (imageCount > option.maxImages) return t('templateMaxShort', { count: option.maxImages })
+  return t('templateReady')
+}
+
+function getTemplateSlotLabel(t: ReturnType<typeof useTranslations<'LayoutSettings'>>, option: LayoutTemplateOption) {
+  return t('templateSlotCount', { count: option.previewCount })
+}
+
+function LayoutTemplatePreview({
+  option,
+  variant = 'card',
+  images = [],
+  imageCount,
+}: {
+  option: LayoutTemplateOption
+  variant?: 'card' | 'hero'
+  images?: readonly (string | undefined)[]
+  imageCount?: number
+}) {
+  const geometry = imageCount === undefined
+    ? getLayoutPreviewGeometry(option.id)
+    : getLayoutGeometry(option.id, imageCount)
+  const isHero = variant === 'hero'
 
   return (
     <span
       aria-hidden="true"
-      className="grid size-12 shrink-0 gap-0.5 rounded-md border border-primary/30 bg-primary/10 p-0.5"
+      className={isHero
+        ? 'grid aspect-[5/2] min-h-0 w-full gap-1 rounded-sm border border-primary/25 bg-primary/5 p-1'
+        : 'grid aspect-[4/3] w-full gap-1 rounded-sm border border-primary/20 bg-primary/5 p-1'}
       style={{
         gridTemplateColumns: `repeat(${geometry.columns}, minmax(0, 1fr))`,
         gridTemplateRows: `repeat(${geometry.rows}, minmax(0, 1fr))`,
       }}
     >
-      {geometry.cells.map((cell, index) => (
-        <span
-          key={`${cell.column}-${cell.row}-${index}`}
-          className="min-h-0 rounded-sm bg-primary/65 transition-colors"
-          style={{
-            gridColumn: `${cell.column + 1} / span ${cell.columnSpan ?? 1}`,
-            gridRow: `${cell.row + 1} / span ${cell.rowSpan ?? 1}`,
-          }}
-        />
-      ))}
+      {geometry.cells.map((cell, index) => {
+        const image = images[index]
+
+        return (
+          <span
+            key={`${cell.column}-${cell.row}-${index}`}
+            className="relative min-h-0 overflow-hidden rounded-[3px]"
+            style={{
+              gridColumn: `${cell.column + 1} / span ${cell.columnSpan ?? 1}`,
+              gridRow: `${cell.row + 1} / span ${cell.rowSpan ?? 1}`,
+            }}
+          >
+            {image ? (
+              // Uploaded previews can be blob URLs, so Next Image cannot optimize this thumbnail.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={image} alt="" draggable={false} decoding="async" className="size-full object-cover" />
+            ) : (
+              <span className={`grid size-full place-items-center border border-dashed ${isHero ? 'border-primary/25 bg-primary/10' : 'border-primary/20 bg-primary/60'}`}>
+                <span className={`font-mono font-semibold tabular-nums ${isHero ? 'text-sm text-primary/70' : 'text-[9px] text-primary-foreground/80'}`}>
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+              </span>
+            )}
+            {image && isHero && (
+              <span className="absolute bottom-1 left-1 rounded-sm bg-primary/75 px-1 py-0.5 font-mono text-[9px] font-semibold tabular-nums text-primary-foreground">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+            )}
+          </span>
+        )
+      })}
     </span>
   )
 }

@@ -32,16 +32,20 @@ export default function KonvaStage({
   emptySlotLabel = 'Add photo',
   emptySlotHint = 'Click or drop',
   emptySlotDisabled = false,
+  loadingSlotLabel = 'Preparing photo…',
+  loadingSlotHint = '',
 }: {
   stageRef: React.RefObject<Konva.Stage | null>
   onSlotSelect?: (index: number) => void
   emptySlotLabel?: string
   emptySlotHint?: string
   emptySlotDisabled?: boolean
+  loadingSlotLabel?: string
+  loadingSlotHint?: string
 }) {
   const {
     images, layoutPreset, hasChosenLayout, imageGap, imageTransition, blendWidth, canvasRatio,
-    borderWidth, backgroundColor, customBackgroundColor, grainIntensity, imageShape, isExporting,
+    borderWidth, backgroundColor, customBackgroundColor, grainIntensity, imageShape, isExporting, zoom,
   } = useStore(useShallow(state => ({
     images: state.images,
     layoutPreset: state.layoutPreset,
@@ -56,6 +60,7 @@ export default function KonvaStage({
     grainIntensity: state.grainIntensity,
     imageShape: state.imageShape,
     isExporting: state.isExporting,
+    zoom: state.zoom,
   })))
   const containerRef = useRef<HTMLDivElement>(null)
   
@@ -68,6 +73,7 @@ export default function KonvaStage({
   
   useEffect(() => {
     let effectActive = true
+    let syncFrame: number | null = null
     const imageCache = imageCacheRef.current
     const pendingLoads = pendingImageLoadsRef.current
     const imageEntries = images.flatMap((url, sourceIndex) => (
@@ -163,9 +169,17 @@ export default function KonvaStage({
       })
     }
 
+    const scheduleLoadedImageSync = () => {
+      if (!effectActive || syncFrame !== null) return
+      syncFrame = window.requestAnimationFrame(() => {
+        syncFrame = null
+        syncLoadedImages()
+      })
+    }
+
     const imageLoadPromises = imageEntries.map(({ url }) => {
       const promise = loadImage(url)
-      void promise.then(syncLoadedImages, syncLoadedImages)
+      void promise.then(scheduleLoadedImageSync, scheduleLoadedImageSync)
       return promise
     })
 
@@ -190,6 +204,10 @@ export default function KonvaStage({
 
     return () => {
       effectActive = false
+      if (syncFrame !== null) {
+        window.cancelAnimationFrame(syncFrame)
+        syncFrame = null
+      }
     }
   }, [images])
 
@@ -243,6 +261,8 @@ export default function KonvaStage({
   const imageSlotCount = occupiedSlotIndices.length > 0
     ? Math.max(...occupiedSlotIndices) + 1
     : 0
+  const loadedSlotSet = new Set(imagesData.map(({ sourceIndex }) => sourceIndex))
+  const loadingSlotIndices = occupiedSlotIndices.filter((index) => !loadedSlotSet.has(index))
 
   const geometryImageCount = getLayoutGeometryImageCount(layoutPreset, imageSlotCount, hasChosenLayout)
   const { logicalWidth, logicalHeight, geometry, effectiveLayoutPreset } = useMemo(() => {
@@ -276,6 +296,8 @@ export default function KonvaStage({
       className="w-full h-full flex items-center justify-center overflow-hidden"
       data-layout-effective-preset={effectiveLayoutPreset}
       data-layout-image-count={occupiedSlotIndices.length}
+      data-layout-loaded-image-count={imagesData.length}
+      data-layout-loading-slot-count={loadingSlotIndices.length}
       data-layout-slot-count={geometry.cells.length}
       data-layout-empty-slot-count={emptySlotCount}
     >
@@ -295,7 +317,7 @@ export default function KonvaStage({
           />
         </Layer>
         
-        {!isExporting && emptySlotCount > 0 && (
+        {!isExporting && (emptySlotCount > 0 || loadingSlotIndices.length > 0) && (
           <EmptySlotLayer
             geometry={geometry}
             contentWidth={logicalWidth}
@@ -308,6 +330,10 @@ export default function KonvaStage({
             primaryHint={emptySlotHint}
             onSlotSelect={onSlotSelect}
             disabled={emptySlotDisabled}
+            loadingSlotIndices={loadingSlotIndices}
+            loadingLabel={loadingSlotLabel}
+            loadingHint={loadingSlotHint}
+            displayScale={scale * (zoom / 100)}
           />
         )}
 
@@ -322,6 +348,7 @@ export default function KonvaStage({
           layoutPreset={layoutPreset}
           layoutImageCount={geometryImageCount}
           imageShape={activeImageShape}
+          renderScale={isExporting ? 1 : Math.min(1, Math.max(0.1, scale * (zoom / 100)))}
           onImageSlotSelect={onSlotSelect}
         />
 

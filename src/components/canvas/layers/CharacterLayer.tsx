@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { Group, Image as KonvaImage, Rect } from 'react-konva'
+import { useEffect, useMemo, useRef, useState, type RefObject } from 'react'
+import { Group, Image as KonvaImage, Rect, Text } from 'react-konva'
 import useImage from 'use-image'
 import { useTranslations } from 'next-intl'
 import { useShallow } from 'zustand/react/shallow'
@@ -67,7 +67,20 @@ function createAlphaOutline(image: HTMLImageElement) {
   return outlineCanvas
 }
 
+function drawCharacterBoundsHitArea(
+  context: Konva.Context,
+  shape: Konva.Shape,
+  width: number,
+  height: number,
+) {
+  context.beginPath()
+  context.rect(0, 0, width, height)
+  context.closePath()
+  context.fillStrokeShape(shape)
+}
+
 function CharacterGuide({
+  guideRef,
   outlineImage,
   position,
   width,
@@ -82,7 +95,9 @@ function CharacterGuide({
   onResizeEnd,
   onHandleEnter,
   onHandleLeave,
+  label,
 }: {
+  guideRef: RefObject<Konva.Group | null>
   outlineImage: HTMLCanvasElement | null
   position: CanvasPosition
   width: number
@@ -97,11 +112,19 @@ function CharacterGuide({
   onResizeEnd: () => void
   onHandleEnter: () => void
   onHandleLeave: () => void
+  label: string
 }) {
-  const visualX = flipped ? position.x - width : position.x
-  const visualY = position.y
+  // The guide is positioned by the same Konva node as the character. Keep
+  // its children local so dragging updates one native transform instead of
+  // re-rendering React for every pointer event.
+  const visualX = flipped ? -width : 0
+  const visualY = 0
   const handleSize = Math.max(18, Math.min(32, contentHeight * 0.024))
   const handleStrokeWidth = Math.max(2, handleSize * 0.1)
+  const frameStrokeWidth = Math.max(2, handleSize * 0.08)
+  const tagFontSize = Math.max(14, Math.min(24, contentHeight * 0.018))
+  const tagPadding = Math.max(6, tagFontSize * 0.35)
+  const tagHeight = tagFontSize + (tagPadding * 2)
   const handlePositions: Record<ResizeHandle, CanvasPosition> = {
     nw: { x: visualX, y: visualY },
     ne: { x: visualX + width, y: visualY },
@@ -110,12 +133,41 @@ function CharacterGuide({
   }
 
   return (
-    <Group>
+    <Group ref={guideRef} x={position.x} y={position.y}>
+      <Rect
+        x={visualX}
+        y={visualY}
+        width={width}
+        height={height}
+        stroke="#e7f5a5"
+        strokeWidth={frameStrokeWidth}
+        dash={[Math.max(12, handleSize * 0.8), Math.max(6, handleSize * 0.45)]}
+        cornerRadius={Math.max(4, handleSize * 0.2)}
+        shadowColor="#173806"
+        shadowBlur={Math.max(4, handleSize * 0.25)}
+        shadowOpacity={0.45}
+        listening={false}
+      />
+      <Text
+        x={visualX}
+        y={Math.max(-position.y, visualY - tagHeight - 6)}
+        text={label}
+        fontSize={tagFontSize}
+        fontStyle="bold"
+        padding={tagPadding}
+        fill="#173806"
+        stroke="#e7f5a5"
+        strokeWidth={Math.max(1, frameStrokeWidth * 0.45)}
+        shadowColor="#ffffff"
+        shadowBlur={3}
+        shadowOpacity={0.9}
+        listening={false}
+      />
       {outlineImage && (
         <KonvaImage
           image={outlineImage}
-          x={position.x}
-          y={position.y}
+          x={0}
+          y={0}
           width={imageWidth}
           height={imageHeight}
           scaleX={flipped ? -scale : scale}
@@ -154,9 +206,10 @@ function CharacterGuide({
             }}
             onDragMove={(event) => {
               event.cancelBubble = true
+              const parentPosition = event.target.getParent()?.position() ?? { x: 0, y: 0 }
               onResizePreview(handle, {
-                x: event.target.x() + handleSize / 2,
-                y: event.target.y() + handleSize / 2,
+                x: parentPosition.x + event.target.x() + handleSize / 2,
+                y: parentPosition.y + event.target.y() + handleSize / 2,
               })
             }}
             onDragEnd={(event) => {
@@ -193,10 +246,12 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
     isExporting: state.isExporting,
   })))
   const t = useTranslations('ImageUploader')
+  const characterT = useTranslations('SignatureSettings')
 
   const [characterImg] = useImage(characterCutoutUrl ?? '', 'anonymous')
   const [isHovered, setIsHovered] = useState(false)
-  const [selectedCharacterUrl, setSelectedCharacterUrl] = useState<string | null>(null)
+  const [deselectedCharacterUrl, setDeselectedCharacterUrl] = useState<string | null>(null)
+  const [guideDismissedCharacterUrl, setGuideDismissedCharacterUrl] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [isResizing, setIsResizing] = useState(false)
   const [livePosition, setLivePosition] = useState<CanvasPosition | null>(null)
@@ -206,6 +261,9 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
   const resizeFrameRef = useRef<number | null>(null)
   const guideHideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const characterPositionRef = useRef<CanvasPosition | null>(null)
+  const characterGuideRef = useRef<Konva.Group | null>(null)
+  const isCharacterSelected = Boolean(characterCutoutUrl && deselectedCharacterUrl !== characterCutoutUrl)
+  const isGuideAutoVisible = Boolean(characterCutoutUrl && guideDismissedCharacterUrl !== characterCutoutUrl)
   const outlineImage = useMemo(
     () => characterImg ? createAlphaOutline(characterImg) : null,
     [characterImg],
@@ -228,7 +286,8 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
       const nextPosition = nudgeCharacterPosition(currentPosition, detail)
       characterPositionRef.current = nextPosition
       setCharacterPosition(nextPosition)
-      setSelectedCharacterUrl(characterCutoutUrl)
+      setDeselectedCharacterUrl(null)
+      setGuideDismissedCharacterUrl(null)
       setIsHovered(true)
     }
 
@@ -238,13 +297,14 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
 
   useEffect(() => {
     const handleKeyboardNudge = (event: KeyboardEvent) => {
-      if (isExporting || !characterCutoutUrl || selectedCharacterUrl !== characterCutoutUrl) return
+      if (isExporting || !characterCutoutUrl || !isCharacterSelected) return
       if (!(document.activeElement instanceof HTMLElement) || document.activeElement.dataset.xivFrameCanvas !== 'true') return
       if (isInteractiveElement(document.activeElement) || isInteractiveElement(event.target instanceof Element ? event.target : null)) return
 
       if (event.key === 'Escape') {
         event.preventDefault()
-        setSelectedCharacterUrl(null)
+        setDeselectedCharacterUrl(characterCutoutUrl)
+        setGuideDismissedCharacterUrl(characterCutoutUrl)
         setIsHovered(false)
         return
       }
@@ -271,7 +331,7 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
 
     window.addEventListener('keydown', handleKeyboardNudge)
     return () => window.removeEventListener('keydown', handleKeyboardNudge)
-  }, [characterCutoutUrl, isExporting, selectedCharacterUrl, setCharacterPosition])
+  }, [characterCutoutUrl, isCharacterSelected, isExporting, setCharacterPosition])
 
   // The default footprint is intentionally portrait-friendly for full-body
   // characters, while the user can enlarge it beyond that base size.
@@ -304,7 +364,7 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
 
   const showGuide = shouldShowCharacterGuide({
     isExporting,
-    isHovered,
+    isHovered: isHovered || isGuideAutoVisible,
     isDragging,
     isResizing,
   })
@@ -314,6 +374,7 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
       clearTimeout(guideHideTimeoutRef.current)
       guideHideTimeoutRef.current = null
     }
+    setGuideDismissedCharacterUrl(null)
     setIsHovered(true)
   }
 
@@ -322,6 +383,7 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
     if (guideHideTimeoutRef.current) clearTimeout(guideHideTimeoutRef.current)
     guideHideTimeoutRef.current = setTimeout(() => {
       guideHideTimeoutRef.current = null
+      setGuideDismissedCharacterUrl(characterCutoutUrl)
       setIsHovered(false)
     }, 180)
   }
@@ -337,7 +399,8 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
   }
 
   const selectCharacter = (stage?: Konva.Stage | null) => {
-    if (characterCutoutUrl) setSelectedCharacterUrl(characterCutoutUrl)
+    setDeselectedCharacterUrl(null)
+    setGuideDismissedCharacterUrl(null)
     cancelGuideHide()
     focusStage(stage)
   }
@@ -407,9 +470,14 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
         scaleY={scale}
         offsetX={characterFlipX ? characterImg.width : 0}
         // Konva's default Image hit area is rectangular; use the PNG alpha
-        // mask so transparent margins do not block the photos underneath.
+        // mask before selection, then use the full footprint after selection
+        // so transparent padding remains draggable.
         hitFunc={(context, shape) => {
-          drawCharacterHitArea(context, shape, characterImg, characterImg.width, characterImg.height)
+          if (isCharacterSelected) {
+            drawCharacterBoundsHitArea(context, shape, characterImg.width, characterImg.height)
+          } else {
+            drawCharacterHitArea(context, shape, characterImg, characterImg.width, characterImg.height)
+          }
         }}
         opacity={characterOpacity / 100}
         draggable
@@ -438,20 +506,21 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
           event.cancelBubble = true
           selectCharacter(event.target.getStage())
           setIsDragging(true)
-          setLivePosition({ x: event.target.x(), y: event.target.y() })
+          characterGuideRef.current?.position({ x: event.target.x(), y: event.target.y() })
         }}
         onDragMove={(event) => {
-          setLivePosition({ x: event.target.x(), y: event.target.y() })
+          characterGuideRef.current?.position({ x: event.target.x(), y: event.target.y() })
         }}
         onDragEnd={(event) => {
           const nextPosition = { x: event.target.x(), y: event.target.y() }
+          characterGuideRef.current?.position(nextPosition)
           setCharacterPosition(nextPosition)
-          setLivePosition(null)
           setIsDragging(false)
         }}
       />
       {showGuide && (
         <CharacterGuide
+          guideRef={characterGuideRef}
           outlineImage={outlineImage}
           position={position}
           width={width}
@@ -464,13 +533,14 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
           onResizeStart={(stage) => {
             selectCharacter(stage)
             setIsResizing(true)
-              resizePreviewRef.current = null
-              pendingResizePreviewRef.current = null
-            }}
+            resizePreviewRef.current = null
+            pendingResizePreviewRef.current = null
+          }}
           onResizePreview={handleResizePreview}
           onResizeEnd={handleResizeEnd}
           onHandleEnter={cancelGuideHide}
           onHandleLeave={scheduleGuideHide}
+          label={characterT('characterTitle')}
         />
       )}
     </>

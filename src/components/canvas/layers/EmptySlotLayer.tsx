@@ -111,6 +111,11 @@ function getOuterEdgePoints(entry: CellEntry, sides: Set<CellSide> | undefined, 
   return points
 }
 
+function getReadableFontSize(shortestSide: number, displayScale: number, targetScreenSize: number, maxCellRatio: number) {
+  const safeScale = Number.isFinite(displayScale) && displayScale > 0 ? displayScale : 1
+  return Math.min(shortestSide * maxCellRatio, Math.max(10, targetScreenSize / safeScale))
+}
+
 export function EmptySlotLayer({
   geometry,
   contentWidth,
@@ -123,6 +128,10 @@ export function EmptySlotLayer({
   primaryHint,
   onSlotSelect,
   disabled = false,
+  loadingSlotIndices = [],
+  loadingLabel = 'Preparing photo…',
+  loadingHint = '',
+  displayScale = 1,
 }: {
   geometry: LayoutGeometry
   contentWidth: number
@@ -135,14 +144,19 @@ export function EmptySlotLayer({
   primaryHint: string
   onSlotSelect?: (index: number) => void
   disabled?: boolean
+  loadingSlotIndices?: readonly number[]
+  loadingLabel?: string
+  loadingHint?: string
+  displayScale?: number
 }) {
   const slotCount = Math.max(1, geometry.cells.length)
   const [hoveredSlotIndex, setHoveredSlotIndex] = useState<number | null>(null)
   const occupiedSlotSet = new Set(occupiedSlotIndices)
-  const emptySlotIndices = geometry.cells
+  const loadingSlotSet = new Set(loadingSlotIndices)
+  const previewSlotIndices = geometry.cells
     .map((_, index) => index)
-    .filter((index) => !occupiedSlotSet.has(index))
-  if (emptySlotIndices.length === 0) return null
+    .filter((index) => !occupiedSlotSet.has(index) || loadingSlotSet.has(index))
+  if (previewSlotIndices.length === 0) return null
 
   const cellEntries = geometry.cells.map((layoutCell, index) => ({
     index,
@@ -156,7 +170,7 @@ export function EmptySlotLayer({
       index,
     }),
   }))
-  const emptySlotSet = new Set(emptySlotIndices)
+  const previewSlotSet = new Set(previewSlotIndices)
   const sharedEdges = getSharedEdges(cellEntries)
   const neighbourSides = getNeighbourSides(sharedEdges)
 
@@ -165,7 +179,7 @@ export function EmptySlotLayer({
     : { fill: '#fafbf9', hoverFill: '#eef5ed', stroke: '#c8d0c9', text: '#59665b' }
 
   const sharedEdgePoints = sharedEdges
-    .filter(({ first, second }) => emptySlotSet.has(first.index) || emptySlotSet.has(second.index))
+    .filter(({ first, second }) => previewSlotSet.has(first.index) || previewSlotSet.has(second.index))
     .map(({ first, second, orientation, start, end }) => {
       if (orientation === 'vertical') {
         const x = borderWidth + ((first.geometry.x + first.geometry.width + second.geometry.x) / 2)
@@ -177,39 +191,47 @@ export function EmptySlotLayer({
     })
 
   const outerEdgePoints = cellEntries
-    .filter(({ index }) => emptySlotSet.has(index))
+    .filter(({ index }) => previewSlotSet.has(index))
     .flatMap((entry) => getOuterEdgePoints(entry, neighbourSides.get(entry.index), borderWidth))
   const edgePoints = [...outerEdgePoints, ...sharedEdgePoints]
 
   return (
     <Layer>
-      {emptySlotIndices.map((slotIndex) => {
+      {previewSlotIndices.map((slotIndex) => {
         const cell = cellEntries[slotIndex]?.geometry
         if (!cell) return null
 
-        const offset = emptySlotIndices.indexOf(slotIndex)
+        const offset = previewSlotIndices.indexOf(slotIndex)
         const isPrimary = offset === 0
+        const isLoading = loadingSlotSet.has(slotIndex)
+        const isInteractive = !disabled && !isLoading
         const shortestSide = Math.min(cell.width, cell.height)
-        const numberSize = Math.max(18, Math.min(44, shortestSide * 0.14))
-        const labelSize = Math.max(18, Math.min(36, shortestSide * 0.1))
-        const hintSize = Math.max(12, Math.min(22, shortestSide * 0.055))
+        // Konva sizes are in logical canvas units and are reduced by the
+        // fit-to-container stage scale. Keep the copy readable on narrow
+        // mobile previews as well as on large desktop canvases.
+        const numberSize = getReadableFontSize(shortestSide, displayScale, 18, 0.14)
+        const labelSize = getReadableFontSize(shortestSide, displayScale, 20, 0.2)
+        const hintSize = getReadableFontSize(shortestSide, displayScale, 14, 0.12)
+        const label = isLoading ? loadingLabel : isPrimary ? primaryLabel : String(slotIndex + 1).padStart(2, '0')
+        const hint = isLoading ? loadingHint : primaryHint
+        const showHint = Boolean(hint) && (isLoading || isPrimary)
 
         return (
           <Group
             key={`empty-slot-${slotIndex}`}
             x={borderWidth + cell.x}
             y={borderWidth + cell.y}
-            listening={!disabled}
-            onClick={disabled ? undefined : () => onSlotSelect?.(slotIndex)}
-            onTap={disabled ? undefined : () => onSlotSelect?.(slotIndex)}
-            onMouseEnter={disabled ? undefined : (event) => {
+            listening={isInteractive}
+            onClick={isInteractive ? () => onSlotSelect?.(slotIndex) : undefined}
+            onTap={isInteractive ? () => onSlotSelect?.(slotIndex) : undefined}
+            onMouseEnter={isInteractive ? (event) => {
               setHoveredSlotIndex(slotIndex)
               event.target.getStage()?.container().style.setProperty('cursor', 'pointer')
-            }}
-            onMouseLeave={disabled ? undefined : (event) => {
+            } : undefined}
+            onMouseLeave={isInteractive ? (event) => {
               setHoveredSlotIndex((current) => current === slotIndex ? null : current)
               event.target.getStage()?.container().style.setProperty('cursor', 'default')
-            }}
+            } : undefined}
           >
             <Rect
               width={cell.width}
@@ -218,14 +240,14 @@ export function EmptySlotLayer({
               opacity={disabled ? 0.72 : 1}
               cornerRadius={6}
             />
-            {isPrimary && (
+            {isPrimary && !isLoading && (
               <Text
                 x={cell.width * 0.06}
                 y={cell.height * 0.06}
                 width={cell.width * 0.2}
                 text={String(slotIndex + 1).padStart(2, '0')}
                 fontFamily="Pretendard, sans-serif"
-                fontSize={Math.max(16, Math.min(28, shortestSide * 0.055))}
+                fontSize={getReadableFontSize(shortestSide, displayScale, 14, 0.1)}
                 fontStyle="bold"
                 fill={palette.text}
                 opacity={0.68}
@@ -236,20 +258,20 @@ export function EmptySlotLayer({
               x={0}
               y={cell.height * (isPrimary ? 0.4 : 0.44)}
               width={cell.width}
-              text={isPrimary ? primaryLabel : String(slotIndex + 1).padStart(2, '0')}
+              text={label}
               align="center"
               fontFamily="Pretendard, sans-serif"
-              fontSize={isPrimary ? labelSize : numberSize}
+              fontSize={isPrimary || isLoading ? labelSize : numberSize}
               fontStyle="bold"
               fill={palette.text}
               listening={false}
             />
-            {isPrimary && (
+            {showHint && (
               <Text
                 x={0}
                 y={cell.height * 0.57}
                 width={cell.width}
-                text={primaryHint}
+                text={hint}
                 align="center"
                 fontFamily="Pretendard, sans-serif"
                 fontSize={hintSize}

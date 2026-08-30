@@ -37,6 +37,9 @@ const MAX_UNDO_STEPS = 8
 type BrushMode = 'erase' | 'restore'
 type PointerPosition = { clientX: number; clientY: number }
 type BrushCursor = { x: number; y: number }
+type UndoPatch = { x: number; y: number; width: number; height: number; data: Uint8ClampedArray }
+type UndoEntry = { patches: UndoPatch[] }
+type ActiveStroke = { patches: Map<string, UndoPatch> }
 
 const processingMessageKeys = {
   'model-unavailable': 'characterModelUnavailableError',
@@ -46,6 +49,70 @@ const processingMessageKeys = {
   timeout: 'characterProcessingTimeoutError',
   unknown: 'characterProcessingGenericError',
 } as const
+
+const UNDO_TILE_SIZE = 128
+
+function copyPixelRegion(pixels: PixelState, x: number, y: number, width: number, height: number) {
+  const data = new Uint8ClampedArray(width * height * 4)
+  const rowBytes = width * 4
+  for (let row = 0; row < height; row += 1) {
+    const sourceStart = ((y + row) * pixels.width + x) * 4
+    data.set(pixels.data.subarray(sourceStart, sourceStart + rowBytes), row * rowBytes)
+  }
+  return data
+}
+
+function captureUndoTiles(
+  stroke: ActiveStroke,
+  pixels: PixelState,
+  minX: number,
+  minY: number,
+  maxX: number,
+  maxY: number,
+) {
+  const firstTileX = Math.floor(minX / UNDO_TILE_SIZE) * UNDO_TILE_SIZE
+  const firstTileY = Math.floor(minY / UNDO_TILE_SIZE) * UNDO_TILE_SIZE
+
+  for (let y = firstTileY; y <= maxY; y += UNDO_TILE_SIZE) {
+    for (let x = firstTileX; x <= maxX; x += UNDO_TILE_SIZE) {
+      const width = Math.min(UNDO_TILE_SIZE, pixels.width - x)
+      const height = Math.min(UNDO_TILE_SIZE, pixels.height - y)
+      if (width <= 0 || height <= 0) continue
+
+      const key = `${x}:${y}`
+      if (stroke.patches.has(key)) continue
+      stroke.patches.set(key, {
+        x,
+        y,
+        width,
+        height,
+        data: copyPixelRegion(pixels, x, y, width, height),
+      })
+    }
+  }
+}
+
+function restoreUndoEntry(pixels: PixelState, entry: UndoEntry) {
+  entry.patches.forEach(({ x, y, width, height, data }) => {
+    const rowBytes = width * 4
+    for (let row = 0; row < height; row += 1) {
+      const targetStart = ((y + row) * pixels.width + x) * 4
+      pixels.data.set(data.subarray(row * rowBytes, (row + 1) * rowBytes), targetStart)
+    }
+  })
+}
+
+function createFullUndoEntry(pixels: PixelState): UndoEntry {
+  return {
+    patches: [{
+      x: 0,
+      y: 0,
+      width: pixels.width,
+      height: pixels.height,
+      data: pixels.data.slice(),
+    }],
+  }
+}
 
 function CharacterErrorNotice({
   message,
@@ -193,7 +260,8 @@ export function CharacterSettings() {
   const sourcePixelsRef = useRef<PixelState | null>(null)
   const originalPixelsRef = useRef<PixelState | null>(null)
   const workingPixelsRef = useRef<PixelState | null>(null)
-  const undoStackRef = useRef<Uint8ClampedArray[]>([])
+  const undoStackRef = useRef<UndoEntry[]>([])
+  const activeStrokeRef = useRef<ActiveStroke | null>(null)
   const paintingRef = useRef(false)
   const paintFrameRef = useRef<number | null>(null)
   const brushCursorHideTimeoutRef = useRef<number | null>(null)
@@ -229,6 +297,7 @@ export function CharacterSettings() {
       sourceUrlRef.current = null
       fileRequestRef.current += 1
       processingRequestRef.current += 1
+      activeStrokeRef.current = null
       if (paintFrameRef.current !== null) {
         window.cancelAnimationFrame(paintFrameRef.current)
         paintFrameRef.current = null
@@ -261,6 +330,7 @@ export function CharacterSettings() {
     sourcePixelsRef.current = null
     originalPixelsRef.current = null
     workingPixelsRef.current = null
+    activeStrokeRef.current = null
     paintingRef.current = false
     lastPointerRef.current = null
     undoStackRef.current = []
@@ -403,6 +473,7 @@ export function CharacterSettings() {
       sourcePixelsRef.current = null
       originalPixelsRef.current = null
       workingPixelsRef.current = null
+      activeStrokeRef.current = null
       setWorkingPixels(null)
       setBrushCursor(null)
       setEditorOpen(false)
@@ -551,6 +622,9 @@ export function CharacterSettings() {
     const sourceData = source.data
     const mode = brushMode
 
+    const activeStroke = activeStrokeRef.current
+    if (activeStroke) captureUndoTiles(activeStroke, working, minX, minY, maxX, maxY)
+
     for (let y = minY; y <= maxY; y += 1) {
       const deltaY = y - centerY
       const rowDistanceSquared = deltaY * deltaY
@@ -603,8 +677,7 @@ export function CharacterSettings() {
     if (!working) return
     event.currentTarget.setPointerCapture(event.pointerId)
     paintingRef.current = true
-    undoStackRef.current = [...undoStackRef.current.slice(-(MAX_UNDO_STEPS - 1)), working.data.slice()]
-    setUndoCount(undoStackRef.current.length)
+    activeStrokeRef.current = { patches: new Map() }
     schedulePaint(event)
   }
 
@@ -634,6 +707,15 @@ export function CharacterSettings() {
     }
     paintingRef.current = false
     lastPointerRef.current = null
+    const activeStroke = activeStrokeRef.current
+    activeStrokeRef.current = null
+    if (activeStroke && activeStroke.patches.size > 0) {
+      undoStackRef.current = [
+        ...undoStackRef.current.slice(-(MAX_UNDO_STEPS - 1)),
+        { patches: [...activeStroke.patches.values()] },
+      ]
+      setUndoCount(undoStackRef.current.length)
+    }
     saveWorkingPixels(workingPixelsRef.current)
     if (event.pointerType === 'touch') hideBrushCursor(450)
   }
@@ -643,14 +725,16 @@ export function CharacterSettings() {
     const working = workingPixelsRef.current
     if (!previous || !working) return
     setUndoCount(undoStackRef.current.length)
-    syncWorkingPixels({ data: previous.slice(), width: working.width, height: working.height })
+    restoreUndoEntry(working, previous)
+    syncWorkingPixels({ data: working.data, width: working.width, height: working.height })
     saveWorkingPixels(workingPixelsRef.current)
   }
 
   const handleRestoreModelResult = () => {
     const original = originalPixelsRef.current
-    if (!original) return
-    undoStackRef.current = [...undoStackRef.current.slice(-(MAX_UNDO_STEPS - 1)), workingPixelsRef.current?.data.slice() ?? original.data.slice()]
+    const working = workingPixelsRef.current
+    if (!original || !working) return
+    undoStackRef.current = [...undoStackRef.current.slice(-(MAX_UNDO_STEPS - 1)), createFullUndoEntry(working)]
     setUndoCount(undoStackRef.current.length)
     const next = { data: original.data.slice(), width: original.width, height: original.height }
     syncWorkingPixels(next)
@@ -672,6 +756,7 @@ export function CharacterSettings() {
     sourcePixelsRef.current = null
     originalPixelsRef.current = null
     workingPixelsRef.current = null
+    activeStrokeRef.current = null
     setWorkingPixels(null)
     setBrushCursor(null)
     paintingRef.current = false

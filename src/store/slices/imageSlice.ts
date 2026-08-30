@@ -1,6 +1,11 @@
 import { StateCreator } from 'zustand'
 import { revokeObjectUrl } from '@/lib/imageUpload'
 
+export type PreparedImage = {
+  index: number
+  url: string
+}
+
 export interface ImageSlice {
   images: string[]
   setImages: (images: string[]) => void
@@ -10,6 +15,7 @@ export interface ImageSlice {
   setImageScale: (index: number, scale: number) => void
   selectedImageIndex: number
   setSelectedImageIndex: (index: number) => void
+  setPreparedImages: (entries: readonly PreparedImage[], selectedIndex?: number) => void
   setImageAt: (index: number, url: string) => void
   removeImageAt: (index: number) => void
   swapImages: (idx1: number, idx2: number) => void
@@ -59,6 +65,42 @@ export const createImageSlice: StateCreator<ImageSlice, [], [], ImageSlice> = (s
   }),
 
   setSelectedImageIndex: (index) => set({ selectedImageIndex: Math.max(0, index) }),
+
+  setPreparedImages: (entries, selectedIndex) => set((state) => {
+    const validEntries = entries.filter(({ index, url }) => (
+      Number.isInteger(index) && index >= 0 && typeof url === 'string' && url.length > 0
+    ))
+    if (validEntries.length === 0) return state
+
+    const nextImages = [...state.images]
+    const nextPositions = [...state.imagePositions]
+    const nextScales = [...state.imageScales]
+
+    validEntries.forEach(({ index, url }) => {
+      if (nextImages[index] === url) return
+      nextImages[index] = url
+      nextPositions[index] = { x: 0, y: 0 }
+      nextScales[index] = 1
+    })
+
+    const retainedUrls = new Set(nextImages)
+    const revokedUrls = new Set<string>()
+    state.images.forEach((url) => {
+      if (url && !retainedUrls.has(url) && !revokedUrls.has(url)) {
+        revokeObjectUrl(url)
+        revokedUrls.add(url)
+      }
+    })
+
+    return {
+      images: nextImages,
+      imagePositions: nextPositions,
+      imageScales: nextScales,
+      ...(selectedIndex === undefined
+        ? {}
+        : { selectedImageIndex: Math.max(0, Math.min(selectedIndex, nextImages.length - 1)) }),
+    }
+  }),
   
   setImageAt: (index, url) => set((state) => {
     const newImages = [...state.images]
