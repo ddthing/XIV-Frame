@@ -13,7 +13,7 @@ export function SignatureSettings() {
   return (
     <div className="space-y-6">
       <Tabs defaultValue="text" className="w-full">
-        <SketchbookTabsList className="h-11">
+        <SketchbookTabsList>
           <SketchbookTabsTrigger value="text" className="gap-2">
             <Type className="size-3.5" aria-hidden="true" />
             {t('tabText')}

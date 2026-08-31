@@ -54,7 +54,14 @@
     "positionDown": "Move down",
     "positionLocked": "The image position is locked.",
     "positionKeyboardHint": "Focus a card, then use arrows for 1px or Shift+arrows for 10px.",
-    "canvasKeyboardTarget": "Canvas editing area. Use arrow keys to move the selected composite element."
+    "canvasKeyboardTarget": "Canvas editing area. Use arrow keys to move the selected composite element.",
+    "canvasRegionLabel": "Canvas preview",
+    "canvasEmptySummary": "No photos are added. Press Enter to choose photos.",
+    "canvasImageSummary": "Photo {selected} is selected among {count} photos. Use Page Up and Page Down to select a photo, then use the arrow keys to move it.",
+    "previewGuides": "Guides",
+    "showPreviewGuides": "Show editing guides",
+    "hidePreviewGuides": "Hide editing guides",
+    "previewGuidesNotExported": "Guides are not exported"
   },
   "LayoutSettings": {
     "layoutPreset": "Layout",
@@ -115,6 +122,7 @@
     "defaultShort": "Default",
     "templateSlotCount": "{count} slots",
     "chooseLayout": "Browse other layouts",
+    "layoutCatalog": "Layout list",
     "templateCountSuffix": "types",
     "filterLabel": "Layout range",
     "filterAll": "All",
@@ -251,6 +259,10 @@
     "characterRestore": "Restore",
     "characterBrushSize": "Brush size",
     "characterBrushHint": "The ring shows the active brush area. Choose Restore or Erase, then drag over the preview.",
+    "characterBrushKeyboardHint": "Move the brush with the arrow keys and apply it with Space or Enter. Press E to erase, R to restore, brackets to resize, and Ctrl+Z to undo.",
+    "characterCompareOriginal": "Compare with original",
+    "characterShowResult": "Show refined result",
+    "characterCancelProcessing": "Cancel processing",
     "characterUndo": "Undo",
     "characterResetMask": "Reset mask",
     "characterOpenEditor": "Refine with brush",
@@ -290,7 +302,9 @@
     "reset": "Reset",
     "zoom": "Zoom",
     "appSubtitle": "Screenshot editor",
-    "savedLocally": "Saved locally"
+    "savedLocally": "Saved locally",
+    "previewEyebrow": "01 / Preview",
+    "previewTitle": "Frame preview"
   },
   "MobileLayout": {
     "close": "Close",
@@ -301,6 +315,10 @@
     "navSignature": "Signature",
     "navLayout": "Layout",
     "navExport": "Export",
+    "addPhotoFirst": "Add a photo first",
+    "nextLayout": "Arrange layout",
+    "nextSignature": "Add signature",
+    "nextExport": "Prepare export",
     "ratioSettings": "Ratio Settings",
     "zoomSettings": "Zoom Settings",
     "resetDefault": "Reset to Default",
@@ -372,6 +390,7 @@
     "primaryNavigation": "Primary navigation",
     "mobileNavigation": "Mobile navigation",
     "footerNavigation": "Footer navigation",
+    "affiliation": "Unofficial fan tool, not affiliated with Square Enix",
     "toggleMenu": "Toggle menu"
   },
   "Blog": {
@@ -379,6 +398,11 @@
     "description": "Step-by-step guides for layouts, compositing, background removal, signatures, large files, and publishing checks in XIV Frame.",
     "flowTitle": "Editor flow",
     "flowDescription": "Follow this flow when you are new. With one photo, skip layout selection and go straight to the signature and export steps.",
+    "startHereLabel": "Start here",
+    "featuredLabel": "Featured guide",
+    "guideEyebrow": "03 / Guide",
+    "nextStepLabel": "Next step",
+    "referenceLabel": "Reference",
     "flowStepUpload": "Add photos",
     "flowStepUploadDescription": "One photo starts as a single canvas without an automatic split. Add up to 16 images for a multi-image composition; the 2×2 Grid uses 3–4, while the 3×3 and 4×4 grids use 9 and 16.",
     "flowStepArrange": "Choose layout",

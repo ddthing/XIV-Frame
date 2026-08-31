@@ -3,7 +3,7 @@ import { TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export function SketchbookTabsList({ children, className = '' }: { children: React.ReactNode, className?: string }) {
   return (
-    <TabsList className={`grid min-h-[50px] w-full grid-cols-2 gap-1.5 rounded-xl border border-border bg-surface-inset/70 p-1.5 ${className}`}>
+    <TabsList className={`grid min-h-[54px] w-full grid-cols-2 gap-1.5 rounded-xl border border-border bg-surface-inset/70 p-1 ${className}`}>
       {children}
     </TabsList>
   )
@@ -11,9 +11,9 @@ export function SketchbookTabsList({ children, className = '' }: { children: Rea
 
 export function SketchbookTabsTrigger({ value, children, className = '' }: { value: string, children: React.ReactNode, className?: string }) {
   return (
-    <TabsTrigger 
+    <TabsTrigger
       value={value} 
-      className={`flex min-h-9 h-full items-center justify-center rounded-lg border border-transparent px-3 text-xs font-semibold text-muted-foreground transition-[background-color,border-color,box-shadow,color] hover:bg-background/70 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 after:!hidden data-[state=active]:border-primary/25 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-subtle data-active:border-primary/25 data-active:bg-card data-active:text-foreground data-active:shadow-subtle ${className}`}
+      className={`flex h-auto min-h-11 items-center justify-center rounded-lg border border-transparent px-3 text-xs font-semibold text-foreground/70 transition-[background-color,border-color,box-shadow,color] hover:bg-background/70 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 after:!hidden data-[state=active]:border-primary/25 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-subtle data-active:border-primary/25 data-active:bg-card data-active:text-foreground data-active:shadow-subtle ${className}`}
     >
       {children}
     </TabsTrigger>

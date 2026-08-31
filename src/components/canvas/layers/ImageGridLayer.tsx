@@ -333,6 +333,7 @@ function ImageGridLayerComponent({
   layoutImageCount,
   imageShape = 'rectangle',
   renderScale = 1,
+  showSelectionGuide = false,
   onImageSlotSelect,
 }: {
   images: LoadedCanvasImage[],
@@ -346,12 +347,14 @@ function ImageGridLayerComponent({
   layoutImageCount: number
   imageShape?: ImageShape
   renderScale?: number
+  showSelectionGuide?: boolean
   onImageSlotSelect?: (index: number) => void
 }) {
-  const { imagePositions, imageScales, isImageLocked, setImagePosition, setImageScale, setSelectedImageIndex } = useStore(useShallow(state => ({
+  const { imagePositions, imageScales, isImageLocked, selectedImageIndex, setImagePosition, setImageScale, setSelectedImageIndex } = useStore(useShallow(state => ({
     imagePositions: state.imagePositions,
     imageScales: state.imageScales,
     isImageLocked: state.isImageLocked,
+    selectedImageIndex: state.selectedImageIndex,
     setImagePosition: state.setImagePosition,
     setImageScale: state.setImageScale,
     setSelectedImageIndex: state.setSelectedImageIndex,
@@ -433,6 +436,39 @@ function ImageGridLayerComponent({
         index: activeImage.sourceIndex,
       })
     : null
+  const selectedImage = images.find(({ sourceIndex }) => sourceIndex === selectedImageIndex)
+  const selectedImageCell = selectedImage
+    ? getImageCellGeometry({
+        contentWidth,
+        contentHeight,
+        gap,
+        geometry,
+        imageCount: resolvedLayoutImageCount,
+        index: selectedImage.sourceIndex,
+      })
+    : null
+
+  const selectionGuide = showSelectionGuide && selectedImageCell ? (
+    <Rect
+      x={borderWidth + selectedImageCell.x}
+      y={borderWidth + selectedImageCell.y}
+      width={selectedImageCell.width}
+      height={selectedImageCell.height}
+      stroke="#e7f5a5"
+      strokeWidth={2}
+      strokeScaleEnabled={false}
+      dash={[8, 5]}
+      listening={false}
+    />
+  ) : null
+
+  const selectImageOnCanvas = (sourceIndex: number, node: Konva.Node) => {
+    setSelectedImageIndex(sourceIndex)
+    const region = node.getStage()?.container().closest<HTMLElement>('[data-xiv-frame-canvas-region]')
+    if (!region) return
+    region.dataset.xivFrameSelection = 'image'
+    region.focus({ preventScroll: true })
+  }
 
   const renderImageGroup = ({ image: img, sourceIndex }: LoadedCanvasImage) => {
         const cell = getImageCellGeometry({
@@ -481,6 +517,7 @@ function ImageGridLayerComponent({
                 x={savedPos.x}
                 y={savedPos.y}
                 onDragStart={(e) => {
+                  selectImageOnCanvas(sourceIndex, e.target)
                   const parent = e.target.parent;
                   let inverseTransform = undefined;
                   let absoluteTransform = undefined;
@@ -525,8 +562,8 @@ function ImageGridLayerComponent({
                     wheelCommitFrames.current.set(sourceIndex, frame)
                   }
                 }}
-                onClick={() => setSelectedImageIndex(sourceIndex)}
-                onTap={() => setSelectedImageIndex(sourceIndex)}
+                onClick={(e) => selectImageOnCanvas(sourceIndex, e.target)}
+                onTap={(e) => selectImageOnCanvas(sourceIndex, e.target)}
                 onDblClick={() => onImageSlotSelect?.(sourceIndex)}
                 onDblTap={() => onImageSlotSelect?.(sourceIndex)}
                 dragBoundFunc={function(this: Konva.Node, pos) {
@@ -652,6 +689,7 @@ function ImageGridLayerComponent({
           opacity={0}
           draggable={!isImageLocked}
           onDragStart={(e) => {
+            selectImageOnCanvas(sourceIndex, e.target)
             const parent = e.target.parent
             let inverseTransform = undefined
             let absoluteTransform = undefined
@@ -706,8 +744,8 @@ function ImageGridLayerComponent({
               wheelCommitFrames.current.set(sourceIndex, frame)
             }
           }}
-          onClick={() => setSelectedImageIndex(sourceIndex)}
-          onTap={() => setSelectedImageIndex(sourceIndex)}
+          onClick={(e) => selectImageOnCanvas(sourceIndex, e.target)}
+          onTap={(e) => selectImageOnCanvas(sourceIndex, e.target)}
           onDblClick={() => onImageSlotSelect?.(sourceIndex)}
           onDblTap={() => onImageSlotSelect?.(sourceIndex)}
           dragBoundFunc={function(this: Konva.Node, pos) {
@@ -785,10 +823,16 @@ function ImageGridLayerComponent({
             </Group>
           )}
           {images.map(renderSoftBlendInteraction)}
+          {selectionGuide}
         </Layer>
       </>
     )
-    : <Layer>{images.map(renderImageGroup)}</Layer>
+    : (
+      <>
+        <Layer>{images.map(renderImageGroup)}</Layer>
+        {selectionGuide && <Layer listening={false}>{selectionGuide}</Layer>}
+      </>
+    )
 }
 
 export const ImageGridLayer = React.memo(ImageGridLayerComponent)

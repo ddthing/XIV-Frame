@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Globe } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -10,6 +10,7 @@ export function LanguageSwitcher({ inverse = false, touchTarget = false }: { inv
   const router = useRouter()
   const pathname = usePathname()
   const currentLocale = useLocale()
+  const t = useTranslations('LanguageSwitcher')
 
   const handleLanguageChange = (value: string | null) => {
     if (!value) return
@@ -34,9 +35,9 @@ export function LanguageSwitcher({ inverse = false, touchTarget = false }: { inv
 
   return (
     <div className="flex items-center gap-2">
-      <Globe className={cn('size-4', inverse ? 'text-primary-foreground/60' : 'text-muted-foreground')} />
+      <Globe aria-hidden="true" className={cn('size-4', inverse ? 'text-primary-foreground/70' : 'text-foreground/70')} />
       <Select value={currentLocale} onValueChange={handleLanguageChange}>
-        <SelectTrigger size={touchTarget ? 'touch' : 'default'} className={cn(
+        <SelectTrigger aria-label={t('language')} size={touchTarget ? 'touch' : 'default'} className={cn(
           touchTarget ? 'h-11' : 'h-9',
           'w-[104px] rounded-md text-xs font-semibold transition-colors',
           inverse

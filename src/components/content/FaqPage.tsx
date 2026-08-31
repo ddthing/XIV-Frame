@@ -94,7 +94,7 @@ export function FaqPage({
           <h2 id="faq-help-title" className="mt-2 font-display text-lg font-bold leading-6 tracking-[0.01em] text-foreground">{helpTitle}</h2>
           <p className="mt-2 max-w-xl font-body text-[13px] leading-5 text-foreground/75">{helpDescription}</p>
         </div>
-        <Link href={`/${locale}/contact`} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2.5 font-body text-xs font-bold text-primary-foreground transition-transform hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-sticky-note-mint">
+        <Link href={`/${locale}/contact`} className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2.5 font-body text-xs font-bold text-primary-foreground transition-transform hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background">
           {helpButton}
           <ArrowUpRight className="size-4" aria-hidden="true" />
         </Link>

@@ -37,9 +37,13 @@ export function EditorFieldHeader({
 }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <label htmlFor={htmlFor} className="text-xs font-semibold text-foreground">
-        {label}
-      </label>
+      {htmlFor ? (
+        <label id={`${htmlFor}-label`} htmlFor={htmlFor} className="text-xs font-semibold text-foreground">
+          {label}
+        </label>
+      ) : (
+        <span className="text-xs font-semibold text-foreground">{label}</span>
+      )}
       {value !== undefined && (
         <span className="font-mono text-[11px] tabular-nums text-muted-foreground">{value}</span>
       )}

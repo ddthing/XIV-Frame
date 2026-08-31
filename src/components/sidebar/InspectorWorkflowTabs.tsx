@@ -30,10 +30,10 @@ export function InspectorWorkflowTabs({ ariaLabel, tabs }: InspectorWorkflowTabs
             value={value}
             aria-label={`${step} ${label} ${role}`}
             title={`${step} ${label} · ${role}`}
-            className="group min-h-16 min-w-0 flex-col items-stretch justify-center gap-1 rounded-lg border border-transparent bg-transparent px-2 py-2 text-left text-muted-foreground shadow-none transition-[background-color,border-color,box-shadow,color] hover:bg-background/70 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 after:!hidden data-[state=active]:border-primary/25 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-subtle data-active:border-primary/25 data-active:bg-card data-active:text-foreground data-active:shadow-subtle"
+            className="group min-h-16 min-w-0 flex-col items-stretch justify-center gap-1 rounded-lg border border-transparent bg-transparent px-2 py-2 text-left text-foreground/70 shadow-none transition-[background-color,border-color,box-shadow,color] hover:bg-background/70 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 after:!hidden data-[state=active]:border-primary/25 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-subtle data-active:border-primary/25 data-active:bg-card data-active:text-foreground data-active:shadow-subtle"
           >
             <span className="flex min-w-0 items-center gap-1.5">
-              <span className="font-mono text-[10px] font-semibold tabular-nums text-muted-foreground">
+              <span className="font-mono text-[10px] font-semibold tabular-nums text-foreground/70">
                 {step}
               </span>
               <Icon className="size-3.5 shrink-0" aria-hidden="true" />

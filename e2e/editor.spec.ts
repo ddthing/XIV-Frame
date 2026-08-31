@@ -20,7 +20,7 @@ async function openFreshEditor(page: Page, { expectDesktop = true, clearStorage 
   }
   await page.goto('/ko', { waitUntil: 'networkidle', timeout: 15_000 })
   if (expectDesktop) {
-    await expect(page.getByRole('heading', { name: 'Your frame, in focus.' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: '프레임 미리보기' })).toBeVisible()
   }
 }
 
@@ -28,10 +28,6 @@ async function uploadFixtures(page: Page, files: string[]) {
   await page.locator('input[type="file"]').setInputFiles(files)
   await expect(page.getByText(`${String(files.length).padStart(2, '0')} / 16`, { exact: true })).toBeVisible({ timeout: 60_000 })
   await expect(page.locator('canvas').first()).toBeVisible({ timeout: 60_000 })
-}
-
-async function chooseLayoutFilter(page: Page, filter: 'all' | 'basic' | 'focus' | 'matrix') {
-  await page.locator(`[data-layout-filter="${filter}"]`).click()
 }
 
 async function createPortraitFixture() {
@@ -121,6 +117,50 @@ test('presents the editor workflow as photos, layout, then signature', async ({ 
   await expect(mobileButtons.nth(3)).toHaveAccessibleName('저장')
 })
 
+test('gives editor sliders accessible names and comfortable pointer targets', async ({ page }) => {
+  await openFreshEditor(page)
+
+  const inspectorTabs = page.locator('aside [role="tablist"]').first().getByRole('tab')
+  await inspectorTabs.nth(2).click()
+
+  const signatureSliders = page.locator('aside').getByRole('slider')
+  await expect(signatureSliders.first()).toBeVisible()
+  for (const slider of await signatureSliders.all()) {
+    await expect(slider).not.toHaveAccessibleName('')
+  }
+
+  const undersizedSliderTargets = await page.locator('aside [data-slot="slider"]').evaluateAll((sliders) => sliders.filter((slider) => {
+    const rect = slider.getBoundingClientRect()
+    return rect.height < 44
+  }).length)
+  expect(undersizedSliderTargets).toBe(0)
+
+  await inspectorTabs.nth(1).click()
+  await expect(page.locator('aside label:not([for])')).toHaveCount(0)
+})
+
+test('exposes the canvas as a keyboard-operable region with photo navigation', async ({ page }) => {
+  await openFreshEditor(page)
+  await uploadFixtures(page, [wideFixture, squareFixture])
+
+  const canvasRegion = page.getByRole('region', { name: '캔버스 미리보기' })
+  await expect(canvasRegion).toBeVisible()
+  await expect(canvasRegion).toHaveAttribute('tabindex', '0')
+  await expect(canvasRegion).toHaveAccessibleDescription(/2장의 사진/)
+
+  const sourceCards = page.locator('aside').getByRole('button', { name: /이미지 선택/ })
+  await expect(page.locator('aside').getByRole('list', { name: '이미지 추가' })).toBeVisible()
+  await expect(sourceCards.nth(0)).toHaveAttribute('aria-pressed', 'true')
+
+  await canvasRegion.focus()
+  await canvasRegion.press('PageDown')
+  await expect(sourceCards.nth(1)).toHaveAttribute('aria-pressed', 'true')
+  await expect(canvasRegion).toBeFocused()
+
+  await canvasRegion.press('Home')
+  await expect(sourceCards.nth(0)).toHaveAttribute('aria-pressed', 'true')
+})
+
 test('keeps layout navigation and template labels inside their controls in every locale', async ({ page }) => {
   await page.setViewportSize({ width: 1024, height: 900 })
 
@@ -174,7 +214,7 @@ test('migrates the previous automatic ratio setting to original ratio', async ({
   })
 
   await page.goto('/ko', { waitUntil: 'domcontentloaded', timeout: 15_000 })
-  await expect(page.getByRole('heading', { name: 'Your frame, in focus.' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '프레임 미리보기' })).toBeVisible()
 
   const ratioGroup = page.getByRole('group', { name: '비율', exact: true })
   await expect(ratioGroup.getByRole('button', { name: '원본 비율', exact: true })).toHaveAttribute('aria-pressed', 'true')
@@ -189,7 +229,7 @@ test('migrates the previous fixed 16:9 setting to the X timeline profile', async
   })
 
   await page.goto('/ko', { waitUntil: 'domcontentloaded', timeout: 15_000 })
-  await expect(page.getByRole('heading', { name: 'Your frame, in focus.' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '프레임 미리보기' })).toBeVisible()
 
   const ratioGroup = page.getByRole('group', { name: '비율', exact: true })
   await expect(ratioGroup.getByRole('button', { name: 'X 타임라인', exact: true })).toHaveAttribute('aria-pressed', 'true')
@@ -264,7 +304,6 @@ test('exports a two-photo original-ratio composition without scroll or browser e
 test('previews the selected layout slots before photos are uploaded', async ({ page }) => {
   await openFreshEditor(page)
   await page.getByRole('tab', { name: '02 레이아웃 구성' }).click()
-  await chooseLayoutFilter(page, 'focus')
 
   const gridButton = page.getByRole('button', { name: /^바둑판 배치/ })
   await expect(gridButton).toBeVisible()
@@ -300,6 +339,22 @@ test('does not turn a direct single-photo upload into a split before a layout is
   await expect(canvasFrame).toHaveAttribute('data-layout-empty-slot-count', '0')
 })
 
+test('keeps editing boundaries optional and clearly separate from the export preview', async ({ page }) => {
+  await openFreshEditor(page)
+  await uploadFixtures(page, [wideFixture])
+
+  const canvasFrame = page.locator('[data-layout-effective-preset]')
+  const guideButton = page.getByRole('button', { name: '편집 가이드 표시', exact: true })
+  await expect(guideButton).toHaveAttribute('aria-pressed', 'false')
+  await expect(canvasFrame).toHaveAttribute('data-preview-guides', 'off')
+
+  await guideButton.click()
+  await expect(page.getByRole('button', { name: '편집 가이드 숨기기', exact: true })).toHaveAttribute('aria-pressed', 'true')
+  await expect(canvasFrame).toHaveAttribute('data-preview-guides', 'on')
+  await expect(page.getByText('가이드는 저장되지 않음', { exact: true })).toBeVisible()
+  await expect.poll(() => canvasFrame.locator('[data-preview-boundary]').evaluate((element) => getComputedStyle(element).outlineStyle)).toBe('dashed')
+})
+
 test('does not reuse a previous split choice for the first photo in a new session', async ({ page }) => {
   await page.addInitScript(() => {
     window.localStorage.setItem('xiv-frame-settings-v2', JSON.stringify({
@@ -325,20 +380,16 @@ test('makes layout choices scannable and mirrors loaded photos in the current pr
   await expect(currentPreview).toBeVisible()
   await expect(currentPreview.locator('img')).toHaveCount(3)
 
-  const filterGroup = page.getByRole('group', { name: '레이아웃 범위', exact: true })
-  await expect(filterGroup.getByRole('button', { name: '전체', exact: true })).toBeVisible()
-  await expect(filterGroup.getByRole('button', { name: '3–4장', exact: true })).toBeVisible()
-
-  const templateCards = page.locator('[data-layout-template-card]')
+  const catalog = page.getByRole('group', { name: '레이아웃 목록', exact: true })
+  await expect(catalog).toBeVisible()
+  const templateCards = catalog.locator('[data-layout-template-card]')
+  await expect(templateCards).toHaveCount(13)
   await expect.poll(() => templateCards.first().evaluate((element) => {
     const group = element.parentElement
     return group ? group.scrollWidth <= group.clientWidth : false
   })).toBe(true)
-
-  await filterGroup.getByRole('button', { name: '3–4장', exact: true }).click()
-  await expect(page.getByRole('group', { name: '3장 패턴', exact: true })).toBeVisible()
-  await expect(page.getByRole('group', { name: '4장 패턴', exact: true })).toBeVisible()
-  await expect(page.getByRole('group', { name: '기본 분할', exact: true })).toHaveCount(0)
+  await expect(page.getByText('3장 패턴', { exact: true })).toHaveCount(0)
+  await expect(page.getByText('4장 패턴', { exact: true })).toHaveCount(0)
 
   await page.setViewportSize({ width: 390, height: 844 })
   await page.reload({ waitUntil: 'networkidle' })
@@ -352,14 +403,56 @@ test('keeps the full workflow available for a single photo', async ({ page }) =>
   await uploadFixtures(page, [wideFixture])
   await page.getByRole('tab', { name: '02 레이아웃 구성' }).click()
 
-  await expect(page.locator('[data-layout-filter="all"]')).toHaveAttribute('aria-pressed', 'true')
-  const basicGroup = page.getByRole('group', { name: '기본 분할', exact: true })
-  await expect(basicGroup).toBeVisible()
-  await expect(basicGroup.getByRole('button', { name: '가로 분할', exact: true })).toBeVisible()
-  await expect(basicGroup.getByRole('button', { name: '세로 분할', exact: true })).toBeVisible()
-  await expect(page.getByRole('group', { name: '3장 패턴', exact: true })).toBeVisible()
+  const layoutCatalog = page.getByRole('group', { name: '레이아웃 목록', exact: true })
+  await expect(layoutCatalog.getByRole('button', { name: '가로 분할', exact: true })).toBeVisible()
+  await expect(layoutCatalog.getByRole('button', { name: '세로 분할', exact: true })).toBeVisible()
+  await expect(layoutCatalog.locator('[data-layout-template-card]')).toHaveCount(13)
 
   await page.getByRole('tab', { name: '03 시그니처 오버레이' }).click()
+  await expect(page.locator('#signature-upper-text')).toBeVisible()
+})
+
+test('keeps mobile segmented tabs inside their control surface', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await openFreshEditor(page, { expectDesktop: false })
+  await page.locator('main input[type="file"]').first().setInputFiles(wideFixture)
+  await expect(page.locator('[data-layout-effective-preset]')).toHaveAttribute('data-layout-image-count', '1', { timeout: 60_000 })
+
+  const expectTabsToHaveBreathingRoom = async () => {
+    const bounds = await page.locator('[data-slot="drawer-popup"] [data-slot="tabs-list"]').evaluate((list) => {
+      const listRect = list.getBoundingClientRect()
+      const triggerRects = Array.from(list.querySelectorAll<HTMLElement>('[role="tab"]')).map((trigger) => trigger.getBoundingClientRect())
+      return {
+        bottomGap: listRect.bottom - Math.max(...triggerRects.map((rect) => rect.bottom)),
+        topGap: Math.min(...triggerRects.map((rect) => rect.top)) - listRect.top,
+      }
+    })
+
+    expect(bounds.topGap).toBeGreaterThanOrEqual(2)
+    expect(bounds.bottomGap).toBeGreaterThanOrEqual(2)
+  }
+
+  await page.getByRole('navigation', { name: '모바일 편집 도구' }).getByRole('button', { name: '사진', exact: true }).evaluate((button) => (button as HTMLButtonElement).click())
+  await expect(page.locator('[data-slot="drawer-popup"] [data-slot="tabs-list"]')).toBeVisible()
+  await expectTabsToHaveBreathingRoom()
+
+  await page.getByRole('button', { name: '시그니처 추가', exact: true }).click()
+  await expect(page.getByRole('heading', { name: '시그니처 설정', exact: true })).toBeVisible()
+  await expectTabsToHaveBreathingRoom()
+})
+
+test('takes a single-photo mobile flow directly to signature editing', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await openFreshEditor(page, { expectDesktop: false })
+  await page.locator('main input[type="file"]').first().setInputFiles(wideFixture)
+  await expect(page.locator('[data-layout-effective-preset]')).toHaveAttribute('data-layout-image-count', '1', { timeout: 60_000 })
+  await page.getByRole('navigation', { name: '모바일 편집 도구' }).getByRole('button', { name: '사진', exact: true }).evaluate((button) => (button as HTMLButtonElement).click())
+
+  const nextButton = page.getByRole('button', { name: '시그니처 추가', exact: true })
+  await expect(nextButton).toBeVisible()
+  await nextButton.click()
+
+  await expect(page.getByRole('heading', { name: '시그니처 설정', exact: true })).toBeVisible()
   await expect(page.locator('#signature-upper-text')).toBeVisible()
 })
 
@@ -421,13 +514,12 @@ test('shows a readable upload status while a single photo is being prepared', as
   await expect(page.locator('[data-preview-upload-status]')).toContainText('사진 준비 중...')
 })
 
-test('places the four-slot grid template in the four-image group', async ({ page }) => {
+test('places the four-slot grid template in the continuous layout catalog', async ({ page }) => {
   await openFreshEditor(page)
   await page.getByRole('tab', { name: '02 레이아웃 구성' }).click()
-  await chooseLayoutFilter(page, 'focus')
 
-  const fourImageGroup = page.locator('aside').getByRole('group', { name: '4장 패턴', exact: true })
-  await expect(fourImageGroup.getByRole('button', { name: /^바둑판 배치/ })).toBeVisible()
+  const layoutCatalog = page.locator('aside').getByRole('group', { name: '레이아웃 목록', exact: true })
+  await expect(layoutCatalog.getByRole('button', { name: /^바둑판 배치/ })).toBeVisible()
 })
 
 test('keeps the selected two-slot preview when the first photo is uploaded', async ({ page }) => {
@@ -491,7 +583,6 @@ test('keeps the initial canvas neutral when a photo is added from its upload tar
 test('highlights an empty layout slot while the pointer is over it', async ({ page }) => {
   await openFreshEditor(page)
   await page.getByRole('tab', { name: '02 레이아웃 구성' }).click()
-  await chooseLayoutFilter(page, 'focus')
   await page.getByRole('button', { name: /^바둑판 배치/ }).click()
 
   const canvas = page.locator('[data-layout-effective-preset] canvas').last()
@@ -515,7 +606,6 @@ test('highlights an empty layout slot while the pointer is over it', async ({ pa
 test('keeps the selected layout while it is partially filled', async ({ page }) => {
   await openFreshEditor(page)
   await page.getByRole('tab', { name: '02 레이아웃 구성' }).click()
-  await chooseLayoutFilter(page, 'focus')
   await page.getByRole('button', { name: /^바둑판 배치/ }).click()
   await page.getByRole('tab', { name: '01 사진 소스' }).click()
 
@@ -617,7 +707,6 @@ test('keeps the document viewport fixed when sixteen photos are selected', async
 test('adds multiple photos through the drag and drop path', async ({ page }) => {
   await openFreshEditor(page)
   await page.getByRole('tab', { name: '02 레이아웃 구성' }).click()
-  await chooseLayoutFilter(page, 'focus')
   await page.getByRole('button', { name: /^바둑판 배치/ }).click()
 
   const dragFiles = [wideFixture, squareFixture].map((filePath) => ({
@@ -645,7 +734,6 @@ test('adds multiple photos through the drag and drop path', async ({ page }) => 
 test('uploads directly from an empty layout slot and selects the new photo', async ({ page }) => {
   await openFreshEditor(page)
   await page.getByRole('tab', { name: '02 레이아웃 구성' }).click()
-  await chooseLayoutFilter(page, 'focus')
   await page.getByRole('button', { name: /^바둑판 배치/ }).click()
 
   const fileChooserPromise = page.waitForEvent('filechooser')
@@ -663,7 +751,6 @@ test('uploads directly from an empty layout slot and selects the new photo', asy
 test('uploads into the final visible layout slot without collapsing the canvas', async ({ page }) => {
   await openFreshEditor(page)
   await page.getByRole('tab', { name: '02 레이아웃 구성' }).click()
-  await chooseLayoutFilter(page, 'focus')
   await page.getByRole('button', { name: /^바둑판 배치/ }).click()
   await page.getByRole('tab', { name: '01 사진 소스' }).click()
   await uploadFixtures(page, [wideFixture, squareFixture])
@@ -1147,6 +1234,66 @@ test('moves a background-removed composite directly with a pointer drag', async 
   const finalBounds = requirePixelBounds(afterBounds)
   expect(finalBounds.minX).toBeGreaterThan(initialBounds.minX + 20)
   expect(finalBounds.minY).toBeGreaterThan(initialBounds.minY + 5)
+})
+
+test('supports keyboard brush refinement and an original-image comparison', async ({ page }) => {
+  await page.addInitScript(() => {
+    class ControlledWorker {
+      private listeners = new Map<string, Set<(event: unknown) => void>>()
+
+      addEventListener(type: string, listener: (event: unknown) => void) {
+        const listeners = this.listeners.get(type) ?? new Set()
+        listeners.add(listener)
+        this.listeners.set(type, listeners)
+      }
+
+      postMessage(message: { type: string; requestId: number }) {
+        const listeners = this.listeners.get('message') ?? new Set()
+        if (message.type === 'warmup') {
+          listeners.forEach((listener) => listener({ data: { type: 'ready', requestId: message.requestId } }))
+          return
+        }
+        if (message.type !== 'remove') return
+
+        const data = new Uint8ClampedArray(32 * 32 * 4)
+        data.fill(255)
+        listeners.forEach((listener) => listener({
+          data: { type: 'result', requestId: message.requestId, data: data.buffer, width: 32, height: 32, channels: 4 },
+        }))
+      }
+
+      terminate() {}
+    }
+
+    Object.defineProperty(window, 'Worker', { configurable: true, writable: true, value: ControlledWorker })
+  })
+
+  await openFreshEditor(page)
+  await page.getByRole('tab', { name: '01 사진 소스' }).click()
+  await page.getByRole('tab', { name: '합성', exact: true }).click()
+  await page.locator('#character-file-input').setInputFiles(wideFixture)
+  await page.getByRole('button', { name: '배경 제거', exact: true }).click()
+
+  const editor = page.getByRole('region', { name: '배경 제거 결과 보정 캔버스' })
+  await expect(editor).toBeVisible()
+  await expect(editor).toHaveAttribute('tabindex', '0')
+  await expect(editor).toHaveAccessibleDescription(/방향키/)
+
+  await editor.focus()
+  await editor.press('Space')
+  await expect(page.getByRole('button', { name: /되돌리기.*1/ })).toBeEnabled()
+
+  await editor.press('r')
+  await expect(page.getByRole('button', { name: '복원', exact: true })).toHaveAttribute('aria-pressed', 'true')
+
+  const brushSize = page.getByRole('slider', { name: '브러시 크기' })
+  const previousSize = Number(await brushSize.getAttribute('aria-valuenow'))
+  await editor.press(']')
+  await expect(brushSize).toHaveAttribute('aria-valuenow', String(Math.min(220, previousSize + 8)))
+
+  const compare = page.getByRole('button', { name: '원본과 비교', exact: true })
+  await compare.click()
+  await expect(page.getByRole('button', { name: '보정 결과 보기', exact: true })).toHaveAttribute('aria-pressed', 'true')
 })
 
 test('does not restore an upload that finishes after reset', async ({ page }) => {
@@ -1758,7 +1905,7 @@ test('persists logo and layout settings across a reload', async ({ page }) => {
   expect(persistedStorage.logo).toMatch(/^data:image\//)
 
   await page.reload()
-  await expect(page.getByRole('heading', { name: 'Your frame, in focus.' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '프레임 미리보기' })).toBeVisible()
 
   await page.getByRole('tab', { name: '02 레이아웃 구성' }).click()
   await expect(page.getByRole('button', { name: '세로 분할', exact: true })).toHaveAttribute('aria-pressed', 'true')
@@ -1771,12 +1918,12 @@ test('mounts the mobile editor below the responsive breakpoint', async ({ page }
   await page.setViewportSize({ width: 390, height: 844 })
   await openFreshEditor(page, { expectDesktop: false })
 
-  await expect(page.getByRole('heading', { name: 'Your frame, in focus.' })).toBeHidden()
+  await expect(page.getByRole('heading', { name: '프레임 미리보기' })).toBeHidden()
   await expect(page.getByRole('button', { name: '저장', exact: true })).toBeVisible()
 
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.reload()
-  await expect(page.getByRole('heading', { name: 'Your frame, in focus.' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '프레임 미리보기' })).toBeVisible()
 })
 
 test('preserves one editor shell per responsive breakpoint', async ({ page }) => {

@@ -63,8 +63,8 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
     >
       <article className={`flex flex-col rounded-xl border border-border p-5 shadow-subtle transition-[transform,box-shadow,border-color] duration-200 group-hover:-translate-y-1 group-hover:border-primary/40 group-hover:shadow-subtle-2 sm:p-6 ${isFeatured ? 'bg-accent' : 'bg-card'}`}>
         <div className="flex items-center justify-between gap-3">
-          <p className="editor-meta">{isFeatured ? 'FEATURED' : `GUIDE ${String(index + 1).padStart(2, '0')}`}</p>
-          <div className="flex items-center gap-2 font-body text-xs font-medium text-muted-foreground">
+          <p className="editor-meta">{isFeatured ? t('featuredLabel') : `${t('guideLabel')} ${String(index + 1).padStart(2, '0')}`}</p>
+          <div className="flex items-center gap-2 font-body text-xs font-medium text-foreground/70">
             <span className="rounded-full border border-border bg-background/60 px-2 py-0.5 text-[10px] font-semibold text-foreground/70">{post.metadata.category ?? t('guideLabel')}</span>
             <time dateTime={post.metadata.updated ?? post.metadata.date}>
               {new Date(post.metadata.updated ?? post.metadata.date).toLocaleDateString(locale)}
@@ -86,9 +86,9 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
   )
 
   return (
-    <ContentPage eyebrow="03 / GUIDE" title={t('title')} description={t('description')} size="lg" density="editor">
+    <ContentPage eyebrow={t('guideEyebrow')} title={t('title')} description={t('description')} size="lg" density="editor">
       <GuideWorkflow
-        eyebrow="START HERE"
+        eyebrow={t('startHereLabel')}
         title={t('flowTitle')}
         description={t('flowDescription')}
         steps={[

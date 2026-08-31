@@ -328,7 +328,7 @@
   }
 
   .editor-meta {
-    @apply font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground;
+    @apply font-mono text-[10px] uppercase tracking-[0.12em] text-foreground/70;
   }
 
   [data-xiv-frame-canvas="true"]:focus-visible {
@@ -398,6 +398,17 @@
 
     .app-header {
       height: 52px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
     }
   }
 }

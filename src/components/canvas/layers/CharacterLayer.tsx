@@ -392,6 +392,7 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
     const container = stage?.container()
     if (!container) return
     container.dataset.xivFrameCanvas = 'true'
+    container.dataset.xivFrameSelection = 'character'
     container.tabIndex = 0
     container.setAttribute('aria-label', t('canvasKeyboardTarget'))
     container.setAttribute('aria-keyshortcuts', 'ArrowUp ArrowDown ArrowLeft ArrowRight Shift+ArrowUp Shift+ArrowDown Shift+ArrowLeft Shift+ArrowRight')

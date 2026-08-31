@@ -29,7 +29,7 @@ export function MobileSheetHeader({
           <X className="size-4" aria-hidden="true" />
         </DrawerClose>
       </div>
-      <DrawerDescription className="mt-2 font-body text-xs leading-5 text-muted-foreground">{description}</DrawerDescription>
+      <DrawerDescription className="sr-only">{description}</DrawerDescription>
     </div>
   )
 }

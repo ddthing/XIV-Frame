@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { useEffect, useRef, useState, type ChangeEvent, type PointerEvent } from 'react'
+import { useEffect, useId, useRef, useState, type ChangeEvent, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent } from 'react'
 import { useTranslations } from 'next-intl'
 import { useShallow } from 'zustand/react/shallow'
 import {
@@ -252,6 +252,7 @@ export function CharacterSettings() {
     setCharacterShadow: state.setCharacterShadow,
   })))
   const t = useTranslations('SignatureSettings')
+  const brushKeyboardDescriptionId = useId()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const brushViewportRef = useRef<HTMLDivElement>(null)
@@ -266,6 +267,7 @@ export function CharacterSettings() {
   const paintFrameRef = useRef<number | null>(null)
   const brushCursorHideTimeoutRef = useRef<number | null>(null)
   const lastPointerRef = useRef<PointerPosition | null>(null)
+  const keyboardBrushCursorRef = useRef<BrushCursor | null>(null)
   const filePreparationAbortRef = useRef<AbortController | null>(null)
   const cutoutRenderAbortRef = useRef<AbortController | null>(null)
   const cutoutRenderRequestRef = useRef(0)
@@ -275,6 +277,7 @@ export function CharacterSettings() {
   const sourcePreview = characterSourceUrl
   const [workingPixels, setWorkingPixels] = useState<PixelState | null>(null)
   const [brushCursor, setBrushCursor] = useState<BrushCursor | null>(null)
+  const [compareOriginal, setCompareOriginal] = useState(false)
   const [editorOpen, setEditorOpen] = useState(false)
   const [brushMode, setBrushMode] = useState<BrushMode>('erase')
   const [brushSize, setBrushSize] = useState(72)
@@ -339,6 +342,7 @@ export function CharacterSettings() {
       if (!mountedRef.current) return
       setWorkingPixels(null)
       setBrushCursor(null)
+      setCompareOriginal(false)
       setEditorOpen(false)
       setIsPreparing(false)
       setProgress(0)
@@ -380,6 +384,7 @@ export function CharacterSettings() {
 
     const canvasX = Math.max(0, Math.min(canvasRect.width, event.clientX - canvasRect.left))
     const canvasY = Math.max(0, Math.min(canvasRect.height, event.clientY - canvasRect.top))
+    keyboardBrushCursorRef.current = { x: canvasX, y: canvasY }
     setBrushCursor({
       x: canvasRect.left - viewportRect.left + canvasX,
       y: canvasRect.top - viewportRect.top + canvasY,
@@ -720,6 +725,93 @@ export function CharacterSettings() {
     if (event.pointerType === 'touch') hideBrushCursor(450)
   }
 
+  const positionKeyboardBrush = (x: number, y: number) => {
+    const canvas = canvasRef.current
+    const viewport = brushViewportRef.current
+    if (!canvas || !viewport) return null
+    const canvasRect = canvas.getBoundingClientRect()
+    const viewportRect = viewport.getBoundingClientRect()
+    const next = {
+      x: Math.max(0, Math.min(canvasRect.width, x)),
+      y: Math.max(0, Math.min(canvasRect.height, y)),
+    }
+    keyboardBrushCursorRef.current = next
+    setBrushCursor({
+      x: canvasRect.left - viewportRect.left + next.x,
+      y: canvasRect.top - viewportRect.top + next.y,
+    })
+    return { canvasRect, next }
+  }
+
+  const handleBrushFocus = () => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const rect = canvas.getBoundingClientRect()
+    const current = keyboardBrushCursorRef.current ?? { x: rect.width / 2, y: rect.height / 2 }
+    positionKeyboardBrush(current.x, current.y)
+  }
+
+  const handleBrushKeyDown = (event: ReactKeyboardEvent<HTMLCanvasElement>) => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
+      event.preventDefault()
+      handleUndo()
+      return
+    }
+
+    if (event.key.toLowerCase() === 'e') {
+      event.preventDefault()
+      setBrushMode('erase')
+      return
+    }
+    if (event.key.toLowerCase() === 'r') {
+      event.preventDefault()
+      setBrushMode('restore')
+      return
+    }
+    if (event.key === '[' || event.key === ']') {
+      event.preventDefault()
+      setBrushSize((current) => Math.max(16, Math.min(220, current + (event.key === ']' ? 8 : -8))))
+      return
+    }
+
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const rect = canvas.getBoundingClientRect()
+    const current = keyboardBrushCursorRef.current ?? { x: rect.width / 2, y: rect.height / 2 }
+    const movement = {
+      ArrowUp: { x: 0, y: -1 },
+      ArrowLeft: { x: -1, y: 0 },
+      ArrowRight: { x: 1, y: 0 },
+      ArrowDown: { x: 0, y: 1 },
+    }[event.key]
+    if (movement) {
+      event.preventDefault()
+      const step = event.shiftKey ? 10 : 2
+      positionKeyboardBrush(current.x + movement.x * step, current.y + movement.y * step)
+      return
+    }
+
+    if (event.key !== ' ' && event.key !== 'Enter') return
+    event.preventDefault()
+    const positioned = positionKeyboardBrush(current.x, current.y)
+    if (!positioned || !workingPixelsRef.current) return
+    activeStrokeRef.current = { patches: new Map() }
+    paintAt({
+      clientX: positioned.canvasRect.left + positioned.next.x,
+      clientY: positioned.canvasRect.top + positioned.next.y,
+    })
+    const activeStroke = activeStrokeRef.current
+    activeStrokeRef.current = null
+    if (activeStroke && activeStroke.patches.size > 0) {
+      undoStackRef.current = [
+        ...undoStackRef.current.slice(-(MAX_UNDO_STEPS - 1)),
+        { patches: [...activeStroke.patches.values()] },
+      ]
+      setUndoCount(undoStackRef.current.length)
+      saveWorkingPixels(workingPixelsRef.current)
+    }
+  }
+
   const handleUndo = () => {
     const previous = undoStackRef.current.pop()
     const working = workingPixelsRef.current
@@ -759,12 +851,25 @@ export function CharacterSettings() {
     activeStrokeRef.current = null
     setWorkingPixels(null)
     setBrushCursor(null)
+    keyboardBrushCursorRef.current = null
+    setCompareOriginal(false)
     paintingRef.current = false
     lastPointerRef.current = null
     setEditorOpen(false)
     setCharacterPosition(null)
     undoStackRef.current = []
     setUndoCount(0)
+  }
+
+  const handleCancelProcessing = () => {
+    processingRequestRef.current += 1
+    cancelBackgroundRemoval()
+    cutoutRenderAbortRef.current?.abort()
+    cutoutRenderAbortRef.current = null
+    cutoutRenderRequestRef.current += 1
+    setIsPreparing(false)
+    setProgress(0)
+    setCanRetryBackgroundRemoval(false)
   }
 
   return (
@@ -812,9 +917,9 @@ export function CharacterSettings() {
                 <Button type="button" variant="outline" size="sm" className="h-10 rounded-md" onClick={() => fileInputRef.current?.click()} disabled={isPreparing}>
                   <Upload className="size-3.5" aria-hidden="true" /> {t('characterChange')}
                 </Button>
-                <Button type="button" size="sm" className="h-10 rounded-md" onClick={handleRemoveBackground} disabled={isPreparing}>
-                  {isPreparing ? <Loader2 className="size-3.5 animate-spin" aria-hidden="true" /> : <WandSparkles className="size-3.5" aria-hidden="true" />}
-                  {isPreparing ? t('characterProcessing') : t('characterRemoveBackground')}
+                <Button type="button" size="sm" className="h-11 rounded-md" onClick={isPreparing ? handleCancelProcessing : handleRemoveBackground}>
+                  {isPreparing ? <Loader2 className="size-3.5 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <WandSparkles className="size-3.5" aria-hidden="true" />}
+                  {isPreparing ? t('characterCancelProcessing') : t('characterRemoveBackground')}
                 </Button>
               </div>
 
@@ -869,8 +974,14 @@ export function CharacterSettings() {
                 <>
                   <canvas
                     ref={canvasRef}
+                    role="region"
+                    tabIndex={0}
                     aria-label={t('characterEditorLabel')}
-                    className="mx-auto block max-h-[360px] w-full max-w-full cursor-none touch-none object-contain"
+                    aria-describedby={brushKeyboardDescriptionId}
+                    aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Shift+ArrowUp Shift+ArrowDown Shift+ArrowLeft Shift+ArrowRight Space Enter E R [ ] Control+Z Meta+Z"
+                    className={`mx-auto block max-h-[360px] w-full max-w-full cursor-none touch-none object-contain focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${compareOriginal ? 'opacity-0' : 'opacity-100'}`}
+                    onFocus={handleBrushFocus}
+                    onKeyDown={handleBrushKeyDown}
                     onPointerEnter={handlePointerEnter}
                     onPointerLeave={handlePointerLeave}
                     onPointerDown={handlePointerDown}
@@ -878,6 +989,9 @@ export function CharacterSettings() {
                     onPointerUp={handlePointerUp}
                     onPointerCancel={handlePointerUp}
                   />
+                  {compareOriginal && sourcePreview && (
+                    <img src={sourcePreview} alt="" aria-hidden="true" className="pointer-events-none absolute inset-3 h-[calc(100%_-_1.5rem)] w-[calc(100%_-_1.5rem)] object-contain" />
+                  )}
                   {brushCursor && (
                     <span
                       aria-hidden="true"
@@ -899,6 +1013,17 @@ export function CharacterSettings() {
 
             {editorOpen ? (
               <>
+                <p id={brushKeyboardDescriptionId} className="sr-only">{t('characterBrushKeyboardHint')}</p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-11 w-full rounded-md"
+                  aria-pressed={compareOriginal}
+                  onClick={() => setCompareOriginal((current) => !current)}
+                >
+                  {compareOriginal ? t('characterShowResult') : t('characterCompareOriginal')}
+                </Button>
                 <div className="grid grid-cols-2 gap-2">
                   <EditorChoice active={brushMode === 'erase'} onClick={() => setBrushMode('erase')}>
                     <Eraser className="size-3.5" aria-hidden="true" /> {t('characterErase')}
@@ -913,10 +1038,10 @@ export function CharacterSettings() {
                   <p className="font-body text-[11px] leading-4 text-muted-foreground">{t('characterBrushHint')}</p>
                 </div>
                 <div className="flex gap-2">
-                  <Button type="button" variant="outline" size="sm" className="h-10 flex-1 rounded-md" onClick={handleUndo} disabled={undoCount === 0}>
-                    <Undo2 className="size-3.5" aria-hidden="true" /> {t('characterUndo')}
+                  <Button type="button" variant="outline" size="sm" className="h-11 flex-1 rounded-md" onClick={handleUndo} disabled={undoCount === 0}>
+                    <Undo2 className="size-3.5" aria-hidden="true" /> {t('characterUndo')} ({undoCount})
                   </Button>
-                  <Button type="button" variant="outline" size="sm" className="h-10 flex-1 rounded-md" onClick={handleRestoreModelResult}>
+                  <Button type="button" variant="outline" size="sm" className="h-11 flex-1 rounded-md" onClick={handleRestoreModelResult}>
                     <RotateCcw className="size-3.5" aria-hidden="true" /> {t('characterResetMask')}
                   </Button>
                 </div>

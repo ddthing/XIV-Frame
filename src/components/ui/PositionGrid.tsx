@@ -19,7 +19,7 @@ export function PositionGrid({ value, options, onChange }: {
           aria-pressed={value === optVal}
           title={t(label)}
           onClick={() => onChange(optVal)}
-          className={`flex h-10 items-center justify-center rounded-md border transition-all shadow-subtle focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background
+          className={`flex min-h-11 items-center justify-center rounded-md border transition-all shadow-subtle focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background
             ${value === optVal
               ? 'border-primary bg-accent text-accent-foreground font-semibold'
               : 'border-border bg-card text-muted-foreground hover:bg-muted/50'

@@ -75,7 +75,7 @@ export function SettingsPanel() {
               <p className="editor-meta">{t('inspectorEyebrow')}</p>
               <h2 className="mt-2 truncate font-display text-xl font-bold tracking-[0.01em] text-foreground">{currentTab.title}</h2>
             </div>
-            <span className="mt-1 shrink-0 rounded-full border border-border bg-surface-inset/70 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+            <span className="mt-1 shrink-0 rounded-full border border-border bg-surface-inset/70 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-foreground/70">
               {currentTab.role}
             </span>
           </div>

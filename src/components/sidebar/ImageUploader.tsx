@@ -243,13 +243,13 @@ export function ImageUploader() {
         <div role="alert" className="flex items-start gap-2 rounded-md border border-destructive/25 bg-destructive/5 px-3 py-2.5 text-xs leading-4 text-destructive">
           <AlertCircle className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
           <span className="min-w-0 flex-1">{uploadError}</span>
-          <button type="button" className="shrink-0 rounded-sm p-0.5 transition-colors hover:bg-destructive/10" onClick={() => setUploadError(null)} aria-label={t('dismissError')}>
+          <button type="button" className="-m-2.5 shrink-0 rounded-md p-2.5 transition-colors hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={() => setUploadError(null)} aria-label={t('dismissError')}>
             <X className="size-3.5" aria-hidden="true" />
           </button>
         </div>
       )}
       <Tabs defaultValue="frames" className="w-full">
-        <SketchbookTabsList className="h-11">
+        <SketchbookTabsList>
           <SketchbookTabsTrigger value="frames" className="gap-2">
             <Upload className="size-3.5" aria-hidden="true" />
             {t('tabFrames')}
@@ -269,7 +269,7 @@ export function ImageUploader() {
           </EditorSection>
 
           <EditorSection title={t('uploadTitle')} description={t('uploadDescription')}>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3" role="list" aria-label={t('uploadTitle')}>
           {Array.from({ length: MAX_IMAGE_COUNT }, (_, index) => index).map((index) => {
             const image = images[index]
             if (index > 1 && !images[index - 1] && !image) return null
@@ -279,6 +279,7 @@ export function ImageUploader() {
             return (
               <div
                 key={index}
+                role="listitem"
                 aria-busy={uploading}
                 className={`group relative aspect-[4/3] overflow-hidden rounded-xl border bg-card transition-all ${
                   selected
@@ -322,22 +323,22 @@ export function ImageUploader() {
                     )}
                     <div className={`absolute inset-x-2 bottom-2 z-20 flex min-w-0 items-center justify-center gap-1.5 transition-opacity duration-200 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'}`}>
                       {index > 0 && images[index - 1] && (
-                        <button type="button" aria-label={t('movePrevious')} disabled={uploading} onClick={(event) => handleMove(event, index, 'prev')} className="grid size-[32px] shrink-0 place-items-center rounded-md border border-primary-foreground/20 bg-background/95 text-foreground shadow-subtle transition-colors hover:bg-background disabled:pointer-events-none disabled:opacity-50">
+                        <button type="button" aria-label={t('movePrevious')} disabled={uploading} onClick={(event) => handleMove(event, index, 'prev')} className="grid size-11 shrink-0 place-items-center rounded-md border border-primary-foreground/20 bg-background/95 text-foreground shadow-subtle transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">
                           <ChevronLeft className="size-4" aria-hidden="true" />
                         </button>
                       )}
                       {index < images.length - 1 && images[index + 1] && (
-                        <button type="button" aria-label={t('moveNext')} disabled={uploading} onClick={(event) => handleMove(event, index, 'next')} className="grid size-[32px] shrink-0 place-items-center rounded-md border border-primary-foreground/20 bg-background/95 text-foreground shadow-subtle transition-colors hover:bg-background disabled:pointer-events-none disabled:opacity-50">
+                        <button type="button" aria-label={t('moveNext')} disabled={uploading} onClick={(event) => handleMove(event, index, 'next')} className="grid size-11 shrink-0 place-items-center rounded-md border border-primary-foreground/20 bg-background/95 text-foreground shadow-subtle transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">
                           <ChevronRight className="size-4" aria-hidden="true" />
                         </button>
                       )}
                     </div>
                     <span className="pointer-events-none absolute left-2 top-2 z-10 grid size-6 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 font-mono text-[10px] font-bold tabular-nums text-foreground shadow-subtle" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-                    <button type="button" data-photo-change-affordance aria-label={t('change')} title={t('change')} disabled={uploading} onClick={() => handleFileUpload(index)} className="absolute right-2 top-2 z-30 inline-flex h-7 items-center gap-1 rounded-md border border-primary-foreground/20 bg-background/95 px-2 text-[10px] font-semibold text-foreground shadow-subtle transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-60">
+                    <button type="button" data-photo-change-affordance aria-label={t('change')} title={t('change')} disabled={uploading} onClick={() => handleFileUpload(index)} className="absolute right-2 top-2 z-30 inline-flex min-h-11 items-center gap-1 rounded-md border border-primary-foreground/20 bg-background/95 px-2.5 text-[10px] font-semibold text-foreground shadow-subtle transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-60">
                       <ImagePlus className="size-3.5" aria-hidden="true" />
                       {t('change')}
                     </button>
-                    <button type="button" aria-label={t('deleteImage')} disabled={uploading} onClick={(event) => handleRemove(event, index)} className={`absolute right-2 top-11 z-20 grid size-7 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 text-foreground shadow-subtle transition-all hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'}`}>
+                    <button type="button" aria-label={t('deleteImage')} disabled={uploading} onClick={(event) => handleRemove(event, index)} className={`absolute right-2 top-14 z-20 grid size-11 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 text-foreground shadow-subtle transition-all hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'}`}>
                       <X className="size-3.5" aria-hidden="true" />
                     </button>
                   </>
@@ -348,10 +349,10 @@ export function ImageUploader() {
             </div>
 
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="h-10 flex-1 rounded-md text-xs" onClick={() => swapImages(0, 1)} disabled={images.length < 2 || !images[0] || !images[1]}>
+              <Button variant="outline" size="sm" className="h-11 flex-1 rounded-md text-xs" onClick={() => swapImages(0, 1)} disabled={images.length < 2 || !images[0] || !images[1]}>
                 <ArrowLeftRight className="size-3.5" /> {t('swapOrder')}
               </Button>
-              <Button variant="outline" size="sm" className="h-10 flex-1 rounded-md text-xs hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive" onClick={() => { if (!window.confirm(t('clearConfirm'))) return; invalidateAllUploads(); setImages([]); setSelectedImageIndex(0) }} disabled={imageCount === 0}>
+              <Button variant="outline" size="sm" className="h-11 flex-1 rounded-md text-xs hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive" onClick={() => { if (!window.confirm(t('clearConfirm'))) return; invalidateAllUploads(); setImages([]); setSelectedImageIndex(0) }} disabled={imageCount === 0}>
                 <Trash2 className="size-3.5" /> {t('clearAll')}
               </Button>
             </div>
@@ -403,7 +404,7 @@ export function ImageUploader() {
               </div>
               <Switch checked={isImageLocked} onCheckedChange={setIsImageLocked} size="sm" aria-label={t('lockPosition')} />
             </div>
-            <button type="button" onClick={() => { setImageScale(activeIndex, 1); setImagePosition(activeIndex, { x: 0, y: 0 }) }} className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:text-foreground">
+            <button type="button" onClick={() => { setImageScale(activeIndex, 1); setImagePosition(activeIndex, { x: 0, y: 0 }) }} className="inline-flex min-h-11 items-center gap-1.5 rounded-md px-2 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <RefreshCw className="size-3.5" /> {t('reset')}
             </button>
               </div>

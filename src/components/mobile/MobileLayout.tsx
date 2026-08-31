@@ -23,10 +23,12 @@ export function MobileLayout({ stageRef }: { stageRef: React.MutableRefObject<Ko
   const [activeSheet, setActiveSheet] = useState<BottomSheetType>(null)
   const [exportNotice, setExportNotice] = useState<string | null>(null)
   const t = useTranslations('DesktopToolbar')
+  const tMobile = useTranslations('MobileLayout')
   const tNav = useTranslations('Navigation')
   const locale = useLocale()
   const homeHref = localizedLandingPath(locale)
-  const hasImages = useStore((state) => state.images.length > 0)
+  const imageCount = useStore((state) => state.images.filter(Boolean).length)
+  const hasImages = imageCount > 0
 
   useEffect(() => {
     if (!exportNotice) return
@@ -36,6 +38,10 @@ export function MobileLayout({ stageRef }: { stageRef: React.MutableRefObject<Ko
 
   const handleHomeClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (hasImages && !window.confirm(t('leaveConfirm'))) event.preventDefault()
+  }
+
+  const closeSheet = (sheet: Exclude<BottomSheetType, null>) => {
+    setActiveSheet((current) => current === sheet ? null : current)
   }
 
   return (
@@ -70,12 +76,28 @@ export function MobileLayout({ stageRef }: { stageRef: React.MutableRefObject<Ko
         <MobileBottomNav activeSheet={activeSheet} onSelect={setActiveSheet} />
       </div>
 
-      <ImageSheet open={activeSheet === 'image'} onOpenChange={(open) => !open && setActiveSheet(null)} />
-      <SignatureSheet open={activeSheet === 'signature'} onOpenChange={(open) => !open && setActiveSheet(null)} />
-      <LayoutSheet open={activeSheet === 'layout'} onOpenChange={(open) => !open && setActiveSheet(null)} />
+      <ImageSheet
+        open={activeSheet === 'image'}
+        onOpenChange={(open) => !open && closeSheet('image')}
+        onNext={() => setActiveSheet(imageCount === 1 ? 'signature' : 'layout')}
+        nextLabel={imageCount === 0 ? tMobile('addPhotoFirst') : imageCount === 1 ? tMobile('nextSignature') : tMobile('nextLayout')}
+        nextDisabled={imageCount === 0}
+      />
+      <SignatureSheet
+        open={activeSheet === 'signature'}
+        onOpenChange={(open) => !open && closeSheet('signature')}
+        onNext={() => setActiveSheet('export')}
+        nextLabel={tMobile('nextExport')}
+      />
+      <LayoutSheet
+        open={activeSheet === 'layout'}
+        onOpenChange={(open) => !open && closeSheet('layout')}
+        onNext={() => setActiveSheet('signature')}
+        nextLabel={tMobile('nextSignature')}
+      />
       <ExportSheet
         open={activeSheet === 'export'}
-        onOpenChange={(open) => !open && setActiveSheet(null)}
+        onOpenChange={(open) => !open && closeSheet('export')}
         stageRef={stageRef}
         onExportComplete={(result: ExportResult) => {
           if (result.resized) setExportNotice(t('exportResized'))

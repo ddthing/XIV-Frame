@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import dynamic from 'next/dynamic'
 
-import { AlertCircle, LoaderCircle, Upload } from 'lucide-react'
+import { AlertCircle, Eye, EyeOff, LoaderCircle, Upload } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -11,6 +11,7 @@ import { ImageUploadError, filterImageFiles, getImagePreparationMaxDimension, pr
 import { settleWithConcurrency } from '@/lib/asyncPool'
 import { getImagePreparationConcurrency } from '@/lib/browserCapabilities'
 import { MAX_IMAGE_COUNT } from '@/lib/imageLimits'
+import { nudgeImagePosition, type ImageNudgeDirection } from '@/lib/imagePosition'
 
 const KonvaStage = dynamic(() => import('./KonvaStage'), { ssr: false })
 
@@ -18,20 +19,34 @@ import type Konva from 'konva'
 
 export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<Konva.Stage | null> }) {
   const {
+    images,
+    imagePositions,
+    selectedImageIndex,
+    isImageLocked,
     zoom,
     resetVersion,
     setPreparedImages,
+    setImagePosition,
+    setSelectedImageIndex,
   } = useStore(useShallow(state => ({
+    images: state.images,
+    imagePositions: state.imagePositions,
+    selectedImageIndex: state.selectedImageIndex,
+    isImageLocked: state.isImageLocked,
     zoom: state.zoom,
     resetVersion: state.resetVersion,
     setPreparedImages: state.setPreparedImages,
+    setImagePosition: state.setImagePosition,
+    setSelectedImageIndex: state.setSelectedImageIndex,
   })))
   const t = useTranslations('ImageUploader')
+  const canvasDescriptionId = useId()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const targetSlotRef = useRef<number | null>(null)
   const dragDepthRef = useRef(0)
   const [isDragActive, setIsDragActive] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
+  const [showPreviewGuides, setShowPreviewGuides] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
   const uploadAbortRef = useRef<AbortController | null>(null)
   const mountedRef = useRef(true)
@@ -178,6 +193,51 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
     void handleFiles(files, targetSlot ?? undefined)
   }
 
+  const occupiedImageIndices = images.flatMap((image, index) => image ? [index] : [])
+  const activeImageIndex = images[selectedImageIndex]
+    ? selectedImageIndex
+    : occupiedImageIndices[0] ?? -1
+
+  const handleCanvasKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    const target = event.target instanceof HTMLElement ? event.target : null
+    if (target?.dataset.xivFrameSelection === 'character') return
+    if (target?.matches('input, textarea, select, button, [contenteditable="true"]')) return
+
+    if (occupiedImageIndices.length === 0 && event.key === 'Enter') {
+      event.preventDefault()
+      fileInputRef.current?.click()
+      return
+    }
+
+    const currentPosition = Math.max(0, occupiedImageIndices.indexOf(activeImageIndex))
+    const selectionByKey: Partial<Record<string, number>> = {
+      PageUp: Math.max(0, currentPosition - 1),
+      PageDown: Math.min(occupiedImageIndices.length - 1, currentPosition + 1),
+      Home: 0,
+      End: occupiedImageIndices.length - 1,
+    }
+    const nextSelectionPosition = selectionByKey[event.key]
+    if (nextSelectionPosition !== undefined && occupiedImageIndices[nextSelectionPosition] !== undefined) {
+      event.preventDefault()
+      setSelectedImageIndex(occupiedImageIndices[nextSelectionPosition])
+      return
+    }
+
+    const directionByKey: Partial<Record<string, ImageNudgeDirection>> = {
+      ArrowUp: 'up',
+      ArrowLeft: 'left',
+      ArrowRight: 'right',
+      ArrowDown: 'down',
+    }
+    const direction = directionByKey[event.key]
+    if (!direction || activeImageIndex < 0) return
+
+    event.preventDefault()
+    if (isImageLocked) return
+    const position = imagePositions[activeImageIndex] ?? { x: 0, y: 0 }
+    setImagePosition(activeImageIndex, nudgeImagePosition(position, direction, event.shiftKey ? 10 : 1))
+  }
+
   return (
     <div className="flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden bg-background">
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
@@ -186,7 +246,18 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
       <CanvasToolbar className="hidden md:flex" />
 
       <div
-        className="app-backdrop relative flex min-h-0 flex-1 items-center justify-center overflow-hidden"
+        role="region"
+        tabIndex={0}
+        aria-label={t('canvasRegionLabel')}
+        aria-describedby={canvasDescriptionId}
+        aria-keyshortcuts="Enter ArrowUp ArrowDown ArrowLeft ArrowRight Shift+ArrowUp Shift+ArrowDown Shift+ArrowLeft Shift+ArrowRight PageUp PageDown Home End"
+        data-xiv-frame-canvas-region
+        data-xiv-frame-selection="image"
+        className="app-backdrop relative flex min-h-0 flex-1 items-center justify-center overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+        onKeyDown={handleCanvasKeyDown}
+        onFocus={(event) => {
+          if (event.target === event.currentTarget) event.currentTarget.dataset.xivFrameSelection = 'image'
+        }}
         onDragEnter={(event) => {
           event.preventDefault()
           dragDepthRef.current += 1
@@ -203,12 +274,18 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
         }}
         onDrop={handleDrop}
       >
+        <p id={canvasDescriptionId} className="sr-only">
+          {occupiedImageIndices.length === 0
+            ? t('canvasEmptySummary')
+            : t('canvasImageSummary', { count: occupiedImageIndices.length, selected: activeImageIndex + 1 })}
+        </p>
         <div
           className="flex size-full items-center justify-center transition-transform duration-200 motion-reduce:transition-none"
           style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'center' }}
         >
           <KonvaStage
             stageRef={stageRef}
+            showPreviewGuides={showPreviewGuides}
             onSlotSelect={handleSlotSelect}
             emptySlotLabel={isUploading ? t('uploading') : t('emptySlotLabel')}
             emptySlotHint={isUploading ? '' : t('emptySlotHint')}
@@ -247,6 +324,24 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
             </p>
           </div>
         )}
+
+        <div className="absolute bottom-4 left-4 z-20 flex items-center gap-2">
+          <button
+            type="button"
+            aria-label={t(showPreviewGuides ? 'hidePreviewGuides' : 'showPreviewGuides')}
+            aria-pressed={showPreviewGuides}
+            onClick={() => setShowPreviewGuides((current) => !current)}
+            className="inline-flex min-h-11 items-center gap-2 rounded-md border border-border bg-background/95 px-3 text-xs font-semibold text-foreground shadow-subtle transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {showPreviewGuides ? <EyeOff className="size-4" aria-hidden="true" /> : <Eye className="size-4" aria-hidden="true" />}
+            {t('previewGuides')}
+          </button>
+          {showPreviewGuides && (
+            <span className="rounded-md border border-border bg-background/95 px-2.5 py-1.5 text-[11px] font-medium text-muted-foreground shadow-subtle">
+              {t('previewGuidesNotExported')}
+            </span>
+          )}
+        </div>
 
         <input
           ref={fileInputRef}

@@ -229,18 +229,18 @@ export function LogoUploadArea() {
           />
           <div className="group relative flex aspect-[2/1] w-full items-center justify-center overflow-hidden rounded-xl border border-border bg-card shadow-subtle">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={logoUrl} alt="Logo" className="max-w-[80%] max-h-[80%] object-contain" />
+            <img src={logoUrl} alt={t('logoUploadLabel')} className="max-h-[80%] max-w-[80%] object-contain" />
             <button 
               aria-label={t('logoDelete')}
                onClick={handleDelete}
-              className="absolute right-2 top-2 grid size-7 place-items-center rounded-md border border-border bg-background text-foreground shadow-subtle transition-colors hover:bg-destructive/10 hover:text-destructive"
+              className="absolute right-2 top-2 grid size-11 place-items-center rounded-md border border-border bg-background text-foreground shadow-subtle transition-colors hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <X className="size-3.5" />
             </button>
           </div>
           
           <div className="flex gap-2">
-            <Button type="button" variant="outline" size="sm" className="h-10 flex-1 rounded-md" onClick={() => fileInputRef.current?.click()}>
+            <Button type="button" variant="outline" size="sm" className="h-11 flex-1 rounded-md" onClick={() => fileInputRef.current?.click()}>
               <Upload className="size-3.5" aria-hidden="true" /> {t('logoChange')}
             </Button>
           </div>

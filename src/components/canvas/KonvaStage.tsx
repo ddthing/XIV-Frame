@@ -34,6 +34,7 @@ export default function KonvaStage({
   emptySlotDisabled = false,
   loadingSlotLabel = 'Preparing photo…',
   loadingSlotHint = '',
+  showPreviewGuides = false,
 }: {
   stageRef: React.RefObject<Konva.Stage | null>
   onSlotSelect?: (index: number) => void
@@ -42,6 +43,7 @@ export default function KonvaStage({
   emptySlotDisabled?: boolean
   loadingSlotLabel?: string
   loadingSlotHint?: string
+  showPreviewGuides?: boolean
 }) {
   const {
     images, layoutPreset, hasChosenLayout, imageGap, imageTransition, blendWidth, canvasRatio,
@@ -300,7 +302,12 @@ export default function KonvaStage({
       data-layout-loading-slot-count={loadingSlotIndices.length}
       data-layout-slot-count={geometry.cells.length}
       data-layout-empty-slot-count={emptySlotCount}
+      data-preview-guides={showPreviewGuides ? 'on' : 'off'}
     >
+      <div
+        data-preview-boundary
+        className={showPreviewGuides && !isExporting ? 'shrink-0 outline-2 outline-dashed outline-foreground/45 outline-offset-4' : 'shrink-0'}
+      >
       <Stage
         width={outerWidth * scale}
         height={outerHeight * scale}
@@ -349,6 +356,7 @@ export default function KonvaStage({
           layoutImageCount={geometryImageCount}
           imageShape={activeImageShape}
           renderScale={isExporting ? 1 : Math.min(1, Math.max(0.1, scale * (zoom / 100)))}
+          showSelectionGuide={showPreviewGuides && !isExporting}
           onImageSlotSelect={onSlotSelect}
         />
 
@@ -379,6 +387,7 @@ export default function KonvaStage({
           intensity={grainIntensity} 
         />
       </Stage>
+      </div>
     </div>
   )
 }

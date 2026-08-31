@@ -14,14 +14,14 @@ export function SiteFooter({ locale }: { locale: string }) {
           <p className="text-[11px] leading-4 text-primary-foreground/55">
             © {new Date().getFullYear()}
             <span className="mx-1">/</span>
-            Not affiliated with Square Enix.
+            {t('affiliation')}
           </p>
         </div>
 
         <nav className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 text-primary-foreground/65 md:justify-end" aria-label={t('footerNavigation')}>
-          <Link href={`/${locale}/legal/privacy`} className="transition-colors hover:text-primary-foreground">{t('privacy')}</Link>
-          <Link href={`/${locale}/legal/terms`} className="transition-colors hover:text-primary-foreground">{t('terms')}</Link>
-          <a href="https://ko-fi.com/reconeur" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-primary-foreground">
+          <Link href={`/${locale}/legal/privacy`} className="inline-flex min-h-11 items-center transition-colors hover:text-primary-foreground">{t('privacy')}</Link>
+          <Link href={`/${locale}/legal/terms`} className="inline-flex min-h-11 items-center transition-colors hover:text-primary-foreground">{t('terms')}</Link>
+          <a href="https://ko-fi.com/reconeur" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center transition-colors hover:text-primary-foreground">
             {t('donate')}
           </a>
         </nav>

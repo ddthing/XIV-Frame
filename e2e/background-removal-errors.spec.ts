@@ -9,7 +9,7 @@ type CharacterFile = string | { name: string; mimeType: string; buffer: Buffer }
 async function openCharacterSettings(page: Page) {
   await page.addInitScript(() => window.localStorage.clear())
   await page.goto('/ko', { waitUntil: 'networkidle' })
-  await expect(page.getByRole('heading', { name: 'Your frame, in focus.' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '프레임 미리보기' })).toBeVisible()
   const sourceTab = page.getByRole('tab', { name: '01 사진 소스' })
   await sourceTab.click()
   await expect(sourceTab).toHaveAttribute('aria-selected', 'true')

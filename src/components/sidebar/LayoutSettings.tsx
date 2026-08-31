@@ -9,9 +9,7 @@ import {
   getLayoutGeometryImageCount,
   getLayoutPreviewGeometry,
   getRecommendedLayoutPreset,
-  LAYOUT_TEMPLATE_GROUPS,
   LAYOUT_TEMPLATE_OPTIONS,
-  type LayoutTemplateGroup,
   type LayoutTemplateOption,
 } from '@/lib/layoutTemplates'
 import { Input } from '@/components/ui/input'
@@ -196,7 +194,6 @@ export function LayoutSettings() {
     ? LAYOUT_TEMPLATE_OPTIONS.find((option) => option.id === recommendedPreset)
     : undefined
   const selectedTemplate = LAYOUT_TEMPLATE_OPTIONS.find((option) => option.id === layoutPreset)
-  const [layoutFilter, setLayoutFilter] = useState<LayoutFilter | null>(null)
   const hasTemplateOverflow = Boolean(selectedTemplate && imageCount > selectedTemplate.maxImages)
   const previewImages = useMemo(() => images.filter(Boolean), [images])
   const previewThumbnails = useLayoutPreviewThumbnails(previewImages)
@@ -204,15 +201,6 @@ export function LayoutSettings() {
   const currentPreviewSlotCount = selectedTemplate
     ? getLayoutGeometry(selectedTemplate.id, currentPreviewImageCount).cells.length
     : 0
-  const filterOptions: LayoutFilterOption[] = [
-    { value: 'all', label: t('filterAll'), groups: LAYOUT_TEMPLATE_GROUPS },
-    { value: 'basic', label: t('filterBasic'), groups: ['two'] },
-    { value: 'focus', label: t('filterFocus'), groups: ['three', 'four'] },
-    { value: 'matrix', label: t('filterMatrix'), groups: ['matrix'] },
-  ]
-  const activeFilterValue = layoutFilter ?? 'all'
-  const activeFilter = filterOptions.find((option) => option.value === activeFilterValue) ?? filterOptions[0]
-  const visibleGroups = activeFilter.groups
   const safeCustomBackgroundColor = getSafeCustomBackgroundColor(customBackgroundColor)
   const backgroundOptions: BackgroundOption[] = [
     { value: 'white', label: t('bgWhite'), swatch: '#ffffff' },
@@ -246,7 +234,7 @@ export function LayoutSettings() {
                   </span>
                 </div>
               </div>
-              <span className="shrink-0 rounded-full border border-border bg-surface-inset/70 px-2 py-1 font-mono text-[10px] font-semibold tabular-nums text-muted-foreground">
+              <span className="shrink-0 rounded-full border border-border bg-surface-inset/70 px-2 py-1 font-mono text-[10px] font-semibold tabular-nums text-foreground/70">
                 {t('templateSlotCount', { count: currentPreviewSlotCount })}
               </span>
             </div>
@@ -281,7 +269,7 @@ export function LayoutSettings() {
             <EditorChoice
               aria-label={t('recommendationApply', { layout: t(recommendedTemplate.labelKey) })}
               onClick={() => setLayoutPreset(recommendedTemplate.id)}
-              className="h-9 shrink-0 px-2.5 text-[11px]"
+              className="min-h-11 shrink-0 px-2.5 text-[11px]"
             >
               {t('recommendationApply', { layout: t(recommendedTemplate.labelKey) })}
             </EditorChoice>
@@ -297,70 +285,39 @@ export function LayoutSettings() {
             </span>
           </div>
 
-          <div role="group" aria-label={t('filterLabel')} className="grid grid-cols-4 gap-1 rounded-lg border border-border bg-muted/55 p-1">
-            {filterOptions.map((option) => (
-              <EditorChoice
-                key={option.value}
-                active={activeFilterValue === option.value}
-                onClick={() => setLayoutFilter(option.value)}
-                aria-label={option.label}
-                data-layout-filter={option.value}
-                className="min-h-9 min-w-0 flex-col gap-0.5 rounded-md px-1.5 py-1 text-[10px] leading-3"
-              >
-                <span className="truncate">{option.label}</span>
-                <span className="font-mono text-[9px] font-medium tabular-nums opacity-65">
-                  {option.groups.reduce((total, group) => total + LAYOUT_TEMPLATE_OPTIONS.filter((template) => template.group === group).length, 0)}
-                </span>
-              </EditorChoice>
-            ))}
-          </div>
         </div>
 
-        <div className="space-y-5">
-          {visibleGroups.map((group) => {
-            const options = LAYOUT_TEMPLATE_OPTIONS.filter((option) => option.group === group)
+        <div role="group" aria-label={t('layoutCatalog')} data-layout-catalog className="grid grid-cols-2 gap-2">
+          {LAYOUT_TEMPLATE_OPTIONS.map((option) => {
+            const requirement = getTemplateRequirement(t, option, imageCount)
 
             return (
-              <div key={group} className="space-y-2">
-                <div className="flex min-w-0 items-center justify-between gap-3">
-                  <span className="editor-meta min-w-0 truncate">{t(GROUP_LABEL_KEYS[group])}</span>
-                  <span className="min-w-0 truncate font-body text-[11px] text-muted-foreground">{t(GROUP_HINT_KEYS[group])}</span>
-                </div>
-                <div role="group" aria-label={t(GROUP_LABEL_KEYS[group])} className="grid grid-cols-2 gap-2">
-                  {options.map((option) => {
-                    const requirement = getTemplateRequirement(t, option, imageCount)
-
-                    return (
-                      <EditorChoice
-                        key={option.id}
-                        active={layoutPreset === option.id}
-                        onClick={() => setLayoutPreset(option.id)}
-                        aria-label={`${t(option.labelKey)}${requirement ? `, ${requirement}` : ''}`}
-                        title={requirement || undefined}
-                        data-layout-template-card="true"
-                        className="group h-auto min-h-[150px] w-full min-w-0 flex-col items-stretch justify-start gap-2 overflow-hidden p-2.5 text-left"
-                      >
-                        <span className="relative block w-full overflow-hidden rounded-md border border-border bg-muted/35 p-1">
-                          <LayoutTemplatePreview option={option} />
-                          {layoutPreset === option.id && (
-                            <span className="absolute right-1.5 top-1.5 inline-flex items-center gap-1 rounded-full border border-primary/20 bg-background/95 px-1.5 py-0.5 font-mono text-[9px] font-semibold text-foreground shadow-subtle">
-                              <Check className="size-2.5 text-primary" aria-hidden="true" />
-                              {t('selectedShort')}
-                            </span>
-                          )}
-                        </span>
-                        <span className="flex w-full min-w-0 items-start justify-between gap-2">
-                          <span className="min-w-0 line-clamp-2 break-words text-[12px] font-semibold leading-4 text-foreground">{t(option.labelKey)}</span>
-                          <span className="shrink-0 pt-0.5 font-mono text-[9px] tabular-nums text-muted-foreground">{getTemplateSlotLabel(t, option)}</span>
-                        </span>
-                        <span className={`w-full truncate font-body text-[10px] leading-4 ${requirement ? 'text-muted-foreground' : 'text-primary'}`}>
-                          {getTemplateStatus(t, option, imageCount)}
-                        </span>
-                      </EditorChoice>
-                    )
-                  })}
-                </div>
-              </div>
+              <EditorChoice
+                key={option.id}
+                active={layoutPreset === option.id}
+                onClick={() => setLayoutPreset(option.id)}
+                aria-label={`${t(option.labelKey)}${requirement ? `, ${requirement}` : ''}`}
+                title={requirement || undefined}
+                data-layout-template-card="true"
+                className="group h-auto min-h-[150px] w-full min-w-0 flex-col items-stretch justify-start gap-2 overflow-hidden p-2.5 text-left"
+              >
+                <span className="relative block w-full overflow-hidden rounded-md border border-border bg-muted/35 p-1">
+                  <LayoutTemplatePreview option={option} />
+                  {layoutPreset === option.id && (
+                    <span className="absolute right-1.5 top-1.5 inline-flex items-center gap-1 rounded-full border border-primary/20 bg-background/95 px-1.5 py-0.5 font-mono text-[9px] font-semibold text-foreground shadow-subtle">
+                      <Check className="size-2.5 text-primary" aria-hidden="true" />
+                      {t('selectedShort')}
+                    </span>
+                  )}
+                </span>
+                <span className="flex w-full min-w-0 items-start justify-between gap-2">
+                  <span className="min-w-0 line-clamp-2 break-words text-[12px] font-semibold leading-4 text-foreground">{t(option.labelKey)}</span>
+                  <span className="shrink-0 pt-0.5 font-mono text-[9px] tabular-nums text-muted-foreground">{getTemplateSlotLabel(t, option)}</span>
+                </span>
+                <span className={`w-full truncate font-body text-[10px] leading-4 ${requirement ? 'text-muted-foreground' : 'text-primary'}`}>
+                  {getTemplateStatus(t, option, imageCount)}
+                </span>
+              </EditorChoice>
             )
           })}
         </div>
@@ -526,28 +483,6 @@ function BackgroundSwatch({ color, className = 'size-4' }: { color: string; clas
   return <span aria-hidden="true" className={`${className} shrink-0 rounded-sm border border-border`} style={{ backgroundColor: color }} />
 }
 
-const GROUP_LABEL_KEYS: Record<LayoutTemplateGroup, string> = {
-  two: 'templateGroupTwo',
-  three: 'templateGroupThree',
-  four: 'templateGroupFour',
-  matrix: 'templateGroupMatrix',
-}
-
-const GROUP_HINT_KEYS: Record<LayoutTemplateGroup, string> = {
-  two: 'templateGroupTwoHint',
-  three: 'templateGroupThreeHint',
-  four: 'templateGroupFourHint',
-  matrix: 'templateGroupMatrixHint',
-}
-
-type LayoutFilter = 'all' | 'basic' | 'focus' | 'matrix'
-
-type LayoutFilterOption = {
-  value: LayoutFilter
-  label: string
-  groups: readonly LayoutTemplateGroup[]
-}
-
 function getTemplateRequirement(t: ReturnType<typeof useTranslations<'LayoutSettings'>>, option: LayoutTemplateOption, imageCount: number) {
   if (imageCount < option.minImages) return t('templateNeedsImages', { count: option.minImages })
   if (imageCount > option.maxImages) return t('templateMaxImages', { count: option.maxImages })
@@ -609,7 +544,7 @@ function LayoutTemplatePreview({
               <img src={image} alt="" draggable={false} decoding="async" className="size-full object-cover" />
             ) : (
               <span className={`grid size-full place-items-center border border-dashed ${isHero ? 'border-primary/25 bg-primary/10' : 'border-primary/20 bg-primary/60'}`}>
-                <span className={`font-mono font-semibold tabular-nums ${isHero ? 'text-sm text-primary/70' : 'text-[9px] text-primary-foreground/80'}`}>
+                <span className={`font-mono font-semibold tabular-nums ${isHero ? 'text-sm text-primary/70' : 'text-[9px] text-primary-foreground'}`}>
                   {String(index + 1).padStart(2, '0')}
                 </span>
               </span>
