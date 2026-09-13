@@ -7,7 +7,7 @@ export function FaqEn() {
       locale="en"
       eyebrow="05 / FAQ"
       title="Frequently asked questions"
-      description="Answers to the questions that come up between adding an image and saving the final PNG."
+      description="Find answers about adding photos, arranging the frame, tuning a signature, and saving PNGs."
       groups={[
         {
           number: '01',

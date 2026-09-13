@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Container } from './Container'
 import { useTranslations } from 'next-intl'
 import { Logo } from '@/components/ui/Logo'
+import { ExternalLink } from '@/components/content/ExternalLink'
 
 export function SiteFooter({ locale }: { locale: string }) {
   const t = useTranslations('Navigation')
@@ -12,22 +13,22 @@ export function SiteFooter({ locale }: { locale: string }) {
         <div className="flex flex-col items-center gap-3 md:items-start">
           <Logo size="sm" inverse />
           <p className="text-xs text-primary-foreground/55">
-          © {new Date().getFullYear()} XIV Frame.
+          {t('copyright', { year: new Date().getFullYear() })}
           <span className="mx-1">/</span>
-          Not affiliated with Square Enix.
+          {t('notAffiliated')}
           </p>
         </div>
         
         <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-primary-foreground/65 md:justify-end">
-          <Link href={`/${locale}/about`} className="transition-colors hover:text-primary-foreground">{t('about')}</Link>
-          <Link href={`/${locale}/contact`} className="transition-colors hover:text-primary-foreground">{t('contact')}</Link>
-          <Link href={`/${locale}/blog`} className="transition-colors hover:text-primary-foreground">{t('blog')}</Link>
-          <Link href={`/${locale}/faq`} className="transition-colors hover:text-primary-foreground">{t('faq')}</Link>
-          <Link href={`/${locale}/legal/privacy`} className="transition-colors hover:text-primary-foreground">{t('privacy')}</Link>
-          <Link href={`/${locale}/legal/terms`} className="transition-colors hover:text-primary-foreground">{t('terms')}</Link>
-          <a href="https://ko-fi.com/reconeur" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-primary-foreground">
+          <Link href={`/${locale}/about`} className="rounded-sm transition-colors hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary">{t('about')}</Link>
+          <Link href={`/${locale}/contact`} className="rounded-sm transition-colors hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary">{t('contact')}</Link>
+          <Link href={`/${locale}/blog`} className="rounded-sm transition-colors hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary">{t('blog')}</Link>
+          <Link href={`/${locale}/faq`} className="rounded-sm transition-colors hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary">{t('faq')}</Link>
+          <Link href={`/${locale}/legal/privacy`} className="rounded-sm transition-colors hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary">{t('privacy')}</Link>
+          <Link href={`/${locale}/legal/terms`} className="rounded-sm transition-colors hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary">{t('terms')}</Link>
+          <ExternalLink href="https://ko-fi.com/reconeur" newWindowLabel={t('opensInNewTab')} className="rounded-sm transition-colors hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary">
             {t('donate')}
-          </a>
+          </ExternalLink>
         </div>
       </Container>
     </footer>

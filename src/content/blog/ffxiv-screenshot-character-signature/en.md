@@ -11,7 +11,7 @@ The Signature panel adds a two-line text overlay to your screenshot. Use it for 
 
 1. Upload at least one screenshot so you can judge the overlay against the real image.
 2. Open **Signature** in the desktop inspector, or tap **Signature** in the mobile bottom navigation.
-3. The panel opens on the **Text** tab. The **Logo Upload** tab is for image marks, not typed text.
+3. Expand **Text**. Use **Logo Upload** for image marks rather than typed text.
 
 ## 2. Enter the two text lines
 
@@ -58,5 +58,5 @@ The Signature panel adds a two-line text overlay to your screenshot. Use it for 
 1. Inspect the text at a normal preview zoom and confirm that the first and last characters are visible.
 2. If the copyright overlay is enabled, confirm that the fixed notice is visible and not lost against the background.
 3. Click **Save PNG** on desktop.
-4. On mobile, open **Export** and tap **Save Photo**.
+4. On mobile, open **Export** and tap **Save PNG**.
 5. If the signature competes with the subject, return to the panel and adjust position or opacity instead of adding more decoration.

@@ -1,6 +1,6 @@
 import { Feed } from 'feed'
 import { getAllPosts } from '@/lib/markdown'
-import { siteUrl } from '@/lib/site'
+import { siteImageUrl, siteUrl } from '@/lib/site'
 
 export const dynamic = 'force-static'
 
@@ -13,7 +13,7 @@ export async function GET() {
     id: site_url,
     link: site_url,
     language: 'ko', // default
-    image: `${site_url}/og-image.jpg`,
+    image: siteImageUrl,
     favicon: `${site_url}/icon.svg`,
     copyright: `All rights reserved ${new Date().getFullYear()}, XIV Frame`,
     author: {

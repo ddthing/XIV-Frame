@@ -8,7 +8,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { locales } from '@/i18n/request'
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { articleJsonLd, breadcrumbJsonLd, localizedAlternates, localizedUrl } from '@/lib/site'
+import { articleJsonLd, breadcrumbJsonLd, localizedAlternates, localizedUrl, siteImagePath } from '@/lib/site'
 
 interface PostPageProps {
   params: Promise<{ locale: string, slug: string }>
@@ -51,13 +51,13 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
       type: 'article',
       publishedTime: post.metadata.date,
       tags: post.metadata.tags,
-      images: ['/og-image.jpg'],
+      images: [siteImagePath],
     },
     twitter: {
       card: 'summary_large_image',
       title: post.metadata.title,
       description: post.metadata.description,
-      images: ['/og-image.jpg'],
+      images: [siteImagePath],
     },
   }
 }
@@ -106,18 +106,18 @@ export default async function BlogPostPage({ params }: PostPageProps) {
         </div>
       </article>
 
-      <section className="mt-10 rounded-xl border border-border bg-sticky-note-mint p-5 shadow-subtle sm:p-6">
-        <p className="editor-meta">NEXT STEP</p>
+      <section className="mt-10 rounded-xl border border-border bg-muted p-5 shadow-subtle sm:p-6">
+        <p className="editor-meta">{t('nextStep')}</p>
         <h2 className="mt-2 font-display text-xl font-bold leading-7 tracking-[0.01em] text-foreground">{t('ctaTitle')}</h2>
         <p className="mt-2 max-w-xl font-body text-[13px] leading-5 text-foreground/80">{t('ctaDescription')}</p>
-        <Link href={`/${locale}`} className="mt-5 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 font-body text-xs font-bold text-primary-foreground shadow-subtle transition-transform hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-sticky-note-mint">
+        <Link href={`/${locale}`} className="mt-5 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 font-body text-xs font-bold text-primary-foreground shadow-subtle transition-transform hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-muted">
           {t('ctaButton')}
           <ArrowUpRight size={16} aria-hidden="true" />
         </Link>
       </section>
 
       <section className="mt-10 border-t border-border pt-8">
-        <p className="editor-meta">REFERENCE</p>
+        <p className="editor-meta">{t('reference')}</p>
         <h2 className="mt-2 font-display text-xl font-bold leading-7 tracking-[0.01em] text-foreground">{t('faqTitle')}</h2>
         <p className="mt-2 max-w-xl font-body text-[13px] leading-5 text-foreground/75">{t('faqLinkDescription')}</p>
         <Link href={`/${locale}/faq`} className="mt-4 inline-flex items-center gap-2 rounded-md border border-border bg-card px-4 py-2.5 font-body text-xs font-bold text-foreground transition-colors hover:border-primary/35 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">

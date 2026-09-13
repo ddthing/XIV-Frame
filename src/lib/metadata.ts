@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { siteName, siteUrl } from './site'
+import { siteImagePath, siteName, siteUrl } from './site'
 
 export const rootMetadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -15,7 +15,7 @@ export const rootMetadata: Metadata = {
     description: '파이널판타지14 스크린샷을 한 장의 PNG로 구성하고 시그니처까지 더해보세요.',
     url: siteUrl,
     siteName,
-    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'XIV Frame Preview' }],
+    images: [{ url: siteImagePath, width: 1200, height: 630, alt: 'XIV Frame screenshot framer' }],
     locale: 'ko_KR',
     type: 'website',
   },
@@ -23,7 +23,12 @@ export const rootMetadata: Metadata = {
     card: 'summary_large_image',
     title: 'XIV Frame | 파이널판타지14 스크린샷 프레임',
     description: '파이널판타지14 스크린샷을 한 장의 PNG로 구성하고 시그니처까지 더해보세요.',
-    images: ['/og-image.jpg'],
+    images: [siteImagePath],
+  },
+  icons: {
+    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+    shortcut: ['/icon.svg'],
+    apple: [{ url: '/icon.svg', type: 'image/svg+xml' }],
   },
   robots: { index: true, follow: true },
 }

@@ -14,7 +14,7 @@ const MAX_LOGO_FILE_SIZE = 10 * 1024 * 1024
 const MAX_LOGO_DIMENSION = 512
 const MAX_LOGO_DATA_URL_LENGTH = 1_500_000
 
-export function LogoUploadArea() {
+export function LogoUploadArea({ idPrefix = 'signature-logo' }: { idPrefix?: string }) {
   const {
     logoUrl, setLogoUrl,
     logoPosition, setLogoPosition,
@@ -33,6 +33,9 @@ export function LogoUploadArea() {
   const t = useTranslations('SignatureSettings')
   const [uploadError, setUploadError] = useState<string | null>(null)
   const uploadRequestRef = useRef(0)
+  const fileInputId = `${idPrefix}-file-input`
+  const scaleInputId = `${idPrefix}-scale`
+  const opacityInputId = `${idPrefix}-opacity`
 
   useEffect(() => () => {
     uploadRequestRef.current += 1
@@ -133,7 +136,7 @@ export function LogoUploadArea() {
             <span className="text-xs font-semibold text-muted-foreground">{t('logoUploadLabel')}</span>
           </div>
           <input
-            id="logo-file-input"
+            id={fileInputId}
             type="file"
             accept="image/*"
             onChange={handleFileChange}
@@ -145,13 +148,14 @@ export function LogoUploadArea() {
         <div className="space-y-4">
           <div className="group relative flex aspect-[2/1] w-full items-center justify-center overflow-hidden rounded-xl border border-border bg-card shadow-subtle">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={logoUrl} alt="Logo" className="max-w-[80%] max-h-[80%] object-contain" />
+            <img src={logoUrl} alt={t('logoPreview')} className="max-w-[80%] max-h-[80%] object-contain" />
             <button 
+              type="button"
               aria-label={t('logoDelete')}
                onClick={handleDelete}
-              className="absolute right-2 top-2 grid size-7 place-items-center rounded-md border border-border bg-background text-foreground shadow-subtle transition-colors hover:bg-destructive/10 hover:text-destructive"
+              className="absolute right-2 top-2 grid size-10 place-items-center rounded-md border border-border bg-background text-foreground shadow-subtle transition-colors hover:bg-destructive/10 hover:text-destructive"
             >
-              <X className="size-3.5" />
+              <X className="size-3.5" aria-hidden="true" />
             </button>
           </div>
           
@@ -165,9 +169,10 @@ export function LogoUploadArea() {
           </div>
           
           <div className="space-y-2">
-            <EditorFieldHeader label={t('size')} value={`${logoScale}%`} htmlFor="logo-scale" />
+            <EditorFieldHeader label={t('size')} value={`${logoScale}%`} htmlFor={scaleInputId} />
             <Slider 
-              id="logo-scale"
+              id={scaleInputId}
+              aria-label={t('size')}
               value={[logoScale]} 
               onValueChange={(vals) => setLogoScale(Array.isArray(vals) ? vals[0] : vals)} 
               min={10} max={200} step={1} 
@@ -175,9 +180,10 @@ export function LogoUploadArea() {
           </div>
 
           <div className="space-y-2">
-            <EditorFieldHeader label={t('opacity')} value={`${logoOpacity}%`} htmlFor="logo-opacity" />
+            <EditorFieldHeader label={t('opacity')} value={`${logoOpacity}%`} htmlFor={opacityInputId} />
             <Slider 
-              id="logo-opacity"
+              id={opacityInputId}
+              aria-label={t('opacity')}
               value={[logoOpacity]} 
               onValueChange={(vals) => setLogoOpacity(Array.isArray(vals) ? vals[0] : vals)} 
               min={0} max={100} step={1} 

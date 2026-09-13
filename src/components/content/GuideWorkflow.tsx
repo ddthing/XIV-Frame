@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Download, ImagePlus, Type, WandSparkles } from 'lucide-react'
+import { Download, ImagePlus, LayoutGrid, Type, WandSparkles } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 interface GuideWorkflowStep {
@@ -20,12 +20,14 @@ interface GuideWorkflowProps {
 function StepPreview({ number }: { number: string }) {
   if (number === '01') {
     return (
-      <div className="grid h-full grid-cols-3 gap-1.5 p-3">
-        <div className="rounded-md border border-primary/15 bg-primary/10" />
-        <div className="rounded-md border border-primary/15 bg-sticky-note-mint/70" />
-        <div className="grid place-items-center rounded-md border border-dashed border-primary/25 bg-card text-primary/65">
-          <ImagePlus className="size-4" aria-hidden="true" />
+      <div className="flex h-full items-center justify-center gap-2 p-4">
+        <div className="grid h-3/4 w-[42%] grid-cols-2 gap-1.5 rounded-md border border-primary/20 bg-card p-1.5">
+          <div className="rounded-sm bg-primary/70" />
+          <div className="rounded-sm bg-primary/20" />
+          <div className="rounded-sm bg-primary/20" />
+          <div className="rounded-sm bg-primary/70" />
         </div>
+        <LayoutGrid className="size-4 text-primary/70" aria-hidden="true" />
       </div>
     )
   }
@@ -47,7 +49,7 @@ function StepPreview({ number }: { number: string }) {
           <ImagePlus className="size-4 text-primary/70" aria-hidden="true" />
         </div>
         <WandSparkles className="size-4 text-primary/70" aria-hidden="true" />
-        <div className="h-3/4 w-1/3 rounded-md border border-dashed border-primary/25 bg-sticky-note-mint/60" />
+        <div className="h-3/4 w-1/3 rounded-md border border-dashed border-primary/25 bg-muted/60" />
       </div>
     )
   }
@@ -60,7 +62,7 @@ function StepPreview({ number }: { number: string }) {
           <span className="h-1.5 w-20 rounded-full bg-primary/65" />
         </div>
         <div className="ml-6 h-1 w-14 rounded-full bg-primary/25" />
-        <div className="ml-auto h-4 w-10 rounded-sm border border-primary/20 bg-sticky-note-yellow/70" />
+        <div className="ml-auto h-4 w-10 rounded-sm border border-primary/20 bg-muted/70" />
       </div>
     )
   }

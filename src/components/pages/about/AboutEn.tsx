@@ -1,4 +1,5 @@
 import { DocumentPage } from '@/components/content/DocumentPage'
+import { ExternalLink } from '@/components/content/ExternalLink'
 import Link from 'next/link'
 
 export function AboutEn() {
@@ -6,9 +7,10 @@ export function AboutEn() {
     <DocumentPage
       eyebrow="04 / ABOUT"
       title="About XIV Frame"
-      description="Learn what XIV Frame does and how it handles your images and editor settings."
+      description="A short overview of the workflow, image handling, and usage rights."
       updatedLabel="Last updated"
       updated="August 13, 2026"
+      updatedDateTime="2026-08-13"
       asideLabel="On this page"
       sections={[
         {
@@ -33,7 +35,7 @@ export function AboutEn() {
           children: (
             <>
               <p>Use it when you want to show a character from multiple angles, document a glamour or housing project, or prepare a single showcase image for a community post.</p>
-              <p>The simplest path is <strong>add images → choose a layout → tune the signature → save PNG</strong>. The <Link href="/en/blog">guides</Link> follow that same order and explain the controls using the labels in the editor.</p>
+              <p>The simplest path is <strong>choose a layout → add images → tune the signature → save PNG</strong>. Setting the frame shape first makes it easier to compare each image as you add it. The <Link href="/en/blog">guides</Link> follow that same order and explain the controls using the labels in the editor.</p>
             </>
           ),
         },
@@ -54,7 +56,7 @@ export function AboutEn() {
           title: 'Open source and rights',
           children: (
             <>
-              <p>The source code is available in the <a href="https://github.com/ddthing/XIV-Frame" target="_blank" rel="noopener noreferrer">XIV Frame GitHub repository</a>. Send bug reports and product feedback through the <Link href="/en/contact">contact page</Link>.</p>
+              <p>The source code is available in the <ExternalLink href="https://github.com/ddthing/XIV-Frame" newWindowLabel="opens in a new tab">XIV Frame GitHub repository</ExternalLink>. Send bug reports and product feedback through the <Link href="/en/contact">contact page</Link>.</p>
               <p>Rights to Final Fantasy XIV game content and trademarks belong to their respective owners. XIV Frame is not affiliated with or endorsed by Square Enix.</p>
             </>
           ),

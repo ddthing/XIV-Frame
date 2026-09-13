@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Group, Image as KonvaImage, Rect, Text } from 'react-konva'
 import useImage from 'use-image'
 import { useShallow } from 'zustand/react/shallow'
@@ -28,7 +28,7 @@ function createAlphaOutline(image: HTMLImageElement) {
   if (!silhouetteContext) return null
   silhouetteContext.drawImage(sourceCanvas, 0, 0)
   silhouetteContext.globalCompositeOperation = 'source-in'
-  silhouetteContext.fillStyle = '#e7f5a5'
+  silhouetteContext.fillStyle = '#e7e7e7'
   silhouetteContext.fillRect(0, 0, width, height)
 
   const outlineCanvas = document.createElement('canvas')
@@ -122,7 +122,7 @@ function CharacterGuide({
         y={labelY}
         width={labelWidth}
         height={labelHeight}
-        fill="#173806"
+        fill="#2f2f2f"
         opacity={0.94}
         cornerRadius={6}
         listening={false}
@@ -135,7 +135,7 @@ function CharacterGuide({
         text={labelText}
         fontFamily="monospace"
         fontSize={labelFontSize}
-        fill="#f4f7dd"
+        fill="#f7f7f7"
         verticalAlign="middle"
         ellipsis
         listening={false}
@@ -145,8 +145,8 @@ function CharacterGuide({
         y={handleY}
         width={handleSize}
         height={handleSize}
-        fill="#e7f5a5"
-        stroke="#173806"
+        fill="#f7f7f7"
+        stroke="#2f2f2f"
         strokeWidth={Math.max(2, inset * 0.35)}
         cornerRadius={Math.max(3, handleSize * 0.2)}
         draggable
@@ -207,6 +207,41 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
     () => characterImg ? createAlphaOutline(characterImg) : null,
     [characterImg],
   )
+
+  useEffect(() => {
+    const handleNudge = (event: Event) => {
+      if (!characterImg) return
+
+      const detail = (event as CustomEvent<{ dx?: unknown; dy?: unknown }>).detail
+      const dx = typeof detail?.dx === 'number' && Number.isFinite(detail.dx) ? detail.dx : 0
+      const dy = typeof detail?.dy === 'number' && Number.isFinite(detail.dy) ? detail.dy : 0
+      if (dx === 0 && dy === 0) return
+
+      const { characterScale: currentScale, characterPosition: currentPosition, characterFlipX: isFlipped } = useStore.getState()
+      const baseScale = Math.min(
+        (contentWidth * 0.58) / characterImg.width,
+        (contentHeight * 0.86) / characterImg.height,
+      )
+      const width = characterImg.width * baseScale * currentScale
+      const height = characterImg.height * baseScale * currentScale
+      const position = currentPosition ?? {
+        x: Math.max(0, (contentWidth - width) / 2),
+        y: Math.max(0, contentHeight - height - Math.max(24, contentHeight * 0.06)),
+      }
+      const visualX = isFlipped ? position.x - width : position.x
+      const minVisualX = Math.min(-width + 80, contentWidth - 80)
+      const maxVisualX = Math.max(-width + 80, contentWidth - 80)
+      const nextVisualX = Math.min(maxVisualX, Math.max(minVisualX, visualX + dx))
+      const minY = Math.min(-height + 80, contentHeight - 80)
+      const maxY = Math.max(-height + 80, contentHeight - 80)
+      const nextY = Math.min(maxY, Math.max(minY, position.y + dy))
+
+      setCharacterPosition(isFlipped ? { x: nextVisualX + width, y: nextY } : { x: nextVisualX, y: nextY })
+    }
+
+    window.addEventListener('xiv-frame:nudge-character', handleNudge)
+    return () => window.removeEventListener('xiv-frame:nudge-character', handleNudge)
+  }, [characterImg, contentHeight, contentWidth, setCharacterPosition])
 
   if (!characterImg || !characterImg.width || !characterImg.height) return null
 

@@ -1,40 +1,124 @@
-import { useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 
-import { AlertCircle, ImagePlus, Upload } from 'lucide-react'
+import { AlertCircle, Upload } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useShallow } from 'zustand/react/shallow'
 
-import { CanvasToolbar } from './CanvasToolbar'
+import { CanvasDock } from './CanvasDock'
+import { EmptyFrameState } from './EmptyFrameState'
 import { useStore } from '@/store/useStore'
-import { Button } from '@/components/ui/button'
 import { ImageUploadError, prepareImageForCanvas } from '@/lib/imageUpload'
 
 const KonvaStage = dynamic(() => import('./KonvaStage'), { ssr: false })
 
 import type Konva from 'konva'
 
-export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<Konva.Stage | null> }) {
+interface PreviewCanvasProps {
+  stageRef: React.MutableRefObject<Konva.Stage | null>
+  isFocusMode?: boolean
+  onToggleFocus?: () => void
+  showDock?: boolean
+}
+
+interface PanOffset {
+  x: number
+  y: number
+}
+
+export function PreviewCanvas({ stageRef, isFocusMode = false, onToggleFocus, showDock = true }: PreviewCanvasProps) {
   const {
     images,
+    layoutPreset,
+    canvasRatio,
     zoom,
     setImageAt,
     setImageScale,
     setImagePosition,
+    setZoom,
   } = useStore(useShallow(state => ({
     images: state.images,
+    layoutPreset: state.layoutPreset,
+    canvasRatio: state.canvasRatio,
     zoom: state.zoom,
     setImageAt: state.setImageAt,
     setImageScale: state.setImageScale,
     setImagePosition: state.setImagePosition,
+    setZoom: state.setZoom,
   })))
   const t = useTranslations('ImageUploader')
+  const tPreview = useTranslations('CanvasPreview')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const dragDepthRef = useRef(0)
   const [isDragActive, setIsDragActive] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
+  const [isCanvasLoading, setIsCanvasLoading] = useState(true)
   const [uploadError, setUploadError] = useState<string | null>(null)
+  const [panOffset, setPanOffset] = useState<PanOffset>({ x: 0, y: 0 })
+  const [isSpacePressed, setIsSpacePressed] = useState(false)
+  const [isPanning, setIsPanning] = useState(false)
+  const viewportRef = useRef<HTMLDivElement>(null)
+  const panStartRef = useRef<{ pointerId: number; x: number; y: number; originX: number; originY: number } | null>(null)
   const hasImages = images.some(Boolean)
+
+  const handleCanvasLoadError = useCallback(() => {
+    setUploadError(t('uploadError'))
+  }, [t])
+
+  const handleFitToView = useCallback(() => {
+    setZoom(100)
+    setPanOffset({ x: 0, y: 0 })
+  }, [setZoom])
+
+  const handleViewportKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.code !== 'Space' || event.repeat) return
+    event.preventDefault()
+    setIsSpacePressed(true)
+  }
+
+  const handleViewportKeyUp = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.code !== 'Space') return
+    event.preventDefault()
+    setIsSpacePressed(false)
+  }
+
+  const handleViewportPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    const canPan = zoom > 100 && (event.button === 1 || (event.button === 0 && isSpacePressed))
+    if (!canPan) return
+
+    event.preventDefault()
+    event.stopPropagation()
+    event.currentTarget.setPointerCapture(event.pointerId)
+    viewportRef.current?.focus({ preventScroll: true })
+    panStartRef.current = {
+      pointerId: event.pointerId,
+      x: event.clientX,
+      y: event.clientY,
+      originX: panOffset.x,
+      originY: panOffset.y,
+    }
+    setIsPanning(true)
+  }
+
+  const handleViewportPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    const start = panStartRef.current
+    if (!start || start.pointerId !== event.pointerId) return
+
+    setPanOffset({
+      x: start.originX + event.clientX - start.x,
+      y: start.originY + event.clientY - start.y,
+    })
+  }
+
+  const finishPanning = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (panStartRef.current?.pointerId !== event.pointerId) return
+
+    panStartRef.current = null
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
+    setIsPanning(false)
+  }
+
+  const visiblePanOffset = zoom > 100 ? panOffset : { x: 0, y: 0 }
 
   const handleFiles = async (fileList: FileList | File[]) => {
     if (isUploading) return
@@ -104,11 +188,21 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
   }
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden bg-background">
-      <CanvasToolbar className="hidden md:flex" />
+    <div role="region" aria-label={tPreview('regionLabel')} className="flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden bg-background">
+      <h1 className="sr-only">{tPreview('editorTitle')}</h1>
 
       <div
-        className="app-backdrop relative flex min-h-0 flex-1 items-center justify-center overflow-hidden"
+        ref={viewportRef}
+        tabIndex={0}
+        aria-keyshortcuts="Space"
+        className={`app-backdrop relative flex min-h-0 flex-1 items-center justify-center overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring/70 ${isPanning ? 'cursor-grabbing' : isSpacePressed && zoom > 100 ? 'cursor-grab' : ''}`}
+        onKeyDown={handleViewportKeyDown}
+        onKeyUp={handleViewportKeyUp}
+        onBlur={() => setIsSpacePressed(false)}
+        onPointerDownCapture={handleViewportPointerDown}
+        onPointerMove={handleViewportPointerMove}
+        onPointerUp={finishPanning}
+        onPointerCancel={finishPanning}
         onDragEnter={(event) => {
           event.preventDefault()
           dragDepthRef.current += 1
@@ -125,43 +219,47 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
         }}
         onDrop={handleDrop}
       >
-        <div
-          className="flex size-full items-center justify-center transition-transform duration-200 motion-reduce:transition-none"
-          style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'center' }}
-        >
-          <KonvaStage stageRef={stageRef} />
-        </div>
+        {hasImages && (
+          <div
+            className="flex size-full items-center justify-center transition-transform duration-200 motion-reduce:transition-none"
+            style={{
+              transform: `translate3d(${visiblePanOffset.x}px, ${visiblePanOffset.y}px, 0) scale(${zoom / 100})`,
+              transformOrigin: 'center',
+            }}
+          >
+            <KonvaStage
+              stageRef={stageRef}
+              onLoadError={handleCanvasLoadError}
+              onLoadStateChange={setIsCanvasLoading}
+            />
+          </div>
+        )}
+
+        {hasImages && isCanvasLoading && (
+          <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center bg-background/55 backdrop-blur-[1px]">
+            <p role="status" className="inline-flex items-center gap-2 rounded-md bg-background/95 px-3 py-2 text-xs font-semibold text-foreground shadow-subtle">
+              <span aria-hidden="true" className="size-3 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-foreground motion-reduce:animate-none" />
+              {tPreview('loadingCanvas')}
+            </p>
+          </div>
+        )}
 
         {isDragActive && (
-          <div className="pointer-events-none absolute inset-5 z-20 flex items-center justify-center rounded-2xl border-2 border-dashed border-primary bg-sticky-note-mint/45 px-6 text-center backdrop-blur-[2px]">
+          <div className="pointer-events-none absolute inset-5 z-20 flex items-center justify-center rounded-2xl border-2 border-dashed border-primary bg-primary/5 px-6 text-center backdrop-blur-[2px]">
             <div>
-              <Upload className="mx-auto size-8 text-primary" />
+              <Upload aria-hidden="true" className="mx-auto size-8 text-primary" />
               <p className="mt-3 text-sm font-semibold text-primary">{t('dropActive')}</p>
             </div>
           </div>
         )}
 
         {!hasImages && !isDragActive && (
-          <div className="pointer-events-auto absolute inset-0 z-10 flex items-center justify-center bg-background/88 px-6 backdrop-blur-[2px]">
-            <div className="flex max-w-sm flex-col items-center rounded-2xl border border-dashed border-primary/25 bg-card/90 px-8 py-8 text-center shadow-subtle">
-              <div className="grid size-14 place-items-center rounded-xl bg-accent text-accent-foreground">
-                <ImagePlus className="size-6" />
-              </div>
-              <p className="mt-5 font-display text-lg font-bold tracking-[0.01em] text-foreground">{isUploading ? t('uploading') : t('dropTitle')}</p>
-              <p className="mt-2 text-sm leading-5 text-muted-foreground">{t('dropDescription')}</p>
-              <Button type="button" size="sm" className="mt-5 h-10 rounded-md px-4 text-xs" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
-                <Upload className="size-3.5" />
-                {isUploading ? t('uploading') : t('chooseFiles')}
-              </Button>
-              <span className="mt-4 editor-meta">{t('dropHint')}</span>
-              {uploadError && (
-                <p role="alert" className="mt-4 inline-flex items-start gap-1.5 text-left text-xs leading-4 text-destructive">
-                  <AlertCircle className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
-                  <span>{uploadError}</span>
-                </p>
-              )}
-            </div>
-          </div>
+          <EmptyFrameState
+            canvasRatio={canvasRatio}
+            isUploading={isUploading}
+            layoutPreset={layoutPreset}
+            uploadError={uploadError}
+          />
         )}
 
         {uploadError && hasImages && (
@@ -179,10 +277,20 @@ export function PreviewCanvas({ stageRef }: { stageRef: React.MutableRefObject<K
           accept="image/*"
           multiple
           onChange={handleFileInput}
-          className="sr-only"
-          aria-label={t('chooseFiles')}
+          className="hidden"
+          tabIndex={-1}
+          aria-hidden="true"
         />
       </div>
+
+      {hasImages && showDock && onToggleFocus && (
+        <CanvasDock
+          isFocusMode={isFocusMode}
+          onFitToView={handleFitToView}
+          onToggleFocus={onToggleFocus}
+          className="hidden md:flex"
+        />
+      )}
     </div>
   )
 }

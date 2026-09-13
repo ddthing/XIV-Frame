@@ -1,118 +1,85 @@
 'use client'
 
-import { useState } from 'react'
-import type { LucideIcon } from 'lucide-react'
-import { CloudCheck, Images, LayoutTemplate, Type } from 'lucide-react'
+import { ArrowRight, PanelLeftClose } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import type { EditorTab } from './EditorNavigation'
 import { ImageUploader } from './ImageUploader'
 import { LazyLayoutSettings, LazySignatureSettings } from './LazySettings'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { useStore } from '@/store/useStore'
 
-type SettingsTab = 'image' | 'signature' | 'layout'
-
-interface SettingsTabDefinition {
-  value: SettingsTab
-  label: string
-  role: string
+interface SettingsStepDefinition {
+  value: EditorTab
   title: string
-  description: string
-  icon: LucideIcon
 }
 
-export function SettingsPanel() {
-  const t = useTranslations('SettingsPanel')
-  const [activeTab, setActiveTab] = useState<SettingsTab>('image')
+interface SettingsPanelProps {
+  activeTab: EditorTab
+  onTabChange: (tab: EditorTab) => void
+  onToggleCollapse: () => void
+}
 
-  const tabs: SettingsTabDefinition[] = [
+export function SettingsPanel({ activeTab, onTabChange, onToggleCollapse }: SettingsPanelProps) {
+  const t = useTranslations('SettingsPanel')
+  const hasImages = useStore(state => state.images.some(Boolean))
+
+  const steps: SettingsStepDefinition[] = [
+    {
+      value: 'layout',
+      title: t('panelLayoutTitle'),
+    },
     {
       value: 'image',
-      label: t('tabImage'),
-      role: t('tabImageRole'),
       title: t('panelImageTitle'),
-      description: t('panelImageDescription'),
-      icon: Images,
     },
     {
       value: 'signature',
-      label: t('tabSignature'),
-      role: t('tabSignatureRole'),
       title: t('panelSignatureTitle'),
-      description: t('panelSignatureDescription'),
-      icon: Type,
-    },
-    {
-      value: 'layout',
-      label: t('tabLayout'),
-      role: t('tabLayoutRole'),
-      title: t('panelLayoutTitle'),
-      description: t('panelLayoutDescription'),
-      icon: LayoutTemplate,
     },
   ]
 
-  const currentTab = tabs.find(tab => tab.value === activeTab) ?? tabs[0]
+  const currentStep = steps.find(step => step.value === activeTab) ?? steps[0]
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-background">
-      <Tabs
-        value={activeTab}
-        onValueChange={(value) => value && setActiveTab(value as SettingsTab)}
-        className="flex h-full min-h-0 flex-col"
+    <div id="editor-settings" className="flex h-full min-h-0 flex-col bg-background">
+      <header className="flex h-10 shrink-0 items-center justify-end px-4">
+        <h2 id={`editor-panel-${activeTab}-heading`} className="sr-only">{currentStep.title}</h2>
+        <button
+          type="button"
+          aria-label={t('collapsePanel')}
+          title={t('collapsePanel')}
+          onClick={onToggleCollapse}
+          className="grid size-10 shrink-0 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-surface-inset hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+        >
+          <PanelLeftClose aria-hidden="true" className="size-4" />
+        </button>
+      </header>
+
+      <section
+        id={`editor-panel-${activeTab}`}
+        aria-labelledby={`editor-panel-${activeTab}-heading`}
+        className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar"
       >
-        <header className="shrink-0 border-b border-border bg-background px-5 pt-5">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <p className="editor-meta">{t('inspectorEyebrow')}</p>
-              <h2 className="mt-2 truncate font-display text-2xl font-bold tracking-[0.01em] text-foreground">{currentTab.title}</h2>
-            </div>
-            <span className="mt-1 shrink-0 rounded-full border border-border bg-surface-inset/70 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-              {currentTab.role}
-            </span>
-          </div>
-          <p className="mt-2 max-w-[31rem] font-body text-[13px] leading-5 text-muted-foreground">{currentTab.description}</p>
+        <div className="min-h-full space-y-6 px-5 pb-14 pt-1">
+          {activeTab === 'layout' && (
+            <LazyLayoutSettings idPrefix="desktop-layout" showContinue={false} />
+          )}
 
-          <div className="-mx-5 mt-4 overflow-hidden border-t border-border px-4 py-3">
-            <TabsList aria-label={t('flowLabel')} className="grid min-h-[78px] w-full grid-cols-3 gap-1.5 rounded-xl border border-border bg-surface-inset/70 p-1.5">
-              {tabs.map(({ value, label, role, icon: Icon }, index) => (
-                <TabsTrigger
-                  key={value}
-                  value={value}
-                  className="group min-h-[62px] min-w-0 items-center justify-start gap-2 rounded-lg border border-transparent bg-transparent px-2 py-2 text-left text-muted-foreground shadow-none transition-[background-color,border-color,box-shadow,color] hover:bg-background/70 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 after:!hidden data-[state=active]:border-primary/25 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-subtle data-active:border-primary/25 data-active:bg-card data-active:text-foreground data-active:shadow-subtle"
-                >
-                  <span className="mt-0.5 font-mono text-[10px] font-semibold tabular-nums text-muted-foreground/80">{String(index + 1).padStart(2, '0')}</span>
-                  <Icon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-                  <span className="flex min-w-0 flex-col items-start gap-0.5 leading-none">
-                    <strong className="text-[13px] font-semibold leading-4">{label}</strong>
-                    <small className="font-mono text-[10px] font-medium uppercase tracking-[0.05em] text-muted-foreground">{role}</small>
-                  </span>
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </div>
-        </header>
+          {activeTab === 'image' && <ImageUploader idPrefix="desktop-image" />}
 
-        <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
-          <div className="min-h-full space-y-6 p-5 pb-14">
-            <TabsContent value="image" className="mt-0 focus-visible:outline-none">
-              <ImageUploader />
-            </TabsContent>
-
-            <TabsContent value="signature" className="mt-0 focus-visible:outline-none">
-              <LazySignatureSettings />
-            </TabsContent>
-
-            <TabsContent value="layout" className="mt-0 focus-visible:outline-none">
-              <LazyLayoutSettings />
-            </TabsContent>
-          </div>
+          {activeTab === 'signature' && <LazySignatureSettings idPrefix="desktop-signature" />}
         </div>
+      </section>
 
-        <footer className="flex shrink-0 items-center justify-between border-t border-border px-5 py-3 text-[10px] text-muted-foreground">
-          <span className="inline-flex items-center gap-2 font-mono uppercase tracking-[0.08em]"><CloudCheck className="size-3.5 text-primary" />{t('savedLocally')}</span>
-          <span>{t('settingsPersisted')}</span>
+      {activeTab === 'image' && hasImages && (
+        <footer className="flex shrink-0 justify-end px-5 pb-4 pt-2">
+          <Button type="button" size="sm" className="h-9 rounded-md px-3 text-[11px]" onClick={() => onTabChange('signature')}>
+            {t('nextSignature')}
+            <ArrowRight className="size-3.5" aria-hidden="true" />
+          </Button>
         </footer>
-      </Tabs>
+      )}
     </div>
   )
 }

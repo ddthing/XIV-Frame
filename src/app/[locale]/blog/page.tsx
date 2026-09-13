@@ -8,7 +8,7 @@ import { locales } from '@/i18n/request'
 import { Metadata } from 'next'
 import { Download, ImagePlus, LayoutGrid, Type, WandSparkles } from 'lucide-react'
 import { GuideWorkflow } from '@/components/content/GuideWorkflow'
-import { localizedAlternates, localizedUrl } from '@/lib/site'
+import { localizedAlternates, localizedUrl, siteImagePath } from '@/lib/site'
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }))
@@ -35,13 +35,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       description,
       url: canonicalUrl,
       type: 'website',
-      images: ['/og-image.jpg'],
+      images: [siteImagePath],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: ['/og-image.jpg'],
+      images: [siteImagePath],
     },
   }
 }
@@ -59,9 +59,9 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
       href={`/${locale}/blog/${post.slug}`}
       className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-background"
     >
-      <article className={`flex flex-col rounded-xl border border-border p-5 shadow-subtle transition-[transform,box-shadow,border-color] duration-200 group-hover:-translate-y-1 group-hover:border-primary/40 group-hover:shadow-md sm:p-6 ${isFeatured ? 'bg-sticky-note-mint' : 'bg-card'}`}>
+      <article className={`flex flex-col rounded-xl border border-border p-5 shadow-subtle transition-[transform,box-shadow,border-color] duration-200 group-hover:-translate-y-1 group-hover:border-primary/40 group-hover:shadow-md sm:p-6 ${isFeatured ? 'bg-muted' : 'bg-card'}`}>
         <div className="flex items-center justify-between gap-3">
-          <p className="editor-meta">{isFeatured ? 'FEATURED' : `GUIDE ${String(index + 1).padStart(2, '0')}`}</p>
+          <p className="editor-meta">{isFeatured ? t('featuredLabel') : `${t('guideLabel')} ${String(index + 1).padStart(2, '0')}`}</p>
           <time dateTime={post.metadata.date} className="font-body text-xs font-medium text-muted-foreground">
             {new Date(post.metadata.date).toLocaleDateString(locale)}
           </time>
@@ -83,23 +83,23 @@ export default async function BlogIndexPage({ params }: { params: Promise<{ loca
   return (
     <ContentPage eyebrow="03 / GUIDE" title={t('title')} description={t('description')} size="lg" density="editor">
       <GuideWorkflow
-        eyebrow="START HERE"
+        eyebrow={t('startHere')}
         title={t('flowTitle')}
         description={t('flowDescription')}
         steps={[
           {
             number: '01',
-            label: t('flowStepUpload'),
-            description: t('flowStepUploadDescription'),
-            href: `/${locale}/blog/how-to-combine-ffxiv-screenshots`,
-            icon: ImagePlus,
-          },
-          {
-            number: '02',
             label: t('flowStepArrange'),
             description: t('flowStepArrangeDescription'),
             href: `/${locale}/blog/how-to-combine-ffxiv-screenshots`,
             icon: LayoutGrid,
+          },
+          {
+            number: '02',
+            label: t('flowStepUpload'),
+            description: t('flowStepUploadDescription'),
+            href: `/${locale}/blog/how-to-combine-ffxiv-screenshots`,
+            icon: ImagePlus,
           },
           {
             number: '03',

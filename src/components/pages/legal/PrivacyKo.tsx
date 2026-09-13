@@ -1,4 +1,5 @@
 import { DocumentPage } from '@/components/content/DocumentPage'
+import { ExternalLink } from '@/components/content/ExternalLink'
 import Link from 'next/link'
 
 export function PrivacyKo() {
@@ -9,6 +10,7 @@ export function PrivacyKo() {
       description="XIV Frame이 편집 이미지, 브라우저 설정, 광고 관련 정보를 어떻게 다루는지 설명합니다."
       updatedLabel="시행일"
       updated="2026년 8월 13일"
+      updatedDateTime="2026-08-13"
       asideLabel="목차"
       sections={[
         {
@@ -51,7 +53,7 @@ export function PrivacyKo() {
           children: (
             <>
               <p>사이트는 Google AdSense 또는 Google의 광고 태그를 사용할 수 있습니다. 광고가 요청되면 Google과 인증된 제3자 광고 제공자가 쿠키, 웹 비콘, IP 주소 또는 유사 기술을 사용해 광고를 제공·측정할 수 있습니다.</p>
-              <p>Google의 광고 쿠키 사용에 관한 안내는 <a href="https://support.google.com/adsense/answer/1348695" target="_blank" rel="noopener noreferrer">AdSense 필수 콘텐츠 안내</a>에서 확인할 수 있습니다. 개인 맞춤 광고는 <a href="https://adssettings.google.com/" target="_blank" rel="noopener noreferrer">Google 광고 설정</a>에서 관리할 수 있으며, 일부 제3자 광고 쿠키는 <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer">About Ads 선택 페이지</a>에서 거부할 수 있습니다.</p>
+              <p>Google의 광고 쿠키 사용에 관한 안내는 <ExternalLink href="https://support.google.com/adsense/answer/1348695" newWindowLabel="새 탭에서 열림">AdSense 필수 콘텐츠 안내</ExternalLink>에서 확인할 수 있습니다. 개인 맞춤 광고는 <ExternalLink href="https://adssettings.google.com/" newWindowLabel="새 탭에서 열림">Google 광고 설정</ExternalLink>에서 관리할 수 있으며, 일부 제3자 광고 쿠키는 <ExternalLink href="https://www.aboutads.info/choices/" newWindowLabel="새 탭에서 열림">About Ads 선택 페이지</ExternalLink>에서 거부할 수 있습니다.</p>
               <p>광고가 표시되는 지역에서는 관련 법령과 Google의 동의 요구사항에 따라 동의 관리 도구가 적용될 수 있습니다. 광고를 클릭하도록 유도하거나 광고를 메뉴·다운로드 버튼처럼 보이게 만들지 않습니다.</p>
             </>
           ),

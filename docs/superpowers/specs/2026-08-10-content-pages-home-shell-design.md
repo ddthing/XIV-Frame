@@ -1,5 +1,10 @@
 # Content pages home-shell design
 
+> Status: superseded. This historical design note is retained for traceability;
+> the current visual contract is [DESIGN.md](../../../DESIGN.md). The former
+> cream/green/yellow palette and Terrarum UI direction were replaced by the
+> neutral studio system and Pretendard UI font now used by the application.
+
 ## Goal
 
 Extend the editor home screen's visual language across the guide, about, contact, privacy, and terms pages without changing their copy, links, localization routing, metadata intent, or editor state.

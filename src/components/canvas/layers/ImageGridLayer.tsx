@@ -2,6 +2,7 @@ import React from 'react'
 import { Layer, Group, Image as KonvaImage, Rect } from 'react-konva'
 import { useTranslations } from 'next-intl'
 import { useStore } from '@/store/useStore'
+import { useShallow } from 'zustand/react/shallow'
 import { ImageUploadError, prepareImageForCanvas, revokeObjectUrl } from '@/lib/imageUpload'
 import type Konva from 'konva'
 
@@ -26,13 +27,23 @@ function ImageGridLayerComponent({
   blendWidth?: number,
   layoutPreset?: string
 }) {
-  const imagePositions = useStore(state => state.imagePositions)
-  const imageScales = useStore(state => state.imageScales)
-  const imageUrls = useStore(state => state.images)
-  const isImageLocked = useStore(state => state.isImageLocked)
-  const setImagePosition = useStore(state => state.setImagePosition)
-  const setImageAt = useStore(state => state.setImageAt)
-  const setImageScale = useStore(state => state.setImageScale)
+  const {
+    imagePositions,
+    imageScales,
+    imageUrls,
+    isImageLocked,
+    setImagePosition,
+    setImageAt,
+    setImageScale,
+  } = useStore(useShallow(state => ({
+    imagePositions: state.imagePositions,
+    imageScales: state.imageScales,
+    imageUrls: state.images,
+    isImageLocked: state.isImageLocked,
+    setImagePosition: state.setImagePosition,
+    setImageAt: state.setImageAt,
+    setImageScale: state.setImageScale,
+  })))
   const t = useTranslations('ImageUploader')
 
   const isShiftPressed = React.useRef(false)
@@ -121,9 +132,7 @@ function ImageGridLayerComponent({
     itemHeight = contentHeight
   }
 
-  return (
-    <>
-      {images.map((img, index) => {
+  const imageNodes = images.map((img, index) => {
         let xPos = 0
         let yPos = 0
         
@@ -151,17 +160,16 @@ function ImageGridLayerComponent({
         const savedPos = imagePositions[index] || { x: 0, y: 0 }
         
         return (
-          <Layer key={index}>
+          <Group key={index}
+            x={borderWidth + xPos}
+            y={borderWidth + yPos}
+          >
             <Group
-              x={borderWidth + xPos}
-              y={borderWidth + yPos}
+              clipX={0}
+              clipY={0}
+              clipWidth={itemWidth}
+              clipHeight={itemHeight}
             >
-              <Group
-                clipX={0}
-                clipY={0}
-                clipWidth={itemWidth}
-                clipHeight={itemHeight}
-              >
               <KonvaImage
                 image={img}
                 draggable={!isImageLocked}
@@ -277,12 +285,18 @@ function ImageGridLayerComponent({
                 )}
               </>
             )}
-            </Group>
-          </Layer>
+          </Group>
         )
-      })}
-    </>
-  )
+      })
+
+  // A blend mask uses destination-in, so each image must keep its own layer.
+  // In the default mode there is no compositing boundary to preserve; one
+  // shared layer avoids creating a layer per image as the canvas grows.
+  if (isSoftBlend && blendWidth > 0) {
+    return <>{imageNodes.map((node, index) => <Layer key={index}>{node}</Layer>)}</>
+  }
+
+  return <Layer>{imageNodes}</Layer>
 }
 
 export const ImageGridLayer = React.memo(ImageGridLayerComponent)

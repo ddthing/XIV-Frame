@@ -12,7 +12,13 @@ import { NoiseLayer } from './layers/NoiseLayer'
 
 import type Konva from 'konva'
 
-export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Konva.Stage | null> }) {
+interface KonvaStageProps {
+  stageRef: React.RefObject<Konva.Stage | null>
+  onLoadError?: () => void
+  onLoadStateChange?: (isLoading: boolean) => void
+}
+
+export default function KonvaStage({ stageRef, onLoadError, onLoadStateChange }: KonvaStageProps) {
   const {
     images, layoutPreset, imageGap, imageTransition, blendWidth, canvasRatio,
     borderWidth, backgroundColor, grainIntensity
@@ -38,7 +44,9 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
     const imgInstances: HTMLImageElement[] = []
     
     const loadImages = async () => {
-      const promises = images.map(url => {
+      const validImages = images.filter((url): url is string => Boolean(url))
+      onLoadStateChange?.(true)
+      const promises = validImages.map(url => {
         return new Promise<HTMLImageElement>((resolve, reject) => {
           const img = new window.Image()
           imgInstances.push(img)
@@ -50,9 +58,16 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
       
       try {
         const loaded = await Promise.all(promises)
-        if (active) setImagesData(loaded)
-      } catch (e) {
-        console.error('Failed to load image', e)
+        if (active) {
+          setImagesData(loaded)
+          onLoadStateChange?.(false)
+        }
+      } catch {
+        if (active) {
+          setImagesData([])
+          onLoadStateChange?.(false)
+          onLoadError?.()
+        }
       }
     }
     loadImages()
@@ -64,7 +79,7 @@ export default function KonvaStage({ stageRef }: { stageRef: React.RefObject<Kon
         img.src = ''
       })
     }
-  }, [images])
+  }, [images, onLoadError, onLoadStateChange])
 
   useEffect(() => {
     const updateSize = () => {

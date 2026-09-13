@@ -1,37 +1,37 @@
 ---
 title: "Build an FFXIV Glamour Showcase: Front, Back, and Detail in One Image"
-description: "Arrange three or four GPose screenshots in a grid, correct each crop, add a restrained signature, and export a polished showcase PNG."
+description: "Choose the layout first, fill a grid with three or four GPose screenshots, tune each crop and signature, and export a polished showcase PNG."
 date: "2026-06-03"
 tags: ["ffxiv", "glamour", "tutorial"]
 ---
 
 A useful glamour board gives every image a job. The example below uses a front view, a back or side view, a full-body pose, and a close-up detail so the outfit can be understood at a glance.
 
-## 1. Choose the four roles
+## 1. Choose the layout and the four roles
 
-1. Use the first image for the strongest full-body or hero pose.
-2. Use the second image for the back, side, or silhouette.
-3. Use the third image for a face, weapon, accessory, or dye detail.
-4. Use the fourth image for another pose or a detail that would otherwise be missed.
-5. Remove shots with very different lighting or framing before you start arranging them.
+1. Open **Layout** on desktop or the mobile **Layout** menu and choose **Grid** first.
+2. Use the first image for the strongest full-body or hero pose.
+3. Use the second image for the back, side, or silhouette.
+4. Use the third image for a face, weapon, accessory, or dye detail.
+5. Use the fourth image for another pose or a detail that would otherwise be missed.
+6. Remove shots with very different lighting or framing before you start arranging them.
 
 ## 2. Upload in viewing order
 
-1. Open **Image source** on desktop or **Photo** on mobile.
+1. Open **Photo** and add your images in display order.
 2. Upload the hero image first, then the alternate view and detail shots.
 3. You can use up to four images, with a 50MB limit for each file. Larger originals are optimized in the browser after upload.
-4. Use **Swap Order** or the card movement controls if the story of the images is not clear.
+4. Use the card order controls to move an image one position at a time if the sequence needs work.
 
-## 3. Choose the layout
+## 3. Check the layout after uploading
 
-1. Open **Layout** on desktop or the mobile **Layout** sheet.
-2. Choose **Grid** when you have three or four images and want a compact board.
-3. Choose **Split** or **Vertical** when you have only two images. Grid requires at least three images.
-4. Recheck the crop after changing the layout because each image receives a new frame area.
+1. With three or four images, confirm that **Grid** gives you the compact board you want.
+2. Choose **Split** or **Vertical** when you have only two images. Grid requires at least three images.
+3. Recheck the crop after changing the layout because each image receives a new frame area.
 
 ## 4. Set the ratio
 
-1. Start with **Auto** to inspect the natural composition.
+1. On desktop, open **Layout** and start with **Auto** to inspect the natural composition.
 2. Choose **16:9** for a familiar wide showcase canvas.
 3. Choose **2:1** for a long banner-like result.
 4. On mobile, use **Export → Ratio Settings**. The export ratio is separate from preview zoom.
@@ -67,4 +67,4 @@ A useful glamour board gives every image a job. The example below uses a front v
 - Are the name, server, and logo separate from the main subject?
 - Is the text contrast strong enough at the size where you will post it?
 
-When the checklist is clear, click **Save PNG** on desktop or **Export → Save Photo** on mobile.
+When the checklist is clear, click **Save PNG** on desktop or **Export → Save PNG** on mobile.

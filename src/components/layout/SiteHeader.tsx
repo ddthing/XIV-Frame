@@ -24,13 +24,13 @@ export function SiteHeader({ locale, hideBorder = false, className = '' }: { loc
     <div className="sticky top-0 z-50 w-full">
       <header className={`app-header border-b bg-primary text-primary-foreground ${hideBorder ? 'border-transparent' : 'border-primary-foreground/15'} transition-colors ${className}`}>
         <div className="app-header-inner mx-auto w-full justify-between gap-6 px-4 sm:px-5">
-          <Link href={`/${locale}`} className="shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sticky-note-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-primary">
+          <Link href={`/${locale}`} className="shrink-0 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary">
             <Logo size="md" inverse />
           </Link>
 
-          <nav className="hidden items-center gap-1 md:flex" aria-label="Primary navigation">
+          <nav className="hidden items-center gap-1 md:flex" aria-label={t('primaryNavigation')}>
             {navLinks.map((link) => (
-              <Link key={link.href} href={link.href} className={`rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-primary-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sticky-note-yellow ${pathname === link.href || pathname.startsWith(`${link.href}/`) ? 'bg-primary-foreground/12 text-primary-foreground' : 'text-primary-foreground/70'}`}>
+              <Link key={link.href} href={link.href} aria-current={pathname === link.href || pathname.startsWith(`${link.href}/`) ? 'page' : undefined} className={`rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-primary-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground ${pathname === link.href || pathname.startsWith(`${link.href}/`) ? 'bg-primary-foreground/12 text-primary-foreground' : 'text-primary-foreground/70'}`}>
                 {link.label}
               </Link>
             ))}
@@ -40,11 +40,11 @@ export function SiteHeader({ locale, hideBorder = false, className = '' }: { loc
             <div className="hidden sm:block">
               <LanguageSwitcher inverse />
             </div>
-            <Link href={`/${locale}`} className="hidden items-center gap-1 rounded-md bg-sticky-note-yellow px-3 py-2 text-sm font-bold text-primary transition-transform hover:-translate-y-0.5 hover:bg-sticky-note-yellow/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sticky-note-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-primary md:inline-flex">
+            <Link href={`/${locale}`} className="hidden items-center gap-1 rounded-md bg-primary-foreground px-3 py-2 text-sm font-bold text-primary transition-transform hover:-translate-y-0.5 hover:bg-primary-foreground/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary md:inline-flex">
               {t('app')}
               <ArrowUpRight size={15} aria-hidden="true" />
             </Link>
-            <button type="button" className="rounded-md p-2 text-primary-foreground transition-colors hover:bg-primary-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sticky-note-yellow md:hidden" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-label="Toggle mobile menu" aria-expanded={isMobileMenuOpen}>
+            <button type="button" className="rounded-md p-2 text-primary-foreground transition-colors hover:bg-primary-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground md:hidden" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-label={isMobileMenuOpen ? t('closeMenu') : t('openMenu')} aria-expanded={isMobileMenuOpen} aria-controls="site-mobile-navigation">
               {isMobileMenuOpen ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
             </button>
           </div>
@@ -52,16 +52,16 @@ export function SiteHeader({ locale, hideBorder = false, className = '' }: { loc
 
         {isMobileMenuOpen && (
         <div className="border-t border-primary-foreground/15 bg-primary px-4 py-4 md:hidden">
-          <nav className="mx-auto flex max-w-6xl flex-col gap-1" aria-label="Mobile navigation">
+          <nav id="site-mobile-navigation" className="mx-auto flex max-w-6xl flex-col gap-1" aria-label={t('mobileNavigation')}>
             {navLinks.map((link) => (
-              <Link key={link.href} href={link.href} className={`rounded-md px-3 py-3 text-sm font-medium transition-colors hover:bg-primary-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sticky-note-yellow ${pathname === link.href || pathname.startsWith(`${link.href}/`) ? 'bg-primary-foreground/12 text-primary-foreground' : 'text-primary-foreground/70'}`} onClick={() => setIsMobileMenuOpen(false)}>
+              <Link key={link.href} href={link.href} aria-current={pathname === link.href || pathname.startsWith(`${link.href}/`) ? 'page' : undefined} className={`rounded-md px-3 py-3 text-sm font-medium transition-colors hover:bg-primary-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground ${pathname === link.href || pathname.startsWith(`${link.href}/`) ? 'bg-primary-foreground/12 text-primary-foreground' : 'text-primary-foreground/70'}`} onClick={() => setIsMobileMenuOpen(false)}>
                 {link.label}
               </Link>
             ))}
           </nav>
           <div className="mx-auto mt-3 flex max-w-6xl items-center justify-between gap-3 border-t border-primary-foreground/15 pt-3">
             <LanguageSwitcher inverse />
-            <Link href={`/${locale}`} className="inline-flex items-center gap-1 rounded-md bg-sticky-note-yellow px-3 py-2 text-sm font-bold text-primary hover:bg-sticky-note-yellow/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sticky-note-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-primary" onClick={() => setIsMobileMenuOpen(false)}>
+            <Link href={`/${locale}`} className="inline-flex items-center gap-1 rounded-md bg-primary-foreground px-3 py-2 text-sm font-bold text-primary hover:bg-primary-foreground/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary" onClick={() => setIsMobileMenuOpen(false)}>
               {t('app')}
               <ArrowUpRight size={15} aria-hidden="true" />
             </Link>

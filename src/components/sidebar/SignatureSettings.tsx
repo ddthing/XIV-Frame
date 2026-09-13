@@ -1,39 +1,44 @@
 import { ImagePlus, Type } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
-import { Tabs, TabsContent } from '@/components/ui/tabs'
-import { SketchbookTabsList, SketchbookTabsTrigger } from '@/components/ui/SketchbookTabs'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { CopyrightSettings } from './signature/CopyrightSettings'
 import { LogoUploadArea } from './signature/LogoUploadArea'
 import { TextSettingsGroup } from './signature/TextSettingsGroup'
 
-export function SignatureSettings() {
+export function SignatureSettings({ idPrefix = 'signature' }: { idPrefix?: string }) {
   const t = useTranslations('SignatureSettings')
 
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="text" className="w-full">
-        <SketchbookTabsList className="h-11">
-          <SketchbookTabsTrigger value="text" className="gap-2">
-            <Type className="size-3.5" aria-hidden="true" />
-            {t('tabText')}
-          </SketchbookTabsTrigger>
-          <SketchbookTabsTrigger value="logo" className="gap-2">
-            <ImagePlus className="size-3.5" aria-hidden="true" />
-            {t('tabLogo')}
-          </SketchbookTabsTrigger>
-        </SketchbookTabsList>
+      <Accordion multiple defaultValue={['text']} className="gap-1" aria-label={t('sheetTitle')}>
+        <AccordionItem value="text">
+          <AccordionTrigger className="min-h-12 py-3 hover:no-underline">
+            <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              <Type className="size-4 text-muted-foreground" aria-hidden="true" />
+              {t('tabText')}
+            </span>
+          </AccordionTrigger>
+          <AccordionContent className="pb-4">
+            <div className="space-y-4">
+              <TextSettingsGroup idPrefix={`${idPrefix}-text`} />
+              <CopyrightSettings />
+            </div>
+          </AccordionContent>
+        </AccordionItem>
 
-        <TabsContent value="text" className="mt-5 space-y-4 focus-visible:outline-none">
-          <TextSettingsGroup />
-          <CopyrightSettings />
-        </TabsContent>
-
-        <TabsContent value="logo" className="mt-5 space-y-4 focus-visible:outline-none">
-          <LogoUploadArea />
-        </TabsContent>
-
-      </Tabs>
+        <AccordionItem value="logo">
+          <AccordionTrigger className="min-h-12 py-3 hover:no-underline">
+            <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              <ImagePlus className="size-4 text-muted-foreground" aria-hidden="true" />
+              {t('tabLogo')}
+            </span>
+          </AccordionTrigger>
+          <AccordionContent className="pb-4">
+            <LogoUploadArea idPrefix={`${idPrefix}-logo`} />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
 
     </div>
   )

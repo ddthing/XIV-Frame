@@ -1,4 +1,5 @@
 import { DocumentPage } from '@/components/content/DocumentPage'
+import { ExternalLink } from '@/components/content/ExternalLink'
 import Link from 'next/link'
 
 export function PrivacyJa() {
@@ -9,6 +10,7 @@ export function PrivacyJa() {
       description="編集画像、ブラウザ設定、技術的なリクエスト、広告に関する情報の扱いを説明します。"
       updatedLabel="施行日"
       updated="2026年8月13日"
+      updatedDateTime="2026-08-13"
       asideLabel="目次"
       sections={[
         {
@@ -51,7 +53,7 @@ export function PrivacyJa() {
           children: (
             <>
               <p>サイトではGoogle AdSenseまたはGoogleの広告タグを使用する場合があります。広告リクエストが行われると、Googleおよび認定された第三者広告提供者が、広告の配信・測定のためにCookie、ウェブビーコン、IPアドレスなどを利用する場合があります。</p>
-              <p>広告Cookieについては<a href="https://support.google.com/adsense/answer/1348695" target="_blank" rel="noopener noreferrer">AdSenseの必須コンテンツに関する案内</a>を確認できます。パーソナライズド広告は<a href="https://adssettings.google.com/" target="_blank" rel="noopener noreferrer">Google広告設定</a>で管理でき、一部の第三者広告Cookieは<a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer">About Adsの選択ページ</a>から拒否できます。</p>
+              <p>広告Cookieについては<ExternalLink href="https://support.google.com/adsense/answer/1348695" newWindowLabel="新しいタブで開きます">AdSenseの必須コンテンツに関する案内</ExternalLink>を確認できます。パーソナライズド広告は<ExternalLink href="https://adssettings.google.com/" newWindowLabel="新しいタブで開きます">Google広告設定</ExternalLink>で管理でき、一部の第三者広告Cookieは<ExternalLink href="https://www.aboutads.info/choices/" newWindowLabel="新しいタブで開きます">About Adsの選択ページ</ExternalLink>から拒否できます。</p>
               <p>必要な地域では、適用法令とGoogleの同意要件に従って同意管理画面を使用する場合があります。広告のクリックを促したり、広告をナビゲーションやダウンロードボタンに見せたりすることはありません。</p>
             </>
           ),

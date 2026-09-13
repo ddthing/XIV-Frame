@@ -17,7 +17,7 @@ XIV Frame treats a logo as an overlay layer. A transparent PNG is the best choic
 
 1. Upload a screenshot first so the result is visible.
 2. Open **Signature** on desktop or **Signature** in the mobile bottom navigation.
-3. Select the **Logo Upload** tab.
+3. Expand **Logo Upload**.
 4. Click **Upload Logo Image** and choose the file.
 5. If the file cannot be read, choose a PNG or JPG again and check that the logo file is 10MB or smaller.
 
@@ -49,5 +49,5 @@ XIV Frame treats a logo as an overlay layer. A transparent PNG is the best choic
 ## 7. Export
 
 1. Check the logo edge, transparency, and overlap with the subject.
-2. Click **Save PNG** on desktop or use **Export → Save Photo** on mobile.
+2. Click **Save PNG** on desktop or use **Export → Save PNG** on mobile.
 3. If you chose a transparent canvas background, inspect the downloaded PNG to confirm that the area outside the composition remains transparent.

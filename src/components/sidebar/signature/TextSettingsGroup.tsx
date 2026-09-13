@@ -10,7 +10,7 @@ import { PositionGrid } from '@/components/ui/PositionGrid'
 import { AlignGroup } from '@/components/ui/AlignGroup'
 import { DEFAULT_SIGNATURE_FONT, FONT_MAP, POSITION_OPTIONS } from '@/constants/signature'
 
-export function TextSettingsGroup() {
+export function TextSettingsGroup({ idPrefix = 'signature-text' }: { idPrefix?: string }) {
   const {
     characterName, setCharacterName,
     serverName, setServerName,
@@ -57,38 +57,44 @@ export function TextSettingsGroup() {
     setSignatureOpacity: state.setSignatureOpacity
   })))
   const t = useTranslations('SignatureSettings')
+  const controlId = (name: string) => `${idPrefix}-${name}`
 
   return (
     <div className="space-y-4 font-sans">
-      <TextOptionControl
-        label={t('upperText')}
-        placeholder="Name"
-        value={characterName}
-        onChangeValue={setCharacterName}
-        bold={upperBold}
-        onChangeBold={setUpperBold}
-        italic={upperItalic}
-        onChangeItalic={setUpperItalic}
-        letterSpacing={upperLetterSpacing}
-        onChangeLetterSpacing={setUpperLetterSpacing}
-      />
+      <div className="rounded-xl bg-muted/35 p-3 sm:p-4">
+        <div className="space-y-5">
+          <TextOptionControl
+            label={t('upperText')}
+            placeholder={t('charNamePlaceholder')}
+            value={characterName}
+            onChangeValue={setCharacterName}
+            bold={upperBold}
+            onChangeBold={setUpperBold}
+            italic={upperItalic}
+            onChangeItalic={setUpperItalic}
+            letterSpacing={upperLetterSpacing}
+            onChangeLetterSpacing={setUpperLetterSpacing}
+            idPrefix={controlId('upper')}
+          />
+          <TextOptionControl
+            label={t('lowerText')}
+            placeholder={t('serverNamePlaceholder')}
+            value={serverName}
+            onChangeValue={setServerName}
+            bold={lowerBold}
+            onChangeBold={setLowerBold}
+            italic={lowerItalic}
+            onChangeItalic={setLowerItalic}
+            letterSpacing={lowerLetterSpacing}
+            onChangeLetterSpacing={setLowerLetterSpacing}
+            idPrefix={controlId('lower')}
+          />
+        </div>
+      </div>
 
-      <TextOptionControl
-        label={t('lowerText')}
-        placeholder="FINAL FANTASY XIV"
-        value={serverName}
-        onChangeValue={setServerName}
-        bold={lowerBold}
-        onChangeBold={setLowerBold}
-        italic={lowerItalic}
-        onChangeItalic={setLowerItalic}
-        letterSpacing={lowerLetterSpacing}
-        onChangeLetterSpacing={setLowerLetterSpacing}
-      />
-
-      <div className="space-y-5 border-t border-border pt-5">
+      <div className="space-y-5">
         <div className="space-y-2">
-          <Label className="block text-xs font-semibold text-foreground">{t('position')}</Label>
+          <span className="block text-xs font-semibold text-foreground">{t('position')}</span>
           <PositionGrid
             value={signaturePosition}
             options={POSITION_OPTIONS}
@@ -97,14 +103,14 @@ export function TextSettingsGroup() {
         </div>
 
         <div className="space-y-2">
-          <Label className="block text-xs font-semibold text-foreground">{t('align')}</Label>
+          <span className="block text-xs font-semibold text-foreground">{t('align')}</span>
           <AlignGroup value={signatureAlign} onChange={setSignatureAlign} />
         </div>
 
         <div className="space-y-2">
-          <Label className="block text-xs font-semibold text-foreground">{t('font')}</Label>
+          <Label htmlFor={controlId('font')} className="block text-xs font-semibold text-foreground">{t('font')}</Label>
           <Select value={fontFamily} onValueChange={(val) => val && setFontFamily(val)}>
-            <SelectTrigger className="h-10 w-full rounded-md border-border bg-background text-sm focus-visible:border-primary focus-visible:ring-primary">
+            <SelectTrigger id={controlId('font')} className="h-10 w-full rounded-md border-border bg-background text-sm focus-visible:border-primary focus-visible:ring-primary">
               <span className="flex flex-1 text-left truncate">{FONT_MAP[fontFamily]}</span>
             </SelectTrigger>
             <SelectContent className="rounded-xl">
@@ -126,9 +132,10 @@ export function TextSettingsGroup() {
         </div>
 
         <div className="space-y-2">
-          <EditorFieldHeader label={t('size')} value={`${signatureSize}%`} htmlFor="signature-size" />
+          <EditorFieldHeader label={t('size')} value={`${signatureSize}%`} htmlFor={controlId('size')} />
           <Slider 
-            id="signature-size"
+            id={controlId('size')}
+            aria-label={t('size')}
             value={[signatureSize]} 
             onValueChange={(vals) => setSignatureSize(Array.isArray(vals) ? vals[0] : vals)} 
             min={50} max={200} step={1} 
@@ -136,9 +143,10 @@ export function TextSettingsGroup() {
         </div>
 
         <div className="space-y-2">
-          <Label className="block text-xs font-semibold text-foreground">{t('color')}</Label>
+          <Label htmlFor={controlId('color')} className="block text-xs font-semibold text-foreground">{t('color')}</Label>
           <div className="relative h-10 w-full cursor-pointer overflow-hidden rounded-md border border-border bg-background shadow-subtle transition-shadow focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-1">
             <input 
+              id={controlId('color')}
               type="color" 
               aria-label={t('color')}
               value={signatureColor} 
@@ -149,9 +157,10 @@ export function TextSettingsGroup() {
         </div>
 
         <div className="space-y-2">
-          <EditorFieldHeader label={t('opacity')} value={`${signatureOpacity}%`} htmlFor="signature-opacity" />
+          <EditorFieldHeader label={t('opacity')} value={`${signatureOpacity}%`} htmlFor={controlId('opacity')} />
           <Slider 
-            id="signature-opacity"
+            id={controlId('opacity')}
+            aria-label={t('opacity')}
             value={[signatureOpacity]} 
             onValueChange={(vals) => setSignatureOpacity(Array.isArray(vals) ? vals[0] : vals)} 
             min={0} max={100} step={1} 

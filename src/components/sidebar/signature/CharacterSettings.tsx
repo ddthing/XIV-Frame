@@ -6,6 +6,10 @@ import { useEffect, useRef, useState, type ChangeEvent, type PointerEvent } from
 import { useTranslations } from 'next-intl'
 import { useShallow } from 'zustand/react/shallow'
 import {
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
   Brush,
   Eraser,
   FlipHorizontal,
@@ -27,6 +31,7 @@ import { ImageUploadError } from '@/lib/imageUpload'
 import { useStore } from '@/store/useStore'
 
 const MAX_UNDO_STEPS = 8
+const CHARACTER_NUDGE_STEP = 10
 
 type BrushMode = 'erase' | 'restore'
 type PixelState = { data: Uint8ClampedArray; width: number; height: number }
@@ -52,7 +57,7 @@ function drawPixelsRegion(canvas: HTMLCanvasElement | null, pixels: PixelState, 
   context.putImageData(imageData, 0, 0, x, y, width, height)
 }
 
-export function CharacterSettings() {
+export function CharacterSettings({ idPrefix = 'character' }: { idPrefix?: string }) {
   const {
     characterSourceUrl,
     setCharacterSourceUrl,
@@ -103,6 +108,12 @@ export function CharacterSettings() {
   const [progress, setProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [undoCount, setUndoCount] = useState(0)
+  const controlId = (name: string) => `${idPrefix}-${name}`
+  const fileInputId = controlId('file-input')
+
+  const nudgeCharacter = (dx: number, dy: number) => {
+    window.dispatchEvent(new CustomEvent('xiv-frame:nudge-character', { detail: { dx, dy } }))
+  }
 
   useEffect(() => {
     if (!editorOpen) return
@@ -207,9 +218,8 @@ export function CharacterSettings() {
       setCharacterCutoutUrl(imageDataToDataUrl(result.data, result.width, result.height))
       setCharacterPosition(null)
       setEditorOpen(true)
-    } catch (cause) {
+    } catch {
       if (requestId !== processingRequestRef.current) return
-      console.error('Background removal failed', cause)
       setError(t('characterProcessingError'))
     } finally {
       if (requestId === processingRequestRef.current) {
@@ -344,7 +354,7 @@ export function CharacterSettings() {
     <div className="space-y-6 font-sans">
       <EditorSection title={t('characterTitle')} description={t('characterDescription')}>
         <div className="space-y-4">
-          <div className="rounded-xl border border-primary/15 bg-sticky-note-mint/35 px-4 py-3">
+          <div className="rounded-xl border border-border bg-muted/60 px-4 py-3">
             <div className="flex gap-3">
               <span className="grid size-8 shrink-0 place-items-center rounded-md bg-card text-primary shadow-subtle">
                 <WandSparkles className="size-4" aria-hidden="true" />
@@ -357,15 +367,15 @@ export function CharacterSettings() {
           </div>
 
           {!sourcePreview ? (
-            <label htmlFor="character-file-input" className="relative flex min-h-20 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-primary/25 bg-card px-4 text-center transition-colors hover:bg-surface-inset/70 focus-within:ring-2 focus-within:ring-ring/50">
+            <label htmlFor={fileInputId} className="relative flex min-h-20 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-primary/25 bg-card px-4 text-center transition-colors hover:bg-surface-inset/70 focus-within:ring-2 focus-within:ring-ring/50">
               <span className="grid size-8 place-items-center rounded-md bg-surface-inset text-foreground"><Upload className="size-3.5" aria-hidden="true" /></span>
               <span className="text-xs font-semibold text-foreground">{t('characterUploadLabel')}</span>
               <span className="font-body text-[11px] text-muted-foreground">{t('characterUploadHint')}</span>
-              <input ref={fileInputRef} id="character-file-input" type="file" accept="image/*" onChange={handleFileChange} className="absolute inset-0 z-10 size-full cursor-pointer opacity-0" aria-label={t('characterUploadLabel')} />
+              <input ref={fileInputRef} id={fileInputId} type="file" accept="image/*" onChange={handleFileChange} className="absolute inset-0 z-10 size-full cursor-pointer opacity-0" aria-label={t('characterUploadLabel')} />
             </label>
           ) : (
             <div className="space-y-3">
-              <input ref={fileInputRef} id="character-file-input" type="file" accept="image/*" onChange={handleFileChange} className="sr-only" aria-label={t('characterUploadLabel')} />
+              <input ref={fileInputRef} id={fileInputId} type="file" accept="image/*" onChange={handleFileChange} className="sr-only" aria-label={t('characterUploadLabel')} />
               <div className="grid grid-cols-2 gap-2">
                 <div className="overflow-hidden rounded-lg border border-border bg-card">
                   <div className="border-b border-border px-2.5 py-2 font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground">{t('characterOriginal')}</div>
@@ -437,18 +447,17 @@ export function CharacterSettings() {
 
             {editorOpen ? (
               <>
-                <div className="grid grid-cols-2 gap-2">
-                  <EditorChoice active={brushMode === 'erase'} onClick={() => setBrushMode('erase')}>
+                <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label={t('characterBrushMode')}>
+                  <EditorChoice selectionMode="radio" active={brushMode === 'erase'} onClick={() => setBrushMode('erase')}>
                     <Eraser className="size-3.5" aria-hidden="true" /> {t('characterErase')}
                   </EditorChoice>
-                  <EditorChoice active={brushMode === 'restore'} onClick={() => setBrushMode('restore')}>
+                  <EditorChoice selectionMode="radio" active={brushMode === 'restore'} onClick={() => setBrushMode('restore')}>
                     <Brush className="size-3.5" aria-hidden="true" /> {t('characterRestore')}
                   </EditorChoice>
                 </div>
                 <div className="space-y-2 rounded-lg border border-border bg-card p-3">
-                  <EditorFieldHeader label={t('characterBrushSize')} value={`${brushSize}px`} htmlFor="character-brush-size" />
-                  <Slider id="character-brush-size" value={[brushSize]} min={16} max={220} step={1} onValueChange={(values) => setBrushSize(Array.isArray(values) ? values[0] : values)} />
-                  <p className="font-body text-[11px] leading-4 text-muted-foreground">{t('characterBrushHint')}</p>
+                  <EditorFieldHeader label={t('characterBrushSize')} value={`${brushSize}px`} htmlFor={controlId('brush-size')} description={t('characterBrushHint')} />
+                  <Slider id={controlId('brush-size')} aria-label={t('characterBrushSize')} value={[brushSize]} min={16} max={220} step={1} onValueChange={(values) => setBrushSize(Array.isArray(values) ? values[0] : values)} />
                 </div>
                 <div className="flex gap-2">
                   <Button type="button" variant="outline" size="sm" className="h-10 flex-1 rounded-md" onClick={handleUndo} disabled={undoCount === 0}>
@@ -472,12 +481,34 @@ export function CharacterSettings() {
         <EditorSection title={t('characterPlacementTitle')} description={t('characterPlacementDescription')} className="border-t border-border pt-5">
           <div className="space-y-4">
             <div className="space-y-2">
-              <EditorFieldHeader label={t('characterScale')} value={`${Math.round(characterScale * 100)}%`} htmlFor="character-scale" />
-              <Slider id="character-scale" value={[characterScale]} min={0.25} max={2.4} step={0.01} onValueChange={(values) => setCharacterScale(Array.isArray(values) ? values[0] : values)} />
+              <EditorFieldHeader label={t('characterScale')} value={`${Math.round(characterScale * 100)}%`} htmlFor={controlId('scale')} />
+              <Slider id={controlId('scale')} aria-label={t('characterScale')} value={[characterScale]} min={0.25} max={2.4} step={0.01} onValueChange={(values) => setCharacterScale(Array.isArray(values) ? values[0] : values)} />
             </div>
             <div className="space-y-2">
-              <EditorFieldHeader label={t('opacity')} value={`${characterOpacity}%`} htmlFor="character-opacity" />
-              <Slider id="character-opacity" value={[characterOpacity]} min={0} max={100} step={1} onValueChange={(values) => setCharacterOpacity(Array.isArray(values) ? values[0] : values)} />
+              <EditorFieldHeader label={t('opacity')} value={`${characterOpacity}%`} htmlFor={controlId('opacity')} />
+              <Slider id={controlId('opacity')} aria-label={t('opacity')} value={[characterOpacity]} min={0} max={100} step={1} onValueChange={(values) => setCharacterOpacity(Array.isArray(values) ? values[0] : values)} />
+            </div>
+            <div className="space-y-2">
+              <EditorFieldHeader label={t('characterPositionNudge')} value={`${CHARACTER_NUDGE_STEP}px`} />
+              <div className="grid w-fit grid-cols-3 gap-1" role="group" aria-label={t('characterPositionNudge')}>
+                <span aria-hidden="true" />
+                <Button type="button" variant="outline" size="icon" className="size-10 rounded-md" aria-label={t('characterNudgeUp')} onClick={() => nudgeCharacter(0, -CHARACTER_NUDGE_STEP)}>
+                  <ArrowUp className="size-4" aria-hidden="true" />
+                </Button>
+                <span aria-hidden="true" />
+                <Button type="button" variant="outline" size="icon" className="size-10 rounded-md" aria-label={t('characterNudgeLeft')} onClick={() => nudgeCharacter(-CHARACTER_NUDGE_STEP, 0)}>
+                  <ArrowLeft className="size-4" aria-hidden="true" />
+                </Button>
+                <span className="grid size-10 place-items-center rounded-md bg-muted/60 font-mono text-[10px] text-muted-foreground" aria-hidden="true">10</span>
+                <Button type="button" variant="outline" size="icon" className="size-10 rounded-md" aria-label={t('characterNudgeRight')} onClick={() => nudgeCharacter(CHARACTER_NUDGE_STEP, 0)}>
+                  <ArrowRight className="size-4" aria-hidden="true" />
+                </Button>
+                <span aria-hidden="true" />
+                <Button type="button" variant="outline" size="icon" className="size-10 rounded-md" aria-label={t('characterNudgeDown')} onClick={() => nudgeCharacter(0, CHARACTER_NUDGE_STEP)}>
+                  <ArrowDown className="size-4" aria-hidden="true" />
+                </Button>
+                <span aria-hidden="true" />
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <EditorChoice active={characterFlipX} onClick={() => setCharacterFlipX(!characterFlipX)}>
@@ -488,9 +519,8 @@ export function CharacterSettings() {
                 <Switch checked={characterShadow} onCheckedChange={setCharacterShadow} size="sm" aria-label={t('characterShadow')} />
               </div>
             </div>
-            <div className="flex items-center justify-between gap-3">
-              <p className="font-body text-[11px] leading-4 text-muted-foreground">{t('characterDragHint')}</p>
-              <button type="button" className="inline-flex shrink-0 items-center gap-1.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:text-foreground" onClick={() => setCharacterPosition(null)}>
+            <div className="flex justify-end">
+              <button type="button" className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-md px-2 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60" onClick={() => setCharacterPosition(null)}>
                 <RotateCcw className="size-3.5" aria-hidden="true" /> {t('characterResetPosition')}
               </button>
             </div>
@@ -499,7 +529,6 @@ export function CharacterSettings() {
       )}
 
       {error && <p role="alert" className="font-body text-[11px] leading-4 text-destructive">{error}</p>}
-      <p className="font-body text-[11px] leading-4 text-muted-foreground">{t('characterModelNote')}</p>
     </div>
   )
 }

@@ -9,6 +9,7 @@ export function TermsEn() {
       description="The service scope and user responsibilities for using XIV Frame safely and predictably."
       updatedLabel="Effective"
       updated="August 13, 2026"
+      updatedDateTime="2026-08-13"
       asideLabel="On this page"
       sections={[
         {

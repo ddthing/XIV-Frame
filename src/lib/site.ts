@@ -1,5 +1,7 @@
 export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://xiv-frame.pages.dev').replace(/\/$/, '')
 export const siteName = 'XIV Frame'
+export const siteImagePath = '/og-image.svg'
+export const siteImageUrl = `${siteUrl}${siteImagePath}`
 
 export function localizedUrl(locale: string, path = '') {
   const normalizedPath = path ? `/${path.replace(/^\//, '')}` : ''
@@ -70,9 +72,9 @@ export function articleJsonLd({
       url: siteUrl,
       logo: {
         '@type': 'ImageObject',
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/icon.svg`,
       },
     },
-    image: `${siteUrl}/og-image.jpg`,
+    image: siteImageUrl,
   }
 }

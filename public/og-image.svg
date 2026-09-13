@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <title>XIV Frame — FFXIV screenshot framer</title>
+  <rect width="1200" height="630" fill="#F7F7F7"/>
+  <rect x="64" y="64" width="1072" height="502" rx="20" fill="#FFFFFF" stroke="#DEDEDE" stroke-width="2"/>
+  <rect x="64" y="64" width="1072" height="70" rx="20" fill="#303030"/>
+  <path d="M84 64H1116C1127.05 64 1136 72.9543 1136 84V114H64V84C64 72.9543 72.9543 64 84 64Z" fill="#303030"/>
+  <circle cx="92" cy="99" r="5" fill="#F7F7F7" fill-opacity=".55"/>
+  <circle cx="110" cy="99" r="5" fill="#F7F7F7" fill-opacity=".28"/>
+  <circle cx="128" cy="99" r="5" fill="#F7F7F7" fill-opacity=".16"/>
+  <text x="160" y="105" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="1">XIV FRAME</text>
+  <rect x="92" y="170" width="620" height="330" rx="12" fill="#F1F1F1" stroke="#D7D7D7" stroke-width="2"/>
+  <rect x="116" y="194" width="284" height="282" rx="8" fill="#CFCFCF"/>
+  <rect x="424" y="194" width="264" height="134" rx="8" fill="#B9B9B9"/>
+  <rect x="424" y="342" width="264" height="134" rx="8" fill="#DADADA"/>
+  <path d="M255 194H261V476H255zM116 333H688V339H116z" fill="#FFFFFF" fill-opacity=".92"/>
+  <rect x="760" y="184" width="300" height="12" rx="6" fill="#303030" fill-opacity=".18"/>
+  <rect x="760" y="220" width="236" height="12" rx="6" fill="#303030" fill-opacity=".08"/>
+  <rect x="760" y="278" width="300" height="70" rx="10" fill="#F1F1F1" stroke="#DEDEDE"/>
+  <rect x="780" y="298" width="112" height="30" rx="6" fill="#303030" fill-opacity=".12"/>
+  <rect x="908" y="298" width="128" height="30" rx="6" fill="#FFFFFF" stroke="#CFCFCF"/>
+  <rect x="760" y="370" width="300" height="70" rx="10" fill="#F1F1F1" stroke="#DEDEDE"/>
+  <rect x="780" y="390" width="160" height="30" rx="6" fill="#303030" fill-opacity=".12"/>
+  <rect x="956" y="390" width="80" height="30" rx="6" fill="#303030"/>
+  <text x="92" y="544" fill="#303030" font-family="Arial, sans-serif" font-size="26" font-weight="700">FF14 SCREENSHOT FRAMER</text>
+  <text x="760" y="496" fill="#303030" fill-opacity=".58" font-family="Arial, sans-serif" font-size="18" font-weight="600">Choose a layout. Add your photos.</text>
+</svg>

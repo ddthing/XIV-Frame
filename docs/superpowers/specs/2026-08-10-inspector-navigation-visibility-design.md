@@ -1,5 +1,11 @@
 # Inspector navigation and visibility design
 
+> Status: superseded. This historical design note is retained for traceability;
+> the current interaction contract is [DESIGN.md](../../../DESIGN.md). The
+> earlier `source → overlay → composition` order has been replaced by
+> `레이아웃 → 사진 → 시그니처`, with a vertical step rail on desktop and
+> bottom navigation on mobile.
+
 ## Goal
 
 Improve the inspector sidebar after the image-source screenshot review without changing any stored editor values or existing image, signature, and layout behavior.

@@ -1,4 +1,5 @@
 import { DocumentPage } from '@/components/content/DocumentPage'
+import { ExternalLink } from '@/components/content/ExternalLink'
 import Link from 'next/link'
 
 export function AboutJa() {
@@ -6,9 +7,10 @@ export function AboutJa() {
     <DocumentPage
       eyebrow="04 / ABOUT"
       title="XIV Frameについて"
-      description="XIV Frameの機能と、画像・設定の扱いについて確認できます。"
+      description="XIV Frameの使い方と画像・設定の扱いをまとめています。"
       updatedLabel="最終更新"
       updated="2026年8月13日"
+      updatedDateTime="2026-08-13"
       asideLabel="このページ"
       sections={[
         {
@@ -33,7 +35,7 @@ export function AboutJa() {
           children: (
             <>
               <p>キャラクターを複数の角度から見せたい時、ミラプリやハウジングの記録を整理したい時、コミュニティ投稿用のショーケース画像を作りたい時に便利です。</p>
-              <p>基本の順番は<strong>画像を追加 → レイアウトを選ぶ → 署名を調整 → PNGを保存</strong>です。<Link href="/ja/blog">ガイド</Link>もこの順番で、エディターに表示されるラベルに沿って説明しています。</p>
+              <p>基本の順番は<strong>レイアウトを選ぶ → 画像を追加 → 署名を調整 → PNGを保存</strong>です。先にフレームの形を決めておくと、画像を追加した後の見え方を比べやすくなります。<Link href="/ja/blog">ガイド</Link>もこの順番で、エディターに表示されるラベルに沿って説明しています。</p>
             </>
           ),
         },
@@ -54,7 +56,7 @@ export function AboutJa() {
           title: 'オープンソースと権利について',
           children: (
             <>
-              <p>ソースコードは<a href="https://github.com/ddthing/XIV-Frame" target="_blank" rel="noopener noreferrer">XIV FrameのGitHubリポジトリ</a>で確認できます。バグ報告やフィードバックは<Link href="/ja/contact">お問い合わせページ</Link>からお送りください。</p>
+              <p>ソースコードは<ExternalLink href="https://github.com/ddthing/XIV-Frame" newWindowLabel="新しいタブで開きます">XIV FrameのGitHubリポジトリ</ExternalLink>で確認できます。バグ報告やフィードバックは<Link href="/ja/contact">お問い合わせページ</Link>からお送りください。</p>
               <p>ファイナルファンタジーXIVのゲームコンテンツおよび商標の権利は各権利者に帰属します。XIV Frameはスクウェア・エニックスと提携または公式承認されたサービスではありません。</p>
             </>
           ),

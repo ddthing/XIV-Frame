@@ -1,7 +1,7 @@
 import { useTranslations } from 'next-intl'
 import { useShallow } from 'zustand/react/shallow'
 
-import { EditorChoice, EditorFieldHeader, EditorSection } from '@/components/ui/editor'
+import { EditorFieldHeader, EditorRadio, EditorSection, editorSegmentedGroupClass, editorSegmentedOptionClass } from '@/components/ui/editor'
 import { Switch } from '@/components/ui/switch'
 import { useStore, type CopyrightColor, type CopyrightPosition } from '@/store/useStore'
 
@@ -35,36 +35,35 @@ export function CopyrightSettings() {
   ]
 
   return (
-    <EditorSection title={t('creditTitle')} description={t('creditDescription')} className="border-t border-border pt-5">
-      <div className="editor-control-surface space-y-4 p-4">
+    <EditorSection title={t('creditTitle')} description={t('creditDescription')}>
+      <div className="rounded-xl bg-muted/35 p-3 sm:p-4">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <EditorFieldHeader label={t('copyrightToggle')} />
-            <p className="mt-1 font-body text-[11px] leading-4 text-muted-foreground">{t('creditHint')}</p>
+            <EditorFieldHeader label={t('copyrightToggle')} description={t('creditHint')} />
           </div>
           <Switch checked={showCopyright} onCheckedChange={setShowCopyright} aria-label={t('copyrightToggle')} />
         </div>
 
         {showCopyright && (
-          <div className="space-y-4 border-t border-border pt-4">
+          <div className="mt-4 space-y-4">
             <div className="space-y-2">
               <EditorFieldHeader label={t('copyrightPosition')} value={positions.find(item => item.value === copyrightPosition)?.label} />
-              <div className="grid grid-cols-3 gap-2">
+              <div className={`grid grid-cols-3 gap-0.5 ${editorSegmentedGroupClass}`} role="radiogroup" aria-label={t('copyrightPosition')}>
                 {positions.map(({ value, label }) => (
-                  <EditorChoice key={value} active={copyrightPosition === value} onClick={() => setCopyrightPosition(value)} className="px-2">
+                  <EditorRadio checked={copyrightPosition === value} key={value} onClick={() => setCopyrightPosition(value)} className={`${editorSegmentedOptionClass(copyrightPosition === value)} px-2`}>
                     {label}
-                  </EditorChoice>
+                  </EditorRadio>
                 ))}
               </div>
             </div>
 
             <div className="space-y-2">
               <EditorFieldHeader label={t('copyrightColor')} value={colors.find(item => item.value === copyrightColor)?.label} />
-              <div className="grid grid-cols-3 gap-2">
+              <div className={`grid grid-cols-3 gap-0.5 ${editorSegmentedGroupClass}`} role="radiogroup" aria-label={t('copyrightColor')}>
                 {colors.map(({ value, label }) => (
-                  <EditorChoice key={value} active={copyrightColor === value} onClick={() => setCopyrightColor(value)} className="px-2">
+                  <EditorRadio checked={copyrightColor === value} key={value} onClick={() => setCopyrightColor(value)} className={`${editorSegmentedOptionClass(copyrightColor === value)} px-2`}>
                     {label}
-                  </EditorChoice>
+                  </EditorRadio>
                 ))}
               </div>
             </div>

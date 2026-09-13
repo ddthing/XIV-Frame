@@ -4,10 +4,15 @@ import dynamic from 'next/dynamic'
 
 function SettingsLoading() {
   return (
-    <div aria-busy="true" className="space-y-4">
-      <div className="h-4 w-28 animate-pulse rounded bg-muted" />
-      <div className="h-20 animate-pulse rounded-xl border border-border bg-surface-inset/60" />
-      <div className="h-28 animate-pulse rounded-xl border border-border bg-surface-inset/60" />
+    <div aria-busy="true" className="space-y-6">
+      <div className="h-4 w-28 animate-pulse rounded bg-muted motion-reduce:animate-none" />
+      <div className="space-y-3">
+        {[0, 1, 2].map((item) => (
+          <div key={item} className="h-[122px] animate-pulse rounded-xl border border-border bg-surface-inset/60 motion-reduce:animate-none" />
+        ))}
+      </div>
+      <div className="h-20 animate-pulse rounded-xl border border-border bg-surface-inset/60 motion-reduce:animate-none" />
+      <div className="h-24 animate-pulse rounded-xl border border-border bg-surface-inset/60 motion-reduce:animate-none" />
     </div>
   )
 }

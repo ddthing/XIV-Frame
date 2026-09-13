@@ -1,4 +1,5 @@
 import React from 'react'
+import { ChevronDown } from 'lucide-react'
 import { ContentPage } from '@/components/layout/ContentPage'
 
 export interface DocumentSection {
@@ -14,6 +15,7 @@ interface DocumentPageProps {
   description: string
   updatedLabel: string
   updated: string
+  updatedDateTime: string
   sections: DocumentSection[]
   asideLabel: string
   className?: string
@@ -25,17 +27,55 @@ export function DocumentPage({
   description,
   updatedLabel,
   updated,
+  updatedDateTime,
   sections,
   asideLabel,
   className,
 }: DocumentPageProps) {
   return (
     <ContentPage eyebrow={eyebrow} title={title} description={description} size="lg" density="editor" className={className}>
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_13rem] lg:items-start lg:gap-12">
-        <article className="min-w-0 rounded-xl border border-border bg-card p-5 shadow-subtle sm:p-8">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_13rem] lg:items-start lg:gap-12">
+        <aside className="order-1 lg:order-2 lg:sticky lg:top-24">
+          <details className="group rounded-lg border border-border bg-muted px-4 py-2 lg:hidden">
+            <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between gap-3 font-body text-sm font-semibold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary [&::-webkit-details-marker]:hidden">
+              <span>{asideLabel}</span>
+              <ChevronDown aria-hidden="true" className="size-4 text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
+            </summary>
+            <nav className="border-t border-border pb-2 pt-3" aria-label={asideLabel}>
+              <ol className="space-y-2.5">
+                {sections.map((section) => (
+                  <li key={section.id}>
+                    <a href={`#${section.id}`} className="block rounded-sm px-1 py-1 font-body text-xs leading-5 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                      <span className="mr-2 font-mono text-[10px]">{section.index}</span>
+                      {section.title}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          </details>
+
+          <div className="hidden lg:block">
+            <p className="editor-meta">{asideLabel}</p>
+            <nav className="mt-3 border-l border-border pl-4" aria-label={asideLabel}>
+              <ol className="space-y-2.5">
+                {sections.map((section) => (
+                  <li key={section.id}>
+                    <a href={`#${section.id}`} className="font-body text-xs leading-5 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                      <span className="mr-2 font-mono text-[10px]">{section.index}</span>
+                      {section.title}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          </div>
+        </aside>
+
+        <article className="order-2 min-w-0 rounded-xl border border-border bg-card p-5 shadow-subtle sm:p-8 lg:order-1">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-border pb-5 font-body text-xs text-muted-foreground">
             <span className="editor-meta">{updatedLabel}</span>
-            <time dateTime="2026-08-13">{updated}</time>
+            <time dateTime={updatedDateTime}>{updated}</time>
           </div>
 
           <div className="mt-1 divide-y divide-border">
@@ -53,21 +93,6 @@ export function DocumentPage({
           </div>
         </article>
 
-        <aside className="lg:sticky lg:top-24">
-          <p className="editor-meta">{asideLabel}</p>
-          <nav className="mt-3 border-l border-border pl-4" aria-label={asideLabel}>
-            <ol className="space-y-2.5">
-              {sections.map((section) => (
-                <li key={section.id}>
-                  <a href={`#${section.id}`} className="font-body text-xs leading-5 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
-                    <span className="mr-2 font-mono text-[10px]">{section.index}</span>
-                    {section.title}
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </nav>
-        </aside>
       </div>
     </ContentPage>
   )

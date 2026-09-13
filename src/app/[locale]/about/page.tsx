@@ -8,7 +8,7 @@ import { AboutKo } from '@/components/pages/about/AboutKo'
 import { AboutEn } from '@/components/pages/about/AboutEn'
 import { AboutJa } from '@/components/pages/about/AboutJa'
 import type { Metadata } from 'next'
-import { localizedAlternates, localizedUrl } from '@/lib/site'
+import { localizedAlternates, localizedUrl, siteImagePath } from '@/lib/site'
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }))
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     title,
     description,
     alternates: { canonical: url, languages: localizedAlternates('/about') },
-    openGraph: { title, description, url, type: 'website', images: ['/og-image.jpg'] },
+    openGraph: { title, description, url, type: 'website', images: [siteImagePath] },
   }
 }
 

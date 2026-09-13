@@ -9,6 +9,7 @@ export function TermsKo() {
       description="XIV Frame을 안전하고 예측 가능하게 사용하기 위한 서비스 범위와 이용자 책임을 안내합니다."
       updatedLabel="시행일"
       updated="2026년 8월 13일"
+      updatedDateTime="2026-08-13"
       asideLabel="목차"
       sections={[
         {

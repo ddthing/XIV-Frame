@@ -9,6 +9,7 @@ export function TermsJa() {
       description="XIV Frameを安全に利用するためのサービス範囲と利用者の責任を案内します。"
       updatedLabel="施行日"
       updated="2026年8月13日"
+      updatedDateTime="2026-08-13"
       asideLabel="目次"
       sections={[
         {

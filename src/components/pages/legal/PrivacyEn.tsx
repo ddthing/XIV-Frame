@@ -1,4 +1,5 @@
 import { DocumentPage } from '@/components/content/DocumentPage'
+import { ExternalLink } from '@/components/content/ExternalLink'
 import Link from 'next/link'
 
 export function PrivacyEn() {
@@ -9,6 +10,7 @@ export function PrivacyEn() {
       description="How XIV Frame handles edited images, browser settings, technical requests, and advertising."
       updatedLabel="Effective"
       updated="August 13, 2026"
+      updatedDateTime="2026-08-13"
       asideLabel="On this page"
       sections={[
         {
@@ -51,7 +53,7 @@ export function PrivacyEn() {
           children: (
             <>
               <p>The site may use Google AdSense or Google advertising tags. When an ad request is made, Google and certified third-party vendors may use cookies, web beacons, IP addresses, or similar technologies to serve and measure advertising.</p>
-              <p>See <a href="https://support.google.com/adsense/answer/1348695" target="_blank" rel="noopener noreferrer">Google&apos;s AdSense required content guidance</a> for more information about advertising cookies. You can manage personalized advertising in <a href="https://adssettings.google.com/" target="_blank" rel="noopener noreferrer">Google Ads Settings</a> and some third-party advertising cookies through <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer">About Ads choices</a>.</p>
+              <p>See <ExternalLink href="https://support.google.com/adsense/answer/1348695" newWindowLabel="opens in a new tab">Google&apos;s AdSense required content guidance</ExternalLink> for more information about advertising cookies. You can manage personalized advertising in <ExternalLink href="https://adssettings.google.com/" newWindowLabel="opens in a new tab">Google Ads Settings</ExternalLink> and some third-party advertising cookies through <ExternalLink href="https://www.aboutads.info/choices/" newWindowLabel="opens in a new tab">About Ads choices</ExternalLink>.</p>
               <p>Where required, a consent management experience may be used in accordance with applicable law and Google&apos;s consent requirements. We do not encourage ad clicks or make ads look like navigation or download controls.</p>
             </>
           ),

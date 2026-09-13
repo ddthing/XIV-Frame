@@ -8,19 +8,19 @@ interface LogoProps {
 
 export function Logo({ size = 'md', className = '', inverse = false }: LogoProps) {
   const sizeClasses = {
-    sm: 'text-base',
-    md: 'text-xl',
-    lg: 'text-2xl',
+    sm: 'text-sm',
+    md: 'text-lg',
+    lg: 'text-xl',
   }
 
   const iconSizes = {
-    sm: 24,
-    md: 32,
-    lg: 40,
+    sm: 20,
+    md: 24,
+    lg: 32,
   }
 
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
+    <div className={`flex items-center gap-2.5 ${className}`}>
       <FrameWindowMark size={iconSizes[size]} />
       <span className={`font-bold tracking-tight ${inverse ? 'text-primary-foreground' : 'text-foreground'} ${sizeClasses[size]}`}>
         XIV Frame

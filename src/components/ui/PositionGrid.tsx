@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl'
 import { SignaturePosition } from '@/store/useStore'
 import { SignatureTranslationKey } from '@/constants/signature'
+import { EditorRadio, editorSegmentedGroupClass, editorSegmentedOptionClass } from '@/components/ui/editor'
 import React from 'react'
 
 export function PositionGrid({ value, options, onChange }: {
@@ -10,22 +11,18 @@ export function PositionGrid({ value, options, onChange }: {
 }) {
   const t = useTranslations('SignatureSettings')
   return (
-    <div className="grid grid-cols-3 gap-1 w-full font-sans">
+    <div className={`grid w-full grid-cols-3 gap-0.5 font-sans ${editorSegmentedGroupClass}`} role="radiogroup" aria-label={t('position')}>
       {options.map(({ value: optVal, label, icon }) => (
-        <button
+        <EditorRadio
           key={optVal}
-          type="button"
+          checked={value === optVal}
           aria-label={t(label)}
           title={t(label)}
           onClick={() => onChange(optVal)}
-          className={`flex h-10 items-center justify-center rounded-md border transition-all shadow-subtle
-            ${value === optVal
-              ? 'border-primary bg-sticky-note-mint text-primary font-semibold'
-              : 'border-border bg-card text-muted-foreground hover:bg-muted/50'
-            }`}
+          className={`${editorSegmentedOptionClass(value === optVal)} px-2`}
         >
           {icon}
-        </button>
+        </EditorRadio>
       ))}
     </div>
   )

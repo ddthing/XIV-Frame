@@ -3,7 +3,7 @@ import type Konva from 'konva'
 import { useStore } from '@/store/useStore'
 
 export async function exportCanvas(stageRef: RefObject<Konva.Stage | null> | MutableRefObject<Konva.Stage | null>, type: 'png' | 'jpeg') {
-  if (!stageRef.current) return
+  if (!stageRef.current) throw new Error('Canvas is not ready')
 
   const store = useStore.getState()
   store.setIsExporting(true)
@@ -13,7 +13,7 @@ export async function exportCanvas(stageRef: RefObject<Konva.Stage | null> | Mut
     await new Promise(resolve => setTimeout(resolve, 150))
 
     const stage = stageRef.current
-    if (!stage) return
+    if (!stage) throw new Error('Canvas is not ready')
 
     const currentScale = stage.scaleX() || 1
     const logicalWidth = stage.width() / currentScale
@@ -38,7 +38,7 @@ export async function exportCanvas(stageRef: RefObject<Konva.Stage | null> | Mut
       quality: type === 'jpeg' ? 0.95 : undefined, // 95% is optimal for Twitter high-quality JPEG
     }) as Blob | null
 
-    if (!blob) return
+    if (!blob) throw new Error('Canvas export returned no data')
 
     const objectUrl = URL.createObjectURL(blob)
     const link = document.createElement('a')

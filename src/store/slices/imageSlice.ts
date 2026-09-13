@@ -55,11 +55,16 @@ export const createImageSlice: StateCreator<ImageSlice, [], [], ImageSlice> = (s
   }),
   
   setImageAt: (index, url) => set((state) => {
+    if (index < 0 || index > 3) return state
+
     const newImages = [...state.images]
-    const oldUrl = newImages[index]
+    // Keep the collection dense even if a stale UI action targets a later slot.
+    // Dense indices are part of the canvas layout contract.
+    const safeIndex = Math.min(index, newImages.length)
+    const oldUrl = newImages[safeIndex]
     if (oldUrl === url) return state
     revokeObjectUrl(oldUrl)
-    newImages[index] = url
+    newImages[safeIndex] = url
     return { images: newImages }
   }),
   

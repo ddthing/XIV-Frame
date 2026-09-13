@@ -7,7 +7,7 @@ export function FaqJa() {
       locale="ja"
       eyebrow="05 / FAQ"
       title="よくある質問"
-      description="画像を追加してから完成したPNGを保存するまで、よくある質問をまとめました。"
+      description="画像の追加、レイアウト、署名、PNG保存で迷った時の答えをまとめています。"
       groups={[
         {
           number: '01',

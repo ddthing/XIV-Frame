@@ -7,7 +7,7 @@ export function FaqKo() {
       locale="ko"
       eyebrow="05 / FAQ"
       title="자주 묻는 질문"
-      description="사진을 추가하는 순간부터 PNG로 저장하는 순간까지, 실제 편집 화면에서 자주 생기는 질문을 정리했습니다."
+      description="사진 추가, 배치, 시그니처, PNG 저장 중 막히는 지점을 정리했습니다."
       groups={[
         {
           number: '01',

@@ -5,7 +5,7 @@ import { FaqEn } from '@/components/pages/faq/FaqEn'
 import { FaqJa } from '@/components/pages/faq/FaqJa'
 import { locales } from '@/i18n/request'
 import { PageShell } from '@/components/layout/PageShell'
-import { localizedAlternates, localizedUrl } from '@/lib/site'
+import { localizedAlternates, localizedUrl, siteImagePath } from '@/lib/site'
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }))
@@ -26,8 +26,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     title,
     description,
     alternates: { canonical: url, languages: localizedAlternates('/faq') },
-    openGraph: { title, description, url, type: 'website', images: ['/og-image.jpg'] },
-    twitter: { card: 'summary_large_image', title, description, images: ['/og-image.jpg'] },
+    openGraph: { title, description, url, type: 'website', images: [siteImagePath] },
+    twitter: { card: 'summary_large_image', title, description, images: [siteImagePath] },
   }
 }
 

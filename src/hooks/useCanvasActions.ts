@@ -1,15 +1,14 @@
 import { useCallback } from 'react'
-import { useStore, CanvasRatio } from '@/store/useStore'
+import { useShallow } from 'zustand/react/shallow'
+import { useStore } from '@/store/useStore'
 import { exportCanvas } from '@/lib/export'
 import type Konva from 'konva'
 
 export interface UseCanvasActionsReturn {
   zoom: number;
-  canvasRatio: CanvasRatio;
   handleZoomIn: () => void;
   handleZoomOut: () => void;
   handleZoomChange: (value: number | readonly number[]) => void;
-  handleRatioChange: (ratio: CanvasRatio) => void;
   handleReset: () => void;
   handleExport: (stageRef: React.MutableRefObject<Konva.Stage | null>, format?: 'png' | 'jpeg') => Promise<void>;
   isExporting: boolean;
@@ -17,9 +16,13 @@ export interface UseCanvasActionsReturn {
 }
 
 export function useCanvasActions(): UseCanvasActionsReturn {
-  const { zoom, setZoom, canvasRatio, setCanvasRatio, resetAll } = useStore()
-  const isExporting = useStore(state => state.isExporting)
-  const hasImages = useStore(state => state.images.length > 0)
+  const { zoom, setZoom, resetAll, isExporting, hasImages } = useStore(useShallow(state => ({
+    zoom: state.zoom,
+    setZoom: state.setZoom,
+    resetAll: state.resetAll,
+    isExporting: state.isExporting,
+    hasImages: state.images.some(Boolean),
+  })))
 
   const handleZoomIn = useCallback(() => {
     setZoom(Math.min(200, zoom + 10))
@@ -33,21 +36,15 @@ export function useCanvasActions(): UseCanvasActionsReturn {
     setZoom(Array.isArray(value) ? value[0] : value)
   }, [setZoom])
 
-  const handleRatioChange = useCallback((ratio: CanvasRatio) => {
-    setCanvasRatio(ratio)
-  }, [setCanvasRatio])
-
   const handleExport = useCallback(async (stageRef: React.MutableRefObject<Konva.Stage | null>, format: 'png' | 'jpeg' = 'png') => {
     await exportCanvas(stageRef, format)
   }, [])
 
   return {
     zoom,
-    canvasRatio,
     handleZoomIn,
     handleZoomOut,
     handleZoomChange,
-    handleRatioChange,
     handleReset: resetAll,
     handleExport,
     isExporting,

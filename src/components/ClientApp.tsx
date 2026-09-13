@@ -1,7 +1,10 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
+import { EditorNavigation, type EditorTab } from '@/components/sidebar/EditorNavigation'
+import { EditorHelpPanel } from '@/components/sidebar/EditorHelpPanel'
 import { SettingsPanel } from '@/components/sidebar/SettingsPanel'
 import { PreviewCanvas } from '@/components/canvas/PreviewCanvas'
 import { DesktopToolbar } from '@/components/canvas/DesktopToolbar'
@@ -10,12 +13,23 @@ import { MobileLayout } from '@/components/mobile/MobileLayout'
 import type Konva from 'konva'
 
 export function ClientApp({ currentLocale }: { currentLocale: string }) {
-  const stageRef = useRef<Konva.Stage | null>(null)
+  const desktopStageRef = useRef<Konva.Stage | null>(null)
+  const mobileStageRef = useRef<Konva.Stage | null>(null)
   const router = useRouter()
+  const tA11y = useTranslations('Accessibility')
+  const [activeTab, setActiveTab] = useState<EditorTab>('layout')
+  const [isNavigatorCollapsed, setIsNavigatorCollapsed] = useState(false)
+  const [isHelpOpen, setIsHelpOpen] = useState(false)
+  const [isFocusMode, setIsFocusMode] = useState(false)
 
   useEffect(() => {
     // Check if the user previously selected a different language
-    const savedLocale = localStorage.getItem('locale')
+    let savedLocale: string | null = null
+    try {
+      savedLocale = localStorage.getItem('locale')
+    } catch {
+      // The editor remains usable when storage is blocked or unavailable.
+    }
     if (savedLocale && savedLocale !== currentLocale) {
       if (savedLocale === 'ko') {
         router.push('/')
@@ -25,23 +39,97 @@ export function ClientApp({ currentLocale }: { currentLocale: string }) {
     }
   }, [currentLocale, router])
 
+  useEffect(() => {
+    const openEditorTab = (tab: EditorTab) => {
+      setActiveTab(tab)
+      setIsHelpOpen(false)
+      setIsNavigatorCollapsed(false)
+      setIsFocusMode(false)
+    }
+    const openLayout = () => openEditorTab('layout')
+    const openImage = () => openEditorTab('image')
+    const openSignature = () => openEditorTab('signature')
+
+    window.addEventListener('xiv-frame:open-layout', openLayout)
+    window.addEventListener('xiv-frame:open-image', openImage)
+    window.addEventListener('xiv-frame:open-signature', openSignature)
+
+    return () => {
+      window.removeEventListener('xiv-frame:open-layout', openLayout)
+      window.removeEventListener('xiv-frame:open-image', openImage)
+      window.removeEventListener('xiv-frame:open-signature', openSignature)
+    }
+  }, [])
+
+  const handleTabChange = (tab: EditorTab) => {
+    setActiveTab(tab)
+    setIsHelpOpen(false)
+    setIsNavigatorCollapsed(false)
+    setIsFocusMode(false)
+  }
+
+  const handleHelpChange = () => {
+    setIsHelpOpen(true)
+    setIsNavigatorCollapsed(false)
+    setIsFocusMode(false)
+  }
+
+  useEffect(() => {
+    if (!isFocusMode) return
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !event.defaultPrevented) setIsFocusMode(false)
+    }
+
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [isFocusMode])
+
   return (
     <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-background font-sans text-foreground">
-      <div className="hidden min-h-0 flex-1 flex-col md:flex">
-        <DesktopToolbar stageRef={stageRef} />
-        <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_360px] border-b border-border xl:grid-cols-[minmax(0,1fr)_390px]">
-          <main className="relative flex min-h-0 flex-col overflow-hidden border-r border-border bg-background">
-            <PreviewCanvas stageRef={stageRef} />
-          </main>
+      <div id="editor-main" tabIndex={-1} className="relative flex min-h-0 flex-1 flex-col outline-none">
+        <a
+          href="#editor-main"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-xs focus:font-semibold focus:text-primary-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+        >
+          {tA11y('skipToEditor')}
+        </a>
 
-          <aside className="z-10 flex min-h-0 flex-col overflow-hidden bg-background">
-            <SettingsPanel />
-          </aside>
+        <div className="hidden min-h-0 flex-1 flex-col md:flex">
+          <DesktopToolbar stageRef={desktopStageRef} />
+          <div className={`grid min-h-0 flex-1 border-b border-border ${isFocusMode ? 'md:grid-cols-[minmax(0,1fr)]' : isNavigatorCollapsed ? 'md:grid-cols-[64px_minmax(0,1fr)]' : 'md:grid-cols-[64px_320px_minmax(0,1fr)]'} ${isFocusMode ? 'xl:grid-cols-[minmax(0,1fr)]' : isNavigatorCollapsed ? 'xl:grid-cols-[64px_minmax(0,1fr)]' : 'xl:grid-cols-[64px_390px_minmax(0,1fr)]'}`}>
+            {!isFocusMode && <EditorNavigation
+              activeTab={activeTab}
+              isHelpOpen={isHelpOpen}
+              isCollapsed={isNavigatorCollapsed}
+              onTabChange={handleTabChange}
+              onHelpChange={handleHelpChange}
+              onToggleCollapse={() => setIsNavigatorCollapsed(collapsed => !collapsed)}
+            />}
+
+            {!isFocusMode && !isNavigatorCollapsed && (
+              <aside aria-label={tA11y('settingsRegion')} className="z-10 flex min-h-0 min-w-0 flex-col overflow-hidden border-r border-border bg-background">
+                {isHelpOpen ? (
+                  <EditorHelpPanel onToggleCollapse={() => setIsNavigatorCollapsed(true)} />
+                ) : (
+                  <SettingsPanel activeTab={activeTab} onTabChange={handleTabChange} onToggleCollapse={() => setIsNavigatorCollapsed(true)} />
+                )}
+              </aside>
+            )}
+
+            <main aria-label={tA11y('previewRegion')} className="relative flex min-h-0 min-w-0 flex-col overflow-hidden bg-background">
+              <PreviewCanvas
+                stageRef={desktopStageRef}
+                isFocusMode={isFocusMode}
+                onToggleFocus={() => setIsFocusMode(focusMode => !focusMode)}
+              />
+            </main>
+          </div>
         </div>
-      </div>
 
-      <div className="flex min-h-0 h-full w-full md:hidden">
-        <MobileLayout stageRef={stageRef} />
+        <div className="flex min-h-0 h-full w-full md:hidden">
+          <MobileLayout stageRef={mobileStageRef} />
+        </div>
       </div>
     </div>
   )

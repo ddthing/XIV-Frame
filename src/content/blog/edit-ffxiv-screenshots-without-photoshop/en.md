@@ -1,11 +1,11 @@
 ---
 title: "XIV Frame: A Complete Start-to-Finish Editing Guide"
-description: "Follow the real workflow from uploading screenshots to choosing a layout, compositing an image, adding a signature, and saving a PNG."
+description: "Choose the frame shape first, then add screenshots, composites, signatures, and a background before saving a PNG."
 date: "2026-06-03"
 tags: ["ffxiv", "screenshot", "tutorial"]
 ---
 
-XIV Frame is a browser-based tool for arranging screenshots and exporting the finished canvas as a PNG. Use the numbered workflow below instead of guessing which control to use first.
+XIV Frame is a browser-based tool for arranging screenshots and exporting the finished canvas as a PNG. Start with the frame shape, then fill it with screenshots and the finishing layers you need.
 
 ## Before you start
 
@@ -14,33 +14,33 @@ XIV Frame is a browser-based tool for arranging screenshots and exporting the fi
 - Your images are processed in the browser; the original files are not uploaded to a server.
 - Preview zoom changes how large the canvas looks on screen. It does not change the exported image size.
 
-## 1. Add your screenshots
+## 1. Choose a composition
 
-1. On desktop, open the **Image source** panel on the right. On mobile, tap **Photo** in the bottom navigation.
-2. Click the empty **Image 1** card and choose a file.
+1. Open **Layout** in the left navigation on desktop or the bottom navigation on mobile.
+2. Choose **Split** for images placed side by side.
+3. Choose **Vertical** to stack images from top to bottom.
+4. Choose **Grid** for a 2×2-style arrangement. The grid fills correctly when at least three images are uploaded; the selection stays in place before then.
+
+## 2. Add your screenshots
+
+1. Open **Photo** in the left navigation on desktop or the bottom navigation on mobile.
+2. Click the empty **Add photo 1** card and choose a file.
 3. Add more cards for the other screenshots. The upload order becomes the initial composition order.
 4. To replace a file, hover its card and choose **Change**. To remove it, use the X button in the card.
-5. Use **Swap Order** to exchange the first two images, or use the left and right card controls to move an image one position.
+5. Use the order controls on a card to move an image one position at a time.
 
-## 2. Add a composite image
+## 3. Add a composite image
 
-1. Open the **Composite** tab inside the **Image source** panel on desktop. This is not limited to characters: you can add sunlight, effects, decorations, or any other PNG element.
+1. Expand **Character** near the bottom of **Photo**. This is not limited to characters: you can add sunlight, effects, decorations, or another PNG element.
 2. Click **Add image to composite** and choose a PNG, JPG, or WebP file. Transparent PNGs can be used as they are; images with a background can be cleaned up in the next step.
 3. Review the original and **Cutout result** previews, then click **Remove background**. The first run may take longer while the model is prepared in your browser.
 4. If unwanted areas remain, open **Refine the edges**, choose **Erase**, and drag over the preview. Use **Restore** to bring back details that were removed.
 5. In **Canvas placement**, drag the image directly on the canvas and adjust **Image size**, opacity, horizontal flip, and the natural shadow.
-6. To remove the composite image, click **Remove composite**. Your photo sources and signature settings stay unchanged.
-
-## 3. Choose a composition
-
-1. Open the **Layout** tab on desktop. On mobile, open the bottom **Layout** menu, labelled **Ratio** in the compact navigation.
-2. Choose **Split** for images placed side by side.
-3. Choose **Vertical** to stack images from top to bottom.
-4. Choose **Grid** for a 2×2-style arrangement. Grid becomes available when at least three images are uploaded.
+6. To remove the composite image, click **Remove composite**. Your photos and signature settings stay unchanged.
 
 ## 4. Set the canvas ratio
 
-1. On desktop, use the **Ratio** controls above the preview. On mobile, open **Export** and find **Ratio Settings**.
+1. On desktop, choose **Ratio** in the **Layout** panel. On mobile, open **Export** and find **Ratio Settings**.
 2. Choose **Auto** when you want the canvas to follow the current composition.
 3. Choose **16:9** for a standard wide canvas.
 4. Choose **2:1** for a long, banner-like composition.
@@ -53,6 +53,8 @@ XIV Frame is a browser-based tool for arranging screenshots and exporting the fi
 4. Scroll over the selected image to zoom it in or out. Hold Shift while dragging on desktop to constrain movement to one axis.
 5. Click **Reset** to restore the active image scale and position.
 6. Turn on **Lock Image Position** after the framing is correct so you do not move it accidentally.
+
+To inspect the whole canvas, use **Fit to view** or the zoom controls in the dock below it. Above 100%, hold Space while dragging to move the canvas without moving an image.
 
 ## 6. Set spacing and transitions
 
@@ -70,7 +72,7 @@ XIV Frame is a browser-based tool for arranging screenshots and exporting the fi
 ## 8. Add a signature
 
 1. Open **Signature** on desktop or **Signature** in the mobile bottom navigation.
-2. In the **Text** tab, enter a character name in **Upper Text** and a server or secondary label in **Lower Text**.
+2. Expand **Text**, then enter a character name in **Upper Text** and a server or secondary label in **Lower Text**.
 3. Adjust bold, italic, and letter spacing for each line separately.
 4. Choose the position, alignment, font, size, color, and opacity while watching the preview.
 5. Move the signature away from faces, weapons, and other important details.
@@ -80,7 +82,7 @@ XIV Frame is a browser-based tool for arranging screenshots and exporting the fi
 ## 9. Export the result
 
 1. On desktop, click **Save PNG** in the top-right toolbar.
-2. On mobile, open **Export**, confirm the ratio, and tap **Save Photo**.
+2. On mobile, open **Export**, confirm the ratio, and tap **Save PNG**.
 3. The browser downloads a file named like `ffxiv-screenshot-date-time.png`.
 4. If you want to start a completely different edit, use **Reset** in the desktop toolbar or **Reset to Default** in the mobile export sheet. Save anything you want to keep first because reset restores all settings.
 

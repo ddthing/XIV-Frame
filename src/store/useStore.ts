@@ -2,21 +2,22 @@ import { create } from 'zustand'
 import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware'
 
 import { ImageSlice, createImageSlice, initialImageState } from './slices/imageSlice'
-import { LayoutSlice, createLayoutSlice, initialLayoutState, CanvasRatio, BackgroundColor, CopyrightPosition, CopyrightColor } from './slices/layoutSlice'
+import { LayoutSlice, createLayoutSlice, initialLayoutState, CanvasRatio, BackgroundColor, CopyrightPosition, CopyrightColor, LayoutPreset } from './slices/layoutSlice'
 import { SignatureSlice, createSignatureSlice, initialSignatureState, SignaturePosition, SignatureAlign } from './slices/signatureSlice'
 import { CharacterSlice, createCharacterSlice, initialCharacterState } from './slices/characterSlice'
 import { revokeObjectUrl } from '@/lib/imageUpload'
 
 // Re-export types so we don't break existing imports
-export type { CanvasRatio, BackgroundColor, CopyrightPosition, CopyrightColor, SignaturePosition, SignatureAlign }
+export type { CanvasRatio, BackgroundColor, CopyrightPosition, CopyrightColor, LayoutPreset, SignaturePosition, SignatureAlign }
 
 export interface AppState extends ImageSlice, LayoutSlice, SignatureSlice, CharacterSlice {
   resetAll: () => void
 }
 
-type PersistedAppState = Omit<Partial<AppState>, 'layoutPreset' | 'imageTransition'> & {
+type PersistedAppState = Omit<Partial<AppState>, 'layoutPreset' | 'imageTransition' | 'canvasRatio'> & {
   layoutPreset?: string
   imageTransition?: string
+  canvasRatio?: string
 }
 
 // Keep edits usable in private browsing and when a large legacy logo fills the
@@ -68,18 +69,31 @@ export const useStore = create<AppState>()(
     {
       name: 'xiv-frame-settings-v2',
       storage: createJSONStorage(() => safeLocalStorage),
-      version: 2, // Bump version to 2 for layoutPreset migration
+      version: 3, // Normalize legacy layout and canvas ratio values.
       migrate: (persistedState: unknown) => {
         const state: PersistedAppState = persistedState && typeof persistedState === 'object'
           ? { ...(persistedState as PersistedAppState) }
           : {}
-        
+
         // Migrate legacy 'blend' preset
         if (state.layoutPreset === 'blend') {
           state.layoutPreset = 'split'
           state.imageTransition = 'soft-blend'
         }
-        
+
+        if (!['split', 'vertical-split', 'grid'].includes(state.layoutPreset ?? '')) {
+          state.layoutPreset = 'split'
+        }
+
+        if (!['none', 'soft-blend'].includes(state.imageTransition ?? '')) {
+          state.imageTransition = 'none'
+        }
+
+        // Older builds persisted 'original', which is no longer a supported ratio.
+        if (!['auto', '16:9', '2:1'].includes(state.canvasRatio ?? '')) {
+          state.canvasRatio = 'auto'
+        }
+
         return state as AppState
       },
       partialize: (state) => {
