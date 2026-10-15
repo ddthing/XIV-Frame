@@ -5,16 +5,22 @@ import { useLocale, useTranslations } from 'next-intl'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Globe } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useEditorLocaleChange } from './EditorLocaleProvider'
 
 export function LanguageSwitcher({ inverse = false, compact = false }: { inverse?: boolean; compact?: boolean }) {
   const router = useRouter()
   const pathname = usePathname()
   const currentLocale = useLocale()
+  const changeEditorLocale = useEditorLocaleChange()
   const t = useTranslations('LanguageSwitcher')
   const currentLocaleLabel = currentLocale === 'ko' ? '한국어' : currentLocale === 'ja' ? '日本語' : 'English'
 
   const handleLanguageChange = (value: string | null) => {
     if (!value) return
+    if (changeEditorLocale) {
+      changeEditorLocale(value)
+      return
+    }
     try {
       localStorage.setItem('locale', value)
     } catch {

@@ -1,7 +1,6 @@
 'use client'
 
 import { useRef, useEffect, useState, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { EditorNavigation, type EditorTab } from '@/components/sidebar/EditorNavigation'
 import { EditorHelpPanel } from '@/components/sidebar/EditorHelpPanel'
@@ -10,13 +9,17 @@ import { PreviewCanvas } from '@/components/canvas/PreviewCanvas'
 import { DesktopToolbar } from '@/components/canvas/DesktopToolbar'
 import { MobileLayout } from '@/components/mobile/MobileLayout'
 import { useEditorShortcuts } from '@/hooks/useEditorShortcuts'
+import { EditorLocaleProvider } from './EditorLocaleProvider'
 
 import type Konva from 'konva'
 
 export function ClientApp({ currentLocale }: { currentLocale: string }) {
+  return <EditorLocaleProvider initialLocale={currentLocale}><EditorWorkspace /></EditorLocaleProvider>
+}
+
+function EditorWorkspace() {
   const desktopStageRef = useRef<Konva.Stage | null>(null)
   const mobileStageRef = useRef<Konva.Stage | null>(null)
-  const router = useRouter()
   const tA11y = useTranslations('Accessibility')
   const [activeTab, setActiveTab] = useState<EditorTab>('layout')
   const [isNavigatorCollapsed, setIsNavigatorCollapsed] = useState(false)
@@ -24,23 +27,6 @@ export function ClientApp({ currentLocale }: { currentLocale: string }) {
   const [isFocusMode, setIsFocusMode] = useState(false)
   const toggleFocus = useCallback(() => setIsFocusMode(value => !value), [])
   useEditorShortcuts(toggleFocus)
-
-  useEffect(() => {
-    // Check if the user previously selected a different language
-    let savedLocale: string | null = null
-    try {
-      savedLocale = localStorage.getItem('locale')
-    } catch {
-      // The editor remains usable when storage is blocked or unavailable.
-    }
-    if (savedLocale && savedLocale !== currentLocale) {
-      if (savedLocale === 'ko') {
-        router.push('/')
-      } else {
-        router.push(`/${savedLocale}`)
-      }
-    }
-  }, [currentLocale, router])
 
   useEffect(() => {
     const openEditorTab = (tab: EditorTab) => {
