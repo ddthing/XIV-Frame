@@ -225,28 +225,28 @@ export function LayoutSettings({ onContinue, idPrefix = 'layout', showContinue =
 function LayoutThumbnail({ preset }: { preset: LayoutPreset }) {
   if (preset === 'vertical-split') {
     return (
-      <span className="flex h-12 w-full shrink-0 flex-col gap-1 rounded-md bg-surface-inset/70 p-1" aria-hidden="true">
-        <span className="min-h-0 flex-1 rounded-sm bg-primary/75" />
-        <span className="min-h-0 flex-1 rounded-sm bg-primary/35" />
+      <span className="flex h-12 w-full shrink-0 flex-col gap-1 bg-surface-inset/70 p-1" aria-hidden="true">
+        <span className="min-h-0 flex-1 bg-primary/75" />
+        <span className="min-h-0 flex-1 bg-primary/35" />
       </span>
     )
   }
 
   if (preset === 'grid') {
     return (
-      <span className="grid h-12 w-full shrink-0 grid-cols-2 gap-1 rounded-md bg-surface-inset/70 p-1" aria-hidden="true">
-        <span className="rounded-sm bg-primary/75" />
-        <span className="rounded-sm bg-primary/35" />
-        <span className="rounded-sm bg-primary/35" />
-        <span className="rounded-sm bg-primary/75" />
+      <span className="grid h-12 w-full shrink-0 grid-cols-2 gap-1 bg-surface-inset/70 p-1" aria-hidden="true">
+        <span className="bg-primary/75" />
+        <span className="bg-primary/35" />
+        <span className="bg-primary/35" />
+        <span className="bg-primary/75" />
       </span>
     )
   }
 
   return (
-    <span className="grid h-12 w-full shrink-0 grid-cols-2 gap-1 rounded-md bg-surface-inset/70 p-1" aria-hidden="true">
-      <span className="rounded-sm bg-primary/75" />
-      <span className="rounded-sm bg-primary/35" />
+    <span className="grid h-12 w-full shrink-0 grid-cols-2 gap-1 bg-surface-inset/70 p-1" aria-hidden="true">
+      <span className="bg-primary/75" />
+      <span className="bg-primary/35" />
     </span>
   )
 }
