@@ -43,7 +43,8 @@ export function SettingsPanel({ activeTab, onTabChange, onToggleCollapse }: Sett
 
   return (
     <div id="editor-settings" className="flex h-full min-h-0 flex-col bg-background">
-      <header className="flex h-10 shrink-0 items-center justify-end px-4">
+      <header className="flex h-12 shrink-0 items-center justify-between px-5">
+        <span aria-hidden="true" className="font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground">{activeTab === 'layout' ? '01 / COMPOSITION' : activeTab === 'image' ? '02 / PHOTOGRAPHS' : '03 / SIGNATURE'}</span>
         <h2 id={`editor-panel-${activeTab}-heading`} className="sr-only">{currentStep.title}</h2>
         <button
           type="button"
@@ -61,7 +62,7 @@ export function SettingsPanel({ activeTab, onTabChange, onToggleCollapse }: Sett
         aria-labelledby={`editor-panel-${activeTab}-heading`}
         className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar"
       >
-        <div className="min-h-full space-y-6 px-5 pb-14 pt-1">
+        <div className="min-h-full space-y-6 px-5 pb-6 pt-1">
           {activeTab === 'layout' && (
             <LazyLayoutSettings idPrefix="desktop-layout" showContinue={false} />
           )}
@@ -72,10 +73,10 @@ export function SettingsPanel({ activeTab, onTabChange, onToggleCollapse }: Sett
         </div>
       </section>
 
-      {activeTab === 'image' && hasImages && (
-        <footer className="flex shrink-0 justify-end px-5 pb-4 pt-2">
-          <Button type="button" size="sm" className="h-9 rounded-md px-3 text-[11px]" onClick={() => onTabChange('signature')}>
-            {t('nextSignature')}
+      {(activeTab === 'layout' || (activeTab === 'image' && hasImages)) && (
+        <footer className="flex shrink-0 border-t border-border bg-card p-4">
+          <Button type="button" size="sm" className="h-10 w-full justify-between rounded-md px-3 text-xs" onClick={() => onTabChange(activeTab === 'layout' ? 'image' : 'signature')}>
+            {activeTab === 'layout' ? t('tabImage') : t('nextSignature')}
             <ArrowRight className="size-3.5" aria-hidden="true" />
           </Button>
         </footer>

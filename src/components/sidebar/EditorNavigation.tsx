@@ -41,9 +41,9 @@ export function EditorNavigation({
   return (
     <nav
       aria-label={settingsT('flowLabel')}
-      className="hidden min-h-0 w-[64px] shrink-0 flex-col border-r border-border bg-background md:flex"
+      className="studio-rail hidden min-h-0 w-[64px] shrink-0 flex-col border-r border-border bg-card md:flex"
     >
-      <div className="flex flex-col gap-1 p-1.5">
+      <div className="flex flex-col gap-2 px-1.5 py-4">
         {items.map(({ value, label, icon: Icon }, index) => {
           const isActive = activeTab === value && !isHelpOpen
 
@@ -57,13 +57,13 @@ export function EditorNavigation({
               onClick={() => onTabChange(value)}
               className={`flex min-h-[68px] w-full flex-col items-center justify-center gap-1 rounded-md px-1.5 py-2 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 ${
                 isActive
-                  ? 'bg-muted text-foreground'
+                  ? 'bg-primary text-primary-foreground shadow-subtle'
                   : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
               }`}
             >
               <span
                 aria-hidden="true"
-                className={`font-mono text-[9px] font-semibold tabular-nums ${isActive ? 'text-primary' : 'text-muted-foreground'}`}
+                className={`font-mono text-[9px] font-semibold tabular-nums ${isActive ? 'text-primary-foreground/60' : 'text-muted-foreground'}`}
               >
                 {String(index + 1).padStart(2, '0')}
               </span>

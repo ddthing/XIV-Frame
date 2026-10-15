@@ -1,6 +1,6 @@
 import { StateCreator } from 'zustand'
 
-export type CanvasRatio = 'auto' | '16:9' | '2:1'
+export type CanvasRatio = 'auto' | '16:9' | '2:1' | '1:1' | '4:5' | '9:16'
 export type BackgroundColor = 'white' | 'light-gray' | 'transparent'
 export type CopyrightPosition = 'bottom-left' | 'bottom-center' | 'bottom-right'
 export type CopyrightColor = 'black' | 'white' | 'gray'
@@ -40,6 +40,8 @@ export interface LayoutSlice {
 
   isExporting: boolean
   setIsExporting: (isExporting: boolean) => void
+  isCanvasLoading: boolean
+  setIsCanvasLoading: (isCanvasLoading: boolean) => void
 }
 
 export const initialLayoutState = {
@@ -56,6 +58,7 @@ export const initialLayoutState = {
   zoom: 100,
   grainIntensity: 0,
   isExporting: false,
+  isCanvasLoading: true,
 }
 
 export const createLayoutSlice: StateCreator<LayoutSlice, [], [], LayoutSlice> = (set) => ({
@@ -74,4 +77,5 @@ export const createLayoutSlice: StateCreator<LayoutSlice, [], [], LayoutSlice> =
   setZoom: (z) => set({ zoom: z }),
   setGrainIntensity: (intensity) => set({ grainIntensity: intensity }),
   setIsExporting: (isExporting) => set({ isExporting }),
+  setIsCanvasLoading: (isCanvasLoading) => set({ isCanvasLoading }),
 })

@@ -417,3 +417,28 @@
     --font-body: 'Pretendard Variable', 'Pretendard', 'Noto Sans KR', 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif;
     --font-mono: 'Cascadia Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
 }
+
+/* Studio workbench: neutral surfaces keep the composition in focus. */
+@layer components {
+  .studio-header { box-shadow: 0 1px 0 rgb(255 255 255 / 6%) inset; }
+  .app-backdrop { background-color: color-mix(in oklch, var(--muted) 75%, var(--background)); }
+  .studio-frame { transform: rotate(-1deg); transition: transform 240ms ease; }
+  .studio-frame:hover { transform: rotate(0deg); }
+  .studio-frame-cell:nth-child(even) { background: color-mix(in oklch, var(--muted) 94%, var(--foreground)); }
+  .layout-options > button > span:first-child { width: 100%; height: 48px; padding: 5px; gap: 4px; }
+  .preset-art { display: grid; height: 48px; gap: 3px; padding: 5px; background: var(--muted); border: 1px solid var(--border); }
+  .preset-art i { display: block; background: color-mix(in oklch, var(--foreground) 28%, var(--muted)); }
+  .preset-art i:nth-child(even) { background: color-mix(in oklch, var(--foreground) 55%, var(--muted)); }
+  .preset-art-gallery { grid-template-columns: 1fr 1fr; padding: 7px; }
+  .preset-art-cinema { grid-template-columns: 1fr 1fr; padding: 10px 0; background: var(--card); border: 0; }
+  .preset-art-cinema i:nth-child(n+3), .preset-art-portrait i:nth-child(n+3) { display: none; }
+  .preset-art-portrait { grid-template-rows: 1fr 1fr; width: 38px; margin: 0 auto; padding: 5px; }
+  .studio-rail button { transition: background-color 160ms ease, color 160ms ease; }
+  @media (max-height: 650px) {
+    .studio-empty { justify-content: flex-start; padding-top: 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .studio-frame, .studio-frame:hover { transform: none; transition: none; }
+    .studio-rail button { transition: none; }
+  }
+}

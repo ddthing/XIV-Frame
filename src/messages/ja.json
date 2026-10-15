@@ -1,6 +1,6 @@
 {
   "ImageUploader": {
-  "tabCharacter": "キャラクター合成",
+    "tabCharacter": "キャラクター合成",
     "imageCount": "キャンバスの写真",
     "uploadTitle": "写真を追加",
     "uploadDescription": "写真を選び、プレビューでサイズと位置を調整します。",
@@ -42,7 +42,8 @@
     "nudgeLeft": "左へ10px移動",
     "nudgeRight": "右へ10px移動",
     "nudgeUp": "上へ10px移動",
-    "nudgeDown": "下へ10px移動"
+    "nudgeDown": "下へ10px移動",
+    "uploadCanceled": "写真の読み込み中に作業が変更されました。もう一度写真を選択してください。"
   },
   "LayoutSettings": {
     "compositionTitle": "レイアウトを選ぶ",
@@ -225,9 +226,9 @@
     "resetConfirm": "現在の作業と設定をすべてリセットしますか？",
     "copyrightToggle": "著作権表示",
     "reset": "リセット",
-      "canvasControls": "キャンバス表示",
-      "canvasHelp": "拡大中はSpaceキーを押しながらドラッグするか、マウスの中央ボタンでキャンバスを確認できます。表示だけが変わり、保存画像には影響しません。",
-      "fitToView": "画面に合わせる",
+    "canvasControls": "キャンバス表示",
+    "canvasHelp": "拡大中はSpaceキーを押しながらドラッグするか、マウスの中央ボタンでキャンバスを確認できます。表示だけが変わり、保存画像には影響しません。",
+    "fitToView": "画面に合わせる",
     "focusMode": "集中表示",
     "exitFocusMode": "集中表示を閉じる"
   },
@@ -372,5 +373,66 @@
   },
   "CopyrightLayer": {
     "text": "© SQUARE ENIX"
+  },
+  "Studio": {
+    "history": "編集履歴",
+    "undo": "元に戻す",
+    "redo": "やり直す",
+    "presets": "スタジオプリセット",
+    "presetsHint": "比率・配置・余白をまとめて適用します。写真と署名はそのまま。元に戻す操作で取り消せます。",
+    "gallery": "ギャラリー",
+    "cinema": "シネマ",
+    "portrait": "ポートレート",
+    "export": "書き出し",
+    "emptyTitle": "冒険の一瞬を、自分だけの一枚に。",
+    "emptyDescription": "フレームを選び、写真を添えて、物語を仕上げましょう。",
+    "dropHint": "ここに写真をドロップするか、最大4枚をまとめて選択。",
+    "localOnly": "写真はブラウザ内だけで処理されます",
+    "preparing": "写真を準備中",
+    "shortcuts": "キーボードショートカット",
+    "saveProject": "プロジェクト保存",
+    "switchStep": "編集ステップ移動",
+    "focus": "集中モード",
+    "projectFiles": "作業を続ける",
+    "exportDescription": "画像を書き出すか、編集可能なプロジェクトを保存します。"
+  },
+  "ExportSettings": {
+    "title": "作品を保存",
+    "description": "画質とファイル形式を選んで、完成したフレームを保存しましょう。",
+    "close": "保存設定を閉じる",
+    "format": "ファイル形式",
+    "pngDescription": "細部まで鮮明 · 透過背景に対応",
+    "jpegDescription": "軽いファイル · シェアに便利",
+    "size": "出力サイズ",
+    "original": "キャンバス",
+    "originalLimit": "キャンバスが大きいため、安定して保存できる2Kまたは4Kを選んでください。",
+    "sizeHint": "長辺を基準にしたサイズです。プレビューの拡大率は保存画像に影響しません。",
+    "filename": "ファイル名",
+    "output": "保存する画像",
+    "preparing": "サイズを確認中",
+    "jpegBackground": "JPEGでは透過部分を白い背景で保存します。",
+    "previewHint": "フレーム、余白、シグネチャーはプレビューどおりに保存されます。",
+    "empty": "写真を追加すると保存できます。",
+    "loading": "写真を読み込んでいます。しばらくすると保存できます。",
+    "success": "{filename}のダウンロードを開始しました。",
+    "error": "保存できませんでした。写真の読み込みを確認して、もう一度お試しください。",
+    "saving": "画像を作成中…",
+    "download": "{format}をダウンロード"
+  },
+  "Project": {
+    "label": "プロジェクトファイル",
+    "open": "プロジェクトを開く",
+    "save": "プロジェクトを保存",
+    "openHint": "写真と編集設定を含む .xivframe ファイルを開く",
+    "saveHint": "写真と編集設定をまとめて保存 · Ctrl/⌘ S",
+    "opening": "プロジェクトを読み込んでいます。",
+    "saving": "プロジェクトファイルを準備しています。",
+    "opened": "プロジェクトを開きました。「元に戻す」で前の作業に戻れます。",
+    "saved": "写真と編集設定を保存しました。このプロジェクトを開いて編集を続けられます。",
+    "openError": "プロジェクトを読み込めませんでした。有効な .xivframe ファイルを選んでください。現在の作業は保持されます。",
+    "changedDuringOpen": "読み込み中に作業が変更されたため、開く操作を中止しました。現在の操作を終えてから、もう一度開いてください。",
+    "saveError": "プロジェクトを保存できませんでした。写真を確認して、もう一度お試しください。",
+    "versionError": "このプロジェクトのバージョンは未対応です。最新の XIV Frame で開いてください。",
+    "tooLarge": "プロジェクトは80MB以下にしてください。画像の容量を減らして、もう一度お試しください。"
   }
 }

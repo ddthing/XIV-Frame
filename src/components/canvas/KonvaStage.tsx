@@ -9,6 +9,7 @@ import { SignatureLayer } from './layers/SignatureLayer'
 import { LogoLayer } from './layers/LogoLayer'
 import { CopyrightLayer } from './layers/CopyrightLayer'
 import { NoiseLayer } from './layers/NoiseLayer'
+import { getCanvasDimensions } from '@/lib/canvasGeometry'
 
 import type Konva from 'konva'
 
@@ -21,7 +22,7 @@ interface KonvaStageProps {
 export default function KonvaStage({ stageRef, onLoadError, onLoadStateChange }: KonvaStageProps) {
   const {
     images, layoutPreset, imageGap, imageTransition, blendWidth, canvasRatio,
-    borderWidth, backgroundColor, grainIntensity
+    borderWidth, backgroundColor, grainIntensity, setIsCanvasLoading
   } = useStore(useShallow(state => ({
     images: state.images,
     layoutPreset: state.layoutPreset,
@@ -31,13 +32,25 @@ export default function KonvaStage({ stageRef, onLoadError, onLoadStateChange }:
     canvasRatio: state.canvasRatio,
     borderWidth: state.borderWidth,
     backgroundColor: state.backgroundColor,
-    grainIntensity: state.grainIntensity
+    grainIntensity: state.grainIntensity,
+    setIsCanvasLoading: state.setIsCanvasLoading,
   })))
   
   const containerRef = useRef<HTMLDivElement>(null)
   
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 })
-  const [imagesData, setImagesData] = useState<HTMLImageElement[]>([])
+  const [loadedImages, setLoadedImages] = useState<{ images: HTMLImageElement[]; sources: string }>({ images: [], sources: '' })
+  const imagesData = loadedImages.images
+  const requestedSources = JSON.stringify(images.filter(Boolean))
+
+  useEffect(() => {
+    const container = containerRef.current
+    // Both responsive editors are mounted. Only the visible one owns the
+    // shared loading indicator; each stage also carries its own source revision.
+    if (container && container.offsetWidth > 0 && container.offsetHeight > 0) {
+      setIsCanvasLoading(!stageRef.current || loadedImages.sources !== requestedSources)
+    }
+  }, [loadedImages.sources, requestedSources, stageRef, stageSize, setIsCanvasLoading])
   
   useEffect(() => {
     let active = true
@@ -50,21 +63,21 @@ export default function KonvaStage({ stageRef, onLoadError, onLoadStateChange }:
         return new Promise<HTMLImageElement>((resolve, reject) => {
           const img = new window.Image()
           imgInstances.push(img)
-          img.src = url
           img.onload = () => resolve(img)
           img.onerror = reject
+          img.src = url
         })
       })
       
       try {
         const loaded = await Promise.all(promises)
         if (active) {
-          setImagesData(loaded)
+          setLoadedImages({ images: loaded, sources: JSON.stringify(validImages) })
           onLoadStateChange?.(false)
         }
       } catch {
         if (active) {
-          setImagesData([])
+          setLoadedImages({ images: [], sources: '' })
           onLoadStateChange?.(false)
           onLoadError?.()
         }
@@ -113,55 +126,13 @@ export default function KonvaStage({ stageRef, onLoadError, onLoadStateChange }:
     }
   }, [])
 
-  const { logicalWidth, logicalHeight } = useMemo(() => {
-    let width = 1920
-    let height = 1080
-
-    if (imagesData.length > 0) {
-      const baseHeight = imagesData[0].height
-      let totalWidth = 0
-      let gridHeight = baseHeight
-      
-      if (layoutPreset === 'grid' && imagesData.length >= 3) {
-        const cellWidth = imagesData[0].width
-        totalWidth = (cellWidth * 2) + imageGap
-        gridHeight = (baseHeight * 2) + imageGap
-      } else if (layoutPreset === 'vertical-split') {
-        const baseWidth = imagesData[0].width
-        totalWidth = baseWidth
-        gridHeight = 0
-        imagesData.forEach(img => {
-          gridHeight += img.height * (baseWidth / img.width)
-        })
-        gridHeight += Math.max(0, imagesData.length - 1) * imageGap
-      } else {
-        imagesData.forEach(img => {
-          totalWidth += img.width * (baseHeight / img.height)
-        })
-        
-        if (imageTransition === 'soft-blend') {
-          totalWidth -= Math.max(0, imagesData.length - 1) * blendWidth
-        } else {
-          totalWidth += Math.max(0, imagesData.length - 1) * imageGap
-        }
-      }
-
-      if (canvasRatio === '16:9') {
-        width = Math.max(totalWidth, gridHeight * (16 / 9))
-        height = width * (9 / 16)
-      } else if (canvasRatio === '2:1') {
-        width = Math.max(totalWidth, gridHeight * 2)
-        height = width / 2
-      } else {
-        width = totalWidth
-        height = gridHeight
-      }
-    }
-    return { logicalWidth: width, logicalHeight: height }
-  }, [imagesData, layoutPreset, imageGap, imageTransition, blendWidth, canvasRatio])
-
-  const outerWidth = logicalWidth + (borderWidth * 2)
-  const outerHeight = logicalHeight + (borderWidth * 2)
+  const { logicalWidth, logicalHeight, outerWidth, outerHeight } = useMemo(() => getCanvasDimensions({
+    images: imagesData,
+    layoutPreset,
+    gap: imageTransition === 'soft-blend' ? -blendWidth : imageGap,
+    canvasRatio,
+    borderWidth,
+  }), [imagesData, layoutPreset, imageGap, imageTransition, blendWidth, canvasRatio, borderWidth])
 
   const scale = Math.min(
     stageSize.width / outerWidth,
@@ -178,6 +149,7 @@ export default function KonvaStage({ stageRef, onLoadError, onLoadStateChange }:
         height={outerHeight * scale}
         scaleX={scale}
         scaleY={scale}
+        exportImageSources={loadedImages.sources === requestedSources ? requestedSources : null}
         ref={stageRef}
       >
         <Layer>

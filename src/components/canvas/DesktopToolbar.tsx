@@ -1,75 +1,63 @@
-import { useState } from 'react'
-import { AlertCircle, Download, RefreshCw } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+'use client'
 
+import { useEffect, useState } from 'react'
+import { ArrowUpRight, RotateCcw } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { Logo } from '@/components/ui/Logo'
 import { Button } from '@/components/ui/button'
-import { useCanvasActions } from '@/hooks/useCanvasActions'
-
+import { useStore } from '@/store/useStore'
+import { HistoryControls } from './HistoryControls'
+import { ExportDialog } from './ExportDialog'
+import { ProjectActions } from './ProjectActions'
 import type Konva from 'konva'
 
-interface DesktopToolbarProps {
-  stageRef: React.MutableRefObject<Konva.Stage | null>
-  className?: string
-}
-
-export function DesktopToolbar({ stageRef, className = '' }: DesktopToolbarProps) {
-  const { handleReset, handleExport, isExporting, hasImages } = useCanvasActions()
+export function DesktopToolbar({ stageRef, className = '' }: { stageRef: React.MutableRefObject<Konva.Stage | null>; className?: string }) {
   const t = useTranslations('DesktopToolbar')
-  const [exportError, setExportError] = useState<string | null>(null)
+  const studio = useTranslations('Studio')
+  const hasImages = useStore(state => state.images.some(Boolean))
+  const isExporting = useStore(state => state.isExporting)
+  const resetAll = useStore(state => state.resetAll)
+  const [exportOpen, setExportOpen] = useState(false)
 
-  const handleSave = async () => {
-    if (!hasImages || isExporting) return
-    setExportError(null)
-    try {
-      await handleExport(stageRef, 'png')
-    } catch {
-      setExportError(t('exportError'))
+  useEffect(() => {
+    const open = () => {
+      if (window.matchMedia('(min-width: 768px)').matches && useStore.getState().images.some(Boolean)) setExportOpen(true)
     }
-  }
+    const media = window.matchMedia('(min-width: 768px)')
+    const resize = () => { if (!media.matches) setExportOpen(false) }
+    window.addEventListener('xiv-frame:open-export', open)
+    media.addEventListener('change', resize)
+    return () => {
+      window.removeEventListener('xiv-frame:open-export', open)
+      media.removeEventListener('change', resize)
+    }
+  }, [])
 
   return (
-    <header className={`app-header relative flex items-center gap-5 border-b border-primary-foreground/15 bg-primary px-5 text-primary-foreground ${className}`}>
-      <div className="flex min-w-0 items-center">
-        <Logo size="md" inverse />
-      </div>
-
-      <div className="ml-auto flex items-center gap-2">
-        {exportError && (
-          <span role="alert" className="inline-flex max-w-56 items-center gap-1 text-right text-[11px] leading-4 text-destructive">
-            <AlertCircle className="size-3.5" aria-hidden="true" />
-            {exportError}
-          </span>
-        )}
-        <LanguageSwitcher inverse />
-          <Button
-            variant="ghost"
-            size="sm"
-            aria-label={t('reset')}
-            onClick={() => {
-              if (hasImages && !window.confirm(t('resetConfirm'))) return
-              handleReset()
-            }}
-            className="h-9 rounded-md px-3 text-xs font-semibold text-primary-foreground/75 hover:bg-primary-foreground/10 hover:text-primary-foreground"
-          >
-          <RefreshCw aria-hidden="true" className="size-3.5" />
-          <span className="hidden xl:inline">{t('reset')}</span>
-        </Button>
-        <Button
-          variant="default"
-          size="sm"
-          aria-label={`${t('export')} PNG`}
-          disabled={!hasImages || isExporting}
-          aria-describedby={!hasImages ? 'desktop-export-empty-hint' : undefined}
-          className="h-9 rounded-md border-0 bg-primary-foreground px-3 text-xs font-bold text-primary shadow-subtle hover:bg-primary-foreground/90"
-          onClick={() => void handleSave()}
-        >
-          {isExporting ? <RefreshCw className="size-3.5 animate-spin" aria-hidden="true" /> : <Download className="size-3.5" aria-hidden="true" />}
-          <span>{isExporting ? t('exporting') : t('export')}<span className="hidden sm:inline">{isExporting ? '' : ' PNG'}</span></span>
-        </Button>
-        {!hasImages && <span id="desktop-export-empty-hint" className="sr-only">{t('exportDisabledHint')}</span>}
-      </div>
-    </header>
+    <>
+      <header className={`app-header studio-header relative flex items-center gap-4 bg-primary px-5 text-primary-foreground ${className}`}>
+        <div className="flex min-w-0 items-center gap-4">
+          <Logo size="md" inverse />
+          <span className="hidden border-l border-primary-foreground/20 pl-4 font-mono text-[9px] tracking-[0.2em] text-primary-foreground/50 xl:block">SCREENSHOT STUDIO</span>
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          <HistoryControls inverse />
+          <span className="mx-1 h-5 w-px bg-primary-foreground/15" aria-hidden="true" />
+          <ProjectActions compact />
+          <Button variant="ghost" size="icon" aria-label={t('reset')} title={t('reset')}
+            onClick={() => { if (!hasImages || window.confirm(t('resetConfirm'))) resetAll() }}
+            className="size-10 text-primary-foreground/75 hover:bg-primary-foreground/10 hover:text-primary-foreground">
+            <RotateCcw className="size-4" aria-hidden="true" />
+          </Button>
+          <LanguageSwitcher inverse />
+          <Button disabled={!hasImages || isExporting} onClick={() => setExportOpen(true)} aria-keyshortcuts="Control+Shift+S Meta+Shift+S"
+            className="ml-2 h-10 rounded-md bg-primary-foreground px-4 text-xs font-semibold text-primary hover:bg-primary-foreground/90">
+            {studio('export')}<ArrowUpRight className="size-4" aria-hidden="true" />
+          </Button>
+        </div>
+      </header>
+      <ExportDialog open={exportOpen} onOpenChange={setExportOpen} stageRef={stageRef} />
+    </>
   )
 }

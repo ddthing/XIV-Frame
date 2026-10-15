@@ -1,5 +1,4 @@
 import { StateCreator } from 'zustand'
-import { revokeObjectUrl } from '@/lib/imageUpload'
 
 export interface ImageSlice {
   images: string[]
@@ -8,6 +7,7 @@ export interface ImageSlice {
   setImagePosition: (index: number, pos: { x: number; y: number }) => void
   imageScales: number[]
   setImageScale: (index: number, scale: number) => void
+  resetImageTransform: (index: number) => void
   setImageAt: (index: number, url: string) => void
   removeImageAt: (index: number) => void
   swapImages: (idx1: number, idx2: number) => void
@@ -26,32 +26,38 @@ export const createImageSlice: StateCreator<ImageSlice, [], [], ImageSlice> = (s
   ...initialImageState,
   
   setImages: (images) => set((state) => {
-    const nextUrls = new Set(images)
-    const revokedUrls = new Set<string>()
-    state.images.forEach((url) => {
-      if (!nextUrls.has(url) && !revokedUrls.has(url)) {
-        revokeObjectUrl(url)
-        revokedUrls.add(url)
-      }
-    })
-
     return {
-      images,
+      images: [...images],
       imagePositions: images.map((_, i) => state.imagePositions[i] || { x: 0, y: 0 }),
       imageScales: images.map((_, i) => state.imageScales[i] || 1),
     }
   }),
   
   setImagePosition: (index, pos) => set((state) => {
+    if (index < 0 || index >= state.images.length || !Number.isFinite(pos.x) || !Number.isFinite(pos.y)) return state
+    const current = state.imagePositions[index] ?? { x: 0, y: 0 }
+    if (current.x === pos.x && current.y === pos.y) return state
     const newPositions = [...state.imagePositions]
-    newPositions[index] = pos
+    newPositions[index] = { ...pos }
     return { imagePositions: newPositions }
   }),
 
   setImageScale: (index, scale) => set((state) => {
+    if (index < 0 || index >= state.images.length || !Number.isFinite(scale) || scale <= 0 || (state.imageScales[index] ?? 1) === scale) return state
     const newScales = [...state.imageScales]
     newScales[index] = scale
     return { imageScales: newScales }
+  }),
+
+  resetImageTransform: (index) => set((state) => {
+    if (index < 0 || index >= state.images.length) return state
+    const current = state.imagePositions[index] ?? { x: 0, y: 0 }
+    if (current.x === 0 && current.y === 0 && (state.imageScales[index] ?? 1) === 1) return state
+    const imagePositions = [...state.imagePositions]
+    const imageScales = [...state.imageScales]
+    imagePositions[index] = { x: 0, y: 0 }
+    imageScales[index] = 1
+    return { imagePositions, imageScales }
   }),
   
   setImageAt: (index, url) => set((state) => {
@@ -63,17 +69,20 @@ export const createImageSlice: StateCreator<ImageSlice, [], [], ImageSlice> = (s
     const safeIndex = Math.min(index, newImages.length)
     const oldUrl = newImages[safeIndex]
     if (oldUrl === url) return state
-    revokeObjectUrl(oldUrl)
     newImages[safeIndex] = url
-    return { images: newImages }
+    const newPositions = [...state.imagePositions]
+    const newScales = [...state.imageScales]
+    newPositions[safeIndex] = { x: 0, y: 0 }
+    newScales[safeIndex] = 1
+    // Replacement and transform reset are one reversible edit. URL cleanup is
+    // owned by history so a removed screenshot remains available to undo.
+    return { images: newImages, imagePositions: newPositions, imageScales: newScales }
   }),
   
   removeImageAt: (index) => set((state) => {
     if (index < 0 || index >= state.images.length) return state
 
     const newImages = [...state.images]
-    const oldUrl = newImages[index]
-    revokeObjectUrl(oldUrl)
     newImages.splice(index, 1)
     const newPositions = [...state.imagePositions]
     newPositions.splice(index, 1)

@@ -1,13 +1,14 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { Maximize2, Minimize2, Scan, ZoomIn, ZoomOut } from 'lucide-react'
+import { Keyboard, Maximize2, Minimize2, Scan, ZoomIn, ZoomOut } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { useCanvasActions } from '@/hooks/useCanvasActions'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { EditorHelpPopover } from '@/components/ui/EditorHelpPopover'
+import { useStore } from '@/store/useStore'
 
 interface CanvasDockProps {
   isFocusMode: boolean
@@ -19,6 +20,8 @@ interface CanvasDockProps {
 export function CanvasDock({ isFocusMode, onFitToView, onToggleFocus, className = '' }: CanvasDockProps) {
   const { zoom, handleZoomIn, handleZoomOut, handleZoomChange } = useCanvasActions()
   const t = useTranslations('DesktopToolbar')
+  const studio = useTranslations('Studio')
+  const imageCount = useStore(state => state.images.filter(Boolean).length)
   const focusButtonRef = useRef<HTMLButtonElement>(null)
   const hasMountedRef = useRef(false)
 
@@ -35,8 +38,18 @@ export function CanvasDock({ isFocusMode, onFitToView, onToggleFocus, className 
     <div
       role="toolbar"
       aria-label={t('canvasControls')}
-      className={`flex min-h-14 shrink-0 items-center justify-end gap-2 bg-background px-4 py-2 ${className}`}
+      className={`relative flex min-h-14 shrink-0 items-center justify-between gap-2 border-t border-border bg-card px-4 py-2 ${className}`}
     >
+      <div className="flex shrink-0 items-center gap-3">
+        <span className="hidden font-mono text-[10px] text-muted-foreground lg:inline">{String(imageCount).padStart(2, '0')} / 04</span>
+        <details className="relative">
+          <summary aria-label={studio('shortcuts')} title={studio('shortcuts')} className="grid size-10 cursor-pointer list-none place-items-center rounded-md text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden"><Keyboard className="size-4" aria-hidden="true" /></summary>
+          <div className="absolute bottom-12 left-0 z-30 w-64 rounded-xl border border-border bg-card p-4 text-xs shadow-xl">
+            <p className="mb-3 font-semibold">{studio('shortcuts')}</p>
+            {[[studio('undo'), 'Ctrl / ⌘ Z'], [studio('redo'), 'Ctrl / ⌘ ⇧ Z'], [studio('saveProject'), 'Ctrl / ⌘ S'], [studio('export'), 'Ctrl / ⌘ ⇧ S'], [studio('switchStep'), '1 · 2 · 3'], [studio('focus'), 'F / Esc']].map(([label, key]) => <p key={key} className="flex justify-between gap-3 py-1.5 text-muted-foreground"><span>{label}</span><kbd className="font-mono text-[10px]">{key}</kbd></p>)}
+          </div>
+        </details>
+      </div>
       <div className="flex min-w-0 items-center gap-1.5">
         <Button
           type="button"

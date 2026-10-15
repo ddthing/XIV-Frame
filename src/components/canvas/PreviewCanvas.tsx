@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 
 import { AlertCircle, Upload } from 'lucide-react'
@@ -8,7 +8,7 @@ import { useShallow } from 'zustand/react/shallow'
 import { CanvasDock } from './CanvasDock'
 import { EmptyFrameState } from './EmptyFrameState'
 import { useStore } from '@/store/useStore'
-import { ImageUploadError, prepareImageForCanvas } from '@/lib/imageUpload'
+import { ImageUploadError, prepareImageForCanvas, revokeObjectUrl } from '@/lib/imageUpload'
 
 const KonvaStage = dynamic(() => import('./KonvaStage'), { ssr: false })
 
@@ -32,18 +32,12 @@ export function PreviewCanvas({ stageRef, isFocusMode = false, onToggleFocus, sh
     layoutPreset,
     canvasRatio,
     zoom,
-    setImageAt,
-    setImageScale,
-    setImagePosition,
     setZoom,
   } = useStore(useShallow(state => ({
     images: state.images,
     layoutPreset: state.layoutPreset,
     canvasRatio: state.canvasRatio,
     zoom: state.zoom,
-    setImageAt: state.setImageAt,
-    setImageScale: state.setImageScale,
-    setImagePosition: state.setImagePosition,
     setZoom: state.setZoom,
   })))
   const t = useTranslations('ImageUploader')
@@ -60,6 +54,12 @@ export function PreviewCanvas({ stageRef, isFocusMode = false, onToggleFocus, sh
   const viewportRef = useRef<HTMLDivElement>(null)
   const panStartRef = useRef<{ pointerId: number; x: number; y: number; originX: number; originY: number } | null>(null)
   const hasImages = images.some(Boolean)
+  const mountedRef = useRef(true)
+  const uploadingRef = useRef(false)
+  useEffect(() => {
+    mountedRef.current = true
+    return () => { mountedRef.current = false }
+  }, [])
 
   const handleCanvasLoadError = useCallback(() => {
     setUploadError(t('uploadError'))
@@ -121,7 +121,7 @@ export function PreviewCanvas({ stageRef, isFocusMode = false, onToggleFocus, sh
   const visiblePanOffset = zoom > 100 ? panOffset : { x: 0, y: 0 }
 
   const handleFiles = async (fileList: FileList | File[]) => {
-    if (isUploading) return
+    if (uploadingRef.current) return
     const files = Array.from(fileList)
     if (files.length === 0) return
 
@@ -142,20 +142,16 @@ export function PreviewCanvas({ stageRef, isFocusMode = false, onToggleFocus, sh
 
     const filesToPrepare = imageFiles.slice(0, availableSlots.length)
     setUploadError(null)
+    uploadingRef.current = true
     setIsUploading(true)
 
     try {
       const results = await Promise.allSettled(filesToPrepare.map(prepareImageForCanvas))
-      let uploadedCount = 0
+      const uploadedUrls: string[] = []
       let hadTooLargeFile = false
-
-      results.forEach((result, offset) => {
+      results.forEach((result) => {
         if (result.status === 'fulfilled') {
-          const slot = availableSlots[offset]
-          setImageAt(slot, result.value)
-          setImageScale(slot, 1)
-          setImagePosition(slot, { x: 0, y: 0 })
-          uploadedCount += 1
+          uploadedUrls.push(result.value)
           return
         }
 
@@ -163,14 +159,25 @@ export function PreviewCanvas({ stageRef, isFocusMode = false, onToggleFocus, sh
           hadTooLargeFile = true
         }
       })
-
-      if (uploadedCount === 0) {
+      const state = useStore.getState()
+      if (!mountedRef.current || state.images !== currentImages) {
+        uploadedUrls.forEach(revokeObjectUrl)
+        if (mountedRef.current) setUploadError(t('uploadCanceled'))
+        return
+      }
+      if (uploadedUrls.length > 0) state.applyEdit({
+        images: [...state.images, ...uploadedUrls],
+        imagePositions: [...state.images.map((_, index) => state.imagePositions[index] ?? { x: 0, y: 0 }), ...uploadedUrls.map(() => ({ x: 0, y: 0 }))],
+        imageScales: [...state.images.map((_, index) => state.imageScales[index] ?? 1), ...uploadedUrls.map(() => 1)],
+      })
+      if (uploadedUrls.length === 0) {
         setUploadError(hadTooLargeFile ? t('uploadLimit') : t('uploadError'))
-      } else if (uploadedCount < imageFiles.length || imageFiles.length > availableSlots.length) {
+      } else if (uploadedUrls.length < imageFiles.length || imageFiles.length > availableSlots.length) {
         setUploadError(t('dropPartial'))
       }
     } finally {
-      setIsUploading(false)
+      uploadingRef.current = false
+      if (mountedRef.current) setIsUploading(false)
     }
   }
 
@@ -259,6 +266,7 @@ export function PreviewCanvas({ stageRef, isFocusMode = false, onToggleFocus, sh
             isUploading={isUploading}
             layoutPreset={layoutPreset}
             uploadError={uploadError}
+            onAddPhotos={() => fileInputRef.current?.click()}
           />
         )}
 
@@ -283,7 +291,7 @@ export function PreviewCanvas({ stageRef, isFocusMode = false, onToggleFocus, sh
         />
       </div>
 
-      {hasImages && showDock && onToggleFocus && (
+      {showDock && onToggleFocus && (
         <CanvasDock
           isFocusMode={isFocusMode}
           onFitToView={handleFitToView}
