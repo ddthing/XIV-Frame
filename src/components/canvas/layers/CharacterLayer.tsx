@@ -80,7 +80,7 @@ function CharacterGuide({
   onResizeEnd: () => void
 }) {
   const inset = Math.max(8, Math.min(16, contentHeight * 0.012))
-  const visualX = flipped ? position.x - width : position.x
+  const visualX = position.x
   const visualY = position.y
   const labelFontSize = Math.max(22, Math.min(34, contentHeight * 0.03))
   const labelHeight = labelFontSize + 18
@@ -217,7 +217,7 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
       const dy = typeof detail?.dy === 'number' && Number.isFinite(detail.dy) ? detail.dy : 0
       if (dx === 0 && dy === 0) return
 
-      const { characterScale: currentScale, characterPosition: currentPosition, characterFlipX: isFlipped } = useStore.getState()
+      const { characterScale: currentScale, characterPosition: currentPosition } = useStore.getState()
       const baseScale = Math.min(
         (contentWidth * 0.58) / characterImg.width,
         (contentHeight * 0.86) / characterImg.height,
@@ -228,7 +228,7 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
         x: Math.max(0, (contentWidth - width) / 2),
         y: Math.max(0, contentHeight - height - Math.max(24, contentHeight * 0.06)),
       }
-      const visualX = isFlipped ? position.x - width : position.x
+      const visualX = position.x
       const minVisualX = Math.min(-width + 80, contentWidth - 80)
       const maxVisualX = Math.max(-width + 80, contentWidth - 80)
       const nextVisualX = Math.min(maxVisualX, Math.max(minVisualX, visualX + dx))
@@ -236,7 +236,7 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
       const maxY = Math.max(-height + 80, contentHeight - 80)
       const nextY = Math.min(maxY, Math.max(minY, position.y + dy))
 
-      setCharacterPosition(isFlipped ? { x: nextVisualX + width, y: nextY } : { x: nextVisualX, y: nextY })
+      setCharacterPosition({ x: nextVisualX, y: nextY })
     }
 
     window.addEventListener('xiv-frame:nudge-character', handleNudge)
@@ -262,16 +262,11 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
   const showGuide = !isExporting && (isHovered || isDragging || isResizing)
 
   const handleResizePreview = (handleX: number) => {
-    const visualX = characterFlipX ? position.x - width : position.x
+    const visualX = position.x
     const nextWidth = Math.max(80, handleX - visualX)
     const nextScale = Math.max(0.25, Math.min(2.4, nextWidth / (characterImg.width * baseScale)))
-    const nextPosition = characterFlipX
-      ? { x: visualX + characterImg.width * baseScale * nextScale, y: position.y }
-      : position
-
-    resizePreviewRef.current = { scale: nextScale, position: nextPosition }
+    resizePreviewRef.current = { scale: nextScale, position }
     setLiveScale(nextScale)
-    if (characterFlipX) setLivePosition(nextPosition)
   }
 
   const handleResizeEnd = () => {
