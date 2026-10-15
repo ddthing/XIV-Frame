@@ -235,7 +235,7 @@ export function ImageUploader({ idPrefix = 'image' }: { idPrefix?: string }) {
                       <img src={image} alt={t('imageLabel', { index: index + 1 })} className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" />
                       <span aria-hidden="true" className="pointer-events-none absolute inset-0 bg-primary/45 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
                     </button>
-                    <div className={`absolute inset-x-2 bottom-2 z-10 flex min-w-0 items-center justify-center gap-1.5 transition-opacity duration-200 ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'}`}>
+                    {selected && <div className="absolute inset-x-2 bottom-2 z-10 flex min-w-0 items-center justify-center gap-1.5">
                       {index > 0 && images[index - 1] && (
                       <button type="button" aria-label={t('movePrevious')} onClick={(event) => handleMove(event, index, 'prev')} className="grid size-10 shrink-0 place-items-center rounded-md border border-primary-foreground/20 bg-background/95 text-foreground shadow-subtle transition-colors hover:bg-background">
                           <ChevronLeft className="size-4" aria-hidden="true" />
@@ -246,11 +246,11 @@ export function ImageUploader({ idPrefix = 'image' }: { idPrefix?: string }) {
                           <ChevronRight className="size-4" aria-hidden="true" />
                         </button>
                       )}
-                    </div>
-                    <span aria-hidden="true" className="absolute left-2 top-2 grid size-6 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 font-mono text-[10px] font-bold tabular-nums text-foreground shadow-subtle">{String(index + 1).padStart(2, '0')}</span>
-                    <button type="button" aria-label={t('deleteImage')} onClick={(event) => handleRemove(event, index)} className={`absolute right-2 top-2 grid size-10 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 text-foreground shadow-subtle transition-all hover:bg-destructive/10 hover:text-destructive ${selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100'}`}>
+                    </div>}
+                    <span aria-hidden="true" className="pointer-events-none absolute left-2 top-2 grid size-6 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 font-mono text-[10px] font-bold tabular-nums text-foreground shadow-subtle">{String(index + 1).padStart(2, '0')}</span>
+                    {selected && <button type="button" aria-label={t('deleteImage')} onClick={(event) => handleRemove(event, index)} className="absolute right-2 top-2 grid size-10 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 text-foreground shadow-subtle transition-colors hover:bg-destructive/10 hover:text-destructive">
                       <X className="size-3.5" aria-hidden="true" />
-                    </button>
+                    </button>}
                   </>
                 ) : (
                   <button
