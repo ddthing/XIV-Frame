@@ -128,8 +128,9 @@ state, and action names.
   be understood.
 - The editor's base scale covers its assigned frame and may crop the edges.
   Keep per-image scale and position correction next to the selected photo; a
-  future fit mode must be an explicit control and documented here before it is
-  mentioned in user-facing content.
+  `전체 맞춤` fits the entire selected photo with centered margins, while
+  `프레임 채우기` covers its cell and centers the crop. Both are explicit,
+  reversible actions and use the same cell geometry as preview and export.
 - Store image order, scale, and position per image. The position lock is an
   editor-wide guard that disables both direct movement and nudge controls.
 - Direct manipulation is supplemented by a compact nudge dock. Its controls
@@ -264,4 +265,21 @@ KWCAG 2.1 and 2.2:
 - Grain is visible in both preview and export. Font changes refresh measured
   text metrics. Export waits for assets, verifies the exact visible stage, and
   cancels if the composition changes during preparation.
+- The photo library uses four compact square thumbnails with selected-photo
+  actions below them. Precision controls show source dimensions, whole-photo
+  fit, centered fill, 90-degree rotation, and horizontal/vertical flips. Rotation
+  and flips encode lossless PNG locally, preserve alpha, reset photo framing,
+  and remain reversible through history. A pending conversion cannot overwrite
+  newer edits. Existing projects remain compatible without a schema change.
+- Composition guides use a DOM overlay above the preview, so they never enter
+  image exports. `G` toggles thirds; desktop exposes a dock button and mobile
+  exposes the same preference in its save sheet. Transparency uses a preview-only
+  checkerboard. Layout and preset sample cells retain square corners.
+- Only the current responsive editor mounts. Photo reordering reuses decoded
+  images; replacement decodes only changed sources. The cache retains at most
+  the current composition. Grain is loaded only when enabled, and the desktop
+  does not eagerly load the mobile sheet module.
+- Export format, resolution, and filename are shared view preferences. Reopening
+  the dialog or switching between desktop and mobile preserves them without
+  creating an undo step or changing the imported/exported project composition.
 

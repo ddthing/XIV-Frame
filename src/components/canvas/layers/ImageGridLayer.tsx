@@ -5,6 +5,7 @@ import { useStore } from '@/store/useStore'
 import { useShallow } from 'zustand/react/shallow'
 import { ImageUploadError, prepareImageForCanvas, revokeObjectUrl } from '@/lib/imageUpload'
 import type Konva from 'konva'
+import { getImageCellSize } from '@/lib/canvasGeometry'
 
 type PendingUpload = { requestId: number; sourceUrl: string | undefined }
 
@@ -118,19 +119,7 @@ function ImageGridLayerComponent({
   const isGrid = layoutPreset === 'grid' && images.length >= 3
   const isVertical = layoutPreset === 'vertical-split'
 
-  let itemWidth = 0
-  let itemHeight = 0
-  
-  if (isGrid) {
-    itemWidth = (contentWidth - gap) / 2
-    itemHeight = (contentHeight - gap) / 2
-  } else if (isVertical) {
-    itemWidth = contentWidth
-    itemHeight = (contentHeight - (gap * (images.length - 1))) / images.length
-  } else {
-    itemWidth = (contentWidth - (gap * (images.length - 1))) / images.length
-    itemHeight = contentHeight
-  }
+  const { width: itemWidth, height: itemHeight } = getImageCellSize(contentWidth, contentHeight, images.length, layoutPreset ?? 'split', gap)
 
   const imageNodes = images.map((img, index) => {
         let xPos = 0
@@ -202,7 +191,7 @@ function ImageGridLayerComponent({
                   const scaleBy = 1.05
                   const oldScale = imageScales[index] || 1
                   const newScale = e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy
-                  setImageScale(index, Math.max(0.5, Math.min(3, newScale)))
+                  setImageScale(index, Math.max(0.01, Math.min(3, newScale)))
                 }}
                 onDblClick={() => handleFileUpload(index)}
                 onDblTap={() => handleFileUpload(index)}
@@ -215,10 +204,12 @@ function ImageGridLayerComponent({
                   const scaledWidth = img.width * scale;
                   const scaledHeight = img.height * scale;
                   
-                  const minX = -scaledWidth + 100;
-                  const maxX = itemWidth - 100;
-                  const minY = -scaledHeight + 100;
-                  const maxY = itemHeight - 100;
+                  const overlapX = Math.min(100, scaledWidth, itemWidth);
+                  const overlapY = Math.min(100, scaledHeight, itemHeight);
+                  const minX = -scaledWidth + overlapX;
+                  const maxX = itemWidth - overlapX;
+                  const minY = -scaledHeight + overlapY;
+                  const maxY = itemHeight - overlapY;
                   
                   let newX = Math.max(minX, Math.min(maxX, relativePos.x));
                   let newY = Math.max(minY, Math.min(maxY, relativePos.y));

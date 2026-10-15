@@ -433,6 +433,10 @@
   .preset-art-cinema i:nth-child(n+3), .preset-art-portrait i:nth-child(n+3) { display: none; }
   .preset-art-portrait { grid-template-rows: 1fr 1fr; width: 38px; margin: 0 auto; padding: 5px; }
   .studio-rail button { transition: background-color 160ms ease, color 160ms ease; }
+  .konvajs-content { box-shadow: 0 0 0 1px rgb(0 0 0 / 8%), 0 16px 48px rgb(0 0 0 / 12%); }
+  .canvas-transparency { background-color: white; background-image: conic-gradient(#e5e5e5 25%, transparent 0 50%, #e5e5e5 0 75%, transparent 0); background-size: 16px 16px; }
+  .photo-library button[aria-pressed=true]::after { content: ''; position: absolute; inset: 2px; border: 2px solid var(--card); pointer-events: none; }
+  .photo-tools { border-bottom: 1px solid var(--border); padding-bottom: 16px; }
   @media (max-height: 650px) {
     .studio-empty { justify-content: flex-start; padding-top: 24px; }
   }

@@ -394,7 +394,9 @@
     "switchStep": "편집 단계 이동",
     "focus": "집중 모드",
     "projectFiles": "작업 이어하기",
-    "exportDescription": "이미지를 내보내거나 편집 가능한 프로젝트로 저장합니다."
+    "exportDescription": "이미지를 내보내거나 편집 가능한 프로젝트로 저장합니다.",
+    "guides": "구도 가이드",
+    "guidesHint": "화면에만 표시됩니다. 저장 이미지에는 포함되지 않습니다."
   },
   "ExportSettings": {
     "title": "작품 저장",
@@ -434,5 +436,21 @@
     "saveError": "프로젝트를 저장하지 못했습니다. 사진을 확인한 후 다시 시도하세요.",
     "versionError": "지원하지 않는 프로젝트 버전입니다. 최신 XIV Frame에서 다시 열어 주세요.",
     "tooLarge": "프로젝트는 80MB 이하만 지원합니다. 사진 용량을 줄여 다시 시도하세요."
+  },
+  "PhotoTools": {
+    "title": "사진 정밀 편집",
+    "contain": "전체 맞춤",
+    "cover": "프레임 채우기",
+    "rotateLeft": "왼쪽으로 90도 회전",
+    "rotateRight": "오른쪽으로 90도 회전",
+    "flipHorizontal": "사진 좌우 반전",
+    "flipVertical": "사진 상하 반전",
+    "contained": "사진 전체를 중앙에 맞췄습니다.",
+    "covered": "프레임을 채우고 중앙에 맞췄습니다.",
+    "hint": "회전·반전 후 배치를 다시 조정합니다. 모든 변경은 실행 취소할 수 있습니다.",
+    "processing": "사진을 처리하는 중입니다…",
+    "transformed": "사진을 변환했습니다. 배치를 확인하세요.",
+    "changed": "편집 내용이 바뀌어 변환을 중단했습니다. 다시 시도하세요.",
+    "error": "사진을 변환하지 못했습니다. 다시 시도하세요."
   }
 }

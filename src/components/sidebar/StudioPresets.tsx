@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { useStore } from '@/store/useStore'
 import { EditorSection } from '@/components/ui/editor'
 import type { EditorSnapshot } from '@/store/history'
+import { useShallow } from 'zustand/react/shallow'
 
 const presets: { id: 'gallery' | 'cinema' | 'portrait'; ratio: string; settings: Partial<EditorSnapshot> }[] = [
   { id: 'gallery', ratio: '1:1', settings: { layoutPreset: 'grid', canvasRatio: '1:1', imageGap: 24, borderWidth: 32, imageTransition: 'none', backgroundColor: 'white', grainIntensity: 0 } },
@@ -14,12 +15,12 @@ const presets: { id: 'gallery' | 'cinema' | 'portrait'; ratio: string; settings:
 
 export function StudioPresets() {
   const t = useTranslations('Studio')
-  const state = useStore()
+  const state = useStore(useShallow(state => ({ layoutPreset: state.layoutPreset, canvasRatio: state.canvasRatio, imageGap: state.imageGap, borderWidth: state.borderWidth, imageTransition: state.imageTransition, backgroundColor: state.backgroundColor, grainIntensity: state.grainIntensity, applyEdit: state.applyEdit })))
   return (
     <EditorSection title={t('presets')} description={t('presetsHint')}>
       <div className="grid grid-cols-3 gap-2">
         {presets.map(preset => {
-          const selected = Object.entries(preset.settings).every(([key, value]) => state[key as keyof EditorSnapshot] === value)
+          const selected = Object.entries(preset.settings).every(([key, value]) => state[key as keyof typeof state] === value)
           return (
             <button key={preset.id} type="button" onClick={() => state.applyEdit(preset.settings)} aria-pressed={selected}
               className={`preset-card group relative min-w-0 rounded-lg border p-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${selected ? 'border-primary bg-muted' : 'border-border bg-card hover:border-primary/40'}`}>

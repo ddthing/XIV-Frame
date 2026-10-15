@@ -34,6 +34,12 @@ export interface LayoutSlice {
 
   zoom: number
   setZoom: (zoom: number) => void
+  showGuides: boolean
+  setShowGuides: (show: boolean) => void
+  exportFormat: 'png' | 'jpeg'
+  exportSize: 'original' | 2048 | 4096
+  exportFilename: string
+  setExportPreferences: (preferences: Partial<Pick<LayoutSlice, 'exportFormat' | 'exportSize' | 'exportFilename'>>) => void
 
   grainIntensity: number
   setGrainIntensity: (intensity: number) => void
@@ -56,6 +62,10 @@ export const initialLayoutState = {
   copyrightColor: 'black' as CopyrightColor,
   copyrightPosition: 'bottom-center' as CopyrightPosition,
   zoom: 100,
+  showGuides: false,
+  exportFormat: 'png' as const,
+  exportSize: 4096 as const,
+  exportFilename: 'xiv-frame',
   grainIntensity: 0,
   isExporting: false,
   isCanvasLoading: true,
@@ -75,6 +85,8 @@ export const createLayoutSlice: StateCreator<LayoutSlice, [], [], LayoutSlice> =
   setBorderWidth: (width) => set({ borderWidth: width }),
   setShowCopyright: (show) => set({ showCopyright: show }),
   setZoom: (z) => set({ zoom: z }),
+  setShowGuides: (showGuides) => set({ showGuides }),
+  setExportPreferences: (preferences) => set(preferences),
   setGrainIntensity: (intensity) => set({ grainIntensity: intensity }),
   setIsExporting: (isExporting) => set({ isExporting }),
   setIsCanvasLoading: (isCanvasLoading) => set({ isCanvasLoading }),

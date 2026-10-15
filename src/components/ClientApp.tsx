@@ -1,23 +1,27 @@
 'use client'
 
 import { useRef, useEffect, useState, useCallback } from 'react'
+import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
 import { EditorNavigation, type EditorTab } from '@/components/sidebar/EditorNavigation'
 import { EditorHelpPanel } from '@/components/sidebar/EditorHelpPanel'
 import { SettingsPanel } from '@/components/sidebar/SettingsPanel'
 import { PreviewCanvas } from '@/components/canvas/PreviewCanvas'
 import { DesktopToolbar } from '@/components/canvas/DesktopToolbar'
-import { MobileLayout } from '@/components/mobile/MobileLayout'
 import { useEditorShortcuts } from '@/hooks/useEditorShortcuts'
 import { EditorLocaleProvider } from './EditorLocaleProvider'
+import { useMobileViewport } from '@/hooks/useMobileViewport'
 
 import type Konva from 'konva'
+
+const MobileLayout = dynamic(() => import('./mobile/MobileLayout').then(module => module.MobileLayout))
 
 export function ClientApp({ currentLocale }: { currentLocale: string }) {
   return <EditorLocaleProvider initialLocale={currentLocale}><EditorWorkspace /></EditorLocaleProvider>
 }
 
 function EditorWorkspace() {
+  const isMobile = useMobileViewport()
   const desktopStageRef = useRef<Konva.Stage | null>(null)
   const mobileStageRef = useRef<Konva.Stage | null>(null)
   const tA11y = useTranslations('Accessibility')
@@ -84,7 +88,7 @@ function EditorWorkspace() {
           {tA11y('skipToEditor')}
         </a>
 
-        <div className="hidden min-h-0 flex-1 flex-col md:flex">
+        {!isMobile && <div className="hidden min-h-0 flex-1 flex-col md:flex">
           <DesktopToolbar stageRef={desktopStageRef} />
           <div className={`grid min-h-0 flex-1 border-b border-border ${isFocusMode ? 'md:grid-cols-[minmax(0,1fr)]' : isNavigatorCollapsed ? 'md:grid-cols-[64px_minmax(0,1fr)]' : 'md:grid-cols-[64px_304px_minmax(0,1fr)]'} ${isFocusMode ? 'xl:grid-cols-[minmax(0,1fr)]' : isNavigatorCollapsed ? 'xl:grid-cols-[64px_minmax(0,1fr)]' : 'xl:grid-cols-[64px_352px_minmax(0,1fr)]'}`}>
             {!isFocusMode && <EditorNavigation
@@ -114,11 +118,11 @@ function EditorWorkspace() {
               />
             </main>
           </div>
-        </div>
+        </div>}
 
-        <div className="flex min-h-0 h-full w-full md:hidden">
+        {isMobile && <div className="flex min-h-0 h-full w-full md:hidden">
           <MobileLayout stageRef={mobileStageRef} />
-        </div>
+        </div>}
       </div>
     </div>
   )

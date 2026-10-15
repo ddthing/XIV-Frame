@@ -59,6 +59,12 @@ export function getCanvasDimensions({
 }
 
 export type ExportSize = 'original' | 2048 | 4096
+
+export function getImageCellSize(contentWidth: number, contentHeight: number, count: number, layout: string, gap: number) {
+  if (layout === 'grid' && count >= 3) return { width: (contentWidth - gap) / 2, height: (contentHeight - gap) / 2 }
+  if (layout === 'vertical-split') return { width: contentWidth, height: (contentHeight - gap * (count - 1)) / count }
+  return { width: (contentWidth - gap * (count - 1)) / count, height: contentHeight }
+}
 export type ExportFormat = 'png' | 'jpeg'
 
 export function getExportDimensions(width: number, height: number, size: ExportSize) {

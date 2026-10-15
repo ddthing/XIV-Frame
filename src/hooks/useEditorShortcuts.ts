@@ -31,6 +31,9 @@ export function useEditorShortcuts(onToggleFocus: () => void) {
       if (step) {
         event.preventDefault()
         window.dispatchEvent(new CustomEvent(`xiv-frame:open-${step}`))
+      } else if (key === 'g') {
+        event.preventDefault()
+        store.setShowGuides(!store.showGuides)
       } else if (key === 'f' && window.matchMedia('(min-width: 768px)').matches) {
         event.preventDefault()
         onToggleFocus()

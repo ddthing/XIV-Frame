@@ -394,7 +394,9 @@
     "switchStep": "Switch editing step",
     "focus": "Focus mode",
     "projectFiles": "Continue your work",
-    "exportDescription": "Export an image or save an editable project."
+    "exportDescription": "Export an image or save an editable project.",
+    "guides": "Composition guides",
+    "guidesHint": "Preview only. Guides are never exported."
   },
   "ExportSettings": {
     "title": "Save your frame",
@@ -434,5 +436,21 @@
     "saveError": "Could not save the project. Check your photos and try again.",
     "versionError": "This project version is not supported. Open it in the latest XIV Frame.",
     "tooLarge": "Projects must be 80 MB or smaller. Reduce your image sizes and try again."
+  },
+  "PhotoTools": {
+    "title": "Precision editing",
+    "contain": "Fit entire photo",
+    "cover": "Fill frame",
+    "rotateLeft": "Rotate photo 90° left",
+    "rotateRight": "Rotate photo 90° right",
+    "flipHorizontal": "Flip photo horizontally",
+    "flipVertical": "Flip photo vertically",
+    "contained": "The entire photo is fitted and centered.",
+    "covered": "The photo fills the frame and is centered.",
+    "hint": "Rotation and flips reset framing. Every change can be undone.",
+    "processing": "Processing photo…",
+    "transformed": "Photo transformed. Review the framing.",
+    "changed": "Editing changed during processing. Please try again.",
+    "error": "Could not transform the photo. Please try again."
   }
 }
