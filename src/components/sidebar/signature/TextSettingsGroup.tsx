@@ -111,7 +111,7 @@ export function TextSettingsGroup({ idPrefix = 'signature-text' }: { idPrefix?: 
           <Label htmlFor={controlId('font')} className="block text-xs font-semibold text-foreground">{t('font')}</Label>
           <Select value={fontFamily} onValueChange={(val) => val && setFontFamily(val)}>
             <SelectTrigger id={controlId('font')} className="h-10 w-full rounded-md border-border bg-background text-sm focus-visible:border-primary focus-visible:ring-primary">
-              <span className="flex flex-1 text-left truncate">{FONT_MAP[fontFamily]}</span>
+              <span className="flex flex-1 text-left truncate">{t(FONT_MAP[fontFamily])}</span>
             </SelectTrigger>
             <SelectContent className="rounded-xl">
               <SelectItem value="Pretendard" className="text-sm font-sans font-medium" style={{ fontFamily: DEFAULT_SIGNATURE_FONT }}>{t('fontDefault')}</SelectItem>

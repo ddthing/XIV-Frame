@@ -105,7 +105,7 @@ export function MobileLayout({ stageRef }: { stageRef: React.MutableRefObject<Ko
     <div className="relative flex h-full min-h-0 w-full flex-col bg-background">
       <header className="app-header relative flex items-center gap-2 border-b border-primary-foreground/15 bg-primary px-3 text-primary-foreground">
         <div className="flex min-w-0 items-center">
-          <Logo size="sm" inverse />
+          <Logo size="sm" inverse className="[&>span]:whitespace-nowrap max-[359px]:[&>span]:sr-only" />
         </div>
         <div className="ml-auto flex shrink-0 items-center gap-1">
           <HistoryControls inverse />

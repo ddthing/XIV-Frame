@@ -12,7 +12,7 @@ export function LayoutSheet({ open, onOpenChange, onContinue }: { open: boolean;
       <DrawerContent className="max-h-[88vh] rounded-t-2xl bg-background">
         <MobileSheetHeader open={open} onClose={() => onOpenChange(false)} eyebrow={t('layoutEyebrow')} title={t('layoutSheetTitle')} description={t('layoutSheetDescription')} />
         <MobileSheetBody open={open} className="custom-scrollbar overflow-y-auto px-5 pb-[calc(env(safe-area-inset-bottom,1rem)+1.25rem)] pt-5">
-          <LazyLayoutSettings idPrefix="mobile-layout" showRatio={false} stickyContinue onContinue={onContinue ?? (() => {
+          <LazyLayoutSettings idPrefix="mobile-layout" stickyContinue onContinue={onContinue ?? (() => {
             onOpenChange(false)
             window.dispatchEvent(new CustomEvent('xiv-frame:open-image'))
           })} />

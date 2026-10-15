@@ -102,6 +102,17 @@ export function ImageUploader({ idPrefix = 'image' }: { idPrefix?: string }) {
   const activeImage = activeIndex >= 0 ? images[activeIndex] : undefined
   const activePosition = activeIndex >= 0 ? imagePositions[activeIndex] || { x: 0, y: 0 } : { x: 0, y: 0 }
   const activeScale = activeIndex >= 0 ? imageScales[activeIndex] || 1 : 1
+  const [scaleDraft, setScaleDraft] = useState<string | null>(null)
+
+  const commitScale = () => {
+    const draft = scaleDraft ?? String(Math.round(activeScale * 100))
+    const value = Number(draft)
+    const scale = draft.trim() && Number.isFinite(value)
+      ? Math.max(0.5, Math.min(3, value / 100))
+      : activeScale
+    if (activeIndex >= 0) setImageScale(activeIndex, scale)
+    setScaleDraft(null)
+  }
   const scaleInputId = `${idPrefix}-selected-image-scale-input`
   const nudgeStep = 10
 
@@ -230,9 +241,6 @@ export function ImageUploader({ idPrefix = 'image' }: { idPrefix?: string }) {
                           <ChevronLeft className="size-4" aria-hidden="true" />
                         </button>
                       )}
-                      <button type="button" aria-label={t('change')} onClick={(event) => { event.stopPropagation(); handleFileUpload(index) }} className="h-10 min-h-10 min-w-0 flex-1 truncate rounded-md border border-primary-foreground/20 bg-background/95 px-2 text-[11px] font-semibold leading-none whitespace-nowrap text-foreground shadow-subtle transition-colors hover:bg-background">
-                        {t('change')}
-                      </button>
                       {index < images.length - 1 && images[index + 1] && (
                       <button type="button" aria-label={t('moveNext')} onClick={(event) => handleMove(event, index, 'next')} className="grid size-10 shrink-0 place-items-center rounded-md border border-primary-foreground/20 bg-background/95 text-foreground shadow-subtle transition-colors hover:bg-background">
                           <ChevronRight className="size-4" aria-hidden="true" />
@@ -262,6 +270,9 @@ export function ImageUploader({ idPrefix = 'image' }: { idPrefix?: string }) {
 
             {imageCount > 0 && (
               <div className="flex gap-2">
+                <Button variant="outline" size="sm" className="h-10 min-w-0 flex-1 rounded-md text-xs" onClick={() => handleFileUpload(activeIndex)}>
+                  <RefreshCw className="size-3.5" aria-hidden="true" /> {t('change')}
+                </Button>
                 <Button variant="outline" size="sm" className="h-10 flex-1 rounded-md text-xs hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive" onClick={() => { if (!window.confirm(t('clearConfirm'))) return; invalidateAllUploads(); setImages([]); setSelectedIndex(0) }}>
                   <Trash2 className="size-3.5" aria-hidden="true" /> {t('clearAll')}
                 </Button>
@@ -288,12 +299,15 @@ export function ImageUploader({ idPrefix = 'image' }: { idPrefix?: string }) {
                       <Input
                         id={scaleInputId}
                         type="number"
-                        className="h-9 pr-6 text-right text-xs font-semibold tabular-nums [&::-webkit-inner-spin-button]:appearance-none"
-                        value={Math.round(activeScale * 100)}
+                        className="h-10 pr-6 text-right text-xs font-semibold tabular-nums [&::-webkit-inner-spin-button]:appearance-none"
+                        value={scaleDraft ?? String(Math.round(activeScale * 100))}
                         onChange={(event) => {
+                          setScaleDraft(event.target.value)
                           const value = Number(event.target.value)
-                          if (!Number.isNaN(value)) setImageScale(activeIndex, Math.max(0.5, Math.min(3, value / 100)))
+                          if (event.target.value.trim() && Number.isFinite(value) && value >= 50 && value <= 300) setImageScale(activeIndex, value / 100)
                         }}
+                        onBlur={commitScale}
+                        onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur() }}
                         min="50"
                         max="300"
                         aria-label={t('imageSize', { index: activeIndex + 1 })}
