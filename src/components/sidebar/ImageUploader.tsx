@@ -299,7 +299,8 @@ export function ImageUploader({ idPrefix = 'image' }: { idPrefix?: string }) {
                       <Input
                         id={scaleInputId}
                         type="number"
-                        className="h-10 pr-6 text-right text-xs font-semibold tabular-nums [&::-webkit-inner-spin-button]:appearance-none"
+                        inputMode="numeric"
+                        className="h-10 pr-6 text-right text-base font-semibold tabular-nums md:text-xs [&::-webkit-inner-spin-button]:appearance-none"
                         value={scaleDraft ?? String(Math.round(activeScale * 100))}
                         onChange={(event) => {
                           setScaleDraft(event.target.value)

@@ -118,7 +118,7 @@ export function ExportForm({ stageRef }: ExportFormProps) {
               maxLength={100}
               placeholder="xiv-frame"
               autoComplete="off"
-              className="h-11 rounded-md text-sm"
+              className="h-11 rounded-md text-base md:text-sm"
             />
             <span aria-hidden="true" className="font-mono text-xs text-muted-foreground">.{format === 'jpeg' ? 'jpg' : 'png'}</span>
           </div>

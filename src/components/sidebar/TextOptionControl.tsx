@@ -48,7 +48,7 @@ export function TextOptionControl({
           value={value} 
           onChange={(e) => onChangeValue(e.target.value)}
           placeholder={placeholder}
-          className="h-10 w-full rounded-md border-border bg-background text-sm transition-colors focus-visible:border-primary focus-visible:ring-primary"
+          className="h-10 w-full rounded-md border-border bg-background text-base transition-colors focus-visible:border-primary focus-visible:ring-primary md:text-sm"
           maxLength={30}
         />
       </div>
