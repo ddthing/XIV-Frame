@@ -117,14 +117,14 @@
 }
 
 @font-face {
-    font-family: 'HsBombaram30';
+    font-family: 'Bombaram';
     src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-10@1.1/HSBombaram3_Thin.woff') format('woff');
     font-weight: 100;
     font-display: swap;
 }
 
 @font-face {
-    font-family: 'HsBombaram30';
+    font-family: 'Bombaram';
     src: url('https://gcore.jsdelivr.net/gh/projectnoonnu/noonfonts_20-10@1.1/HSBombaram3_Regular.woff') format('woff');
     font-weight: normal;
     font-display: swap;
@@ -425,7 +425,6 @@
   .studio-frame { transform: rotate(-1deg); transition: transform 240ms ease; }
   .studio-frame:hover { transform: rotate(0deg); }
   .studio-frame-cell:nth-child(even) { background: color-mix(in oklch, var(--muted) 94%, var(--foreground)); }
-  .layout-options > button > span:first-child { width: 100%; height: 48px; padding: 5px; gap: 4px; }
   .preset-art { display: grid; height: 48px; gap: 3px; padding: 5px; background: var(--muted); border: 1px solid var(--border); }
   .preset-art i { display: block; background: color-mix(in oklch, var(--foreground) 28%, var(--muted)); }
   .preset-art i:nth-child(even) { background: color-mix(in oklch, var(--foreground) 55%, var(--muted)); }

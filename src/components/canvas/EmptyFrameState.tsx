@@ -35,7 +35,7 @@ export function EmptyFrameState({ canvasRatio, isUploading, layoutPreset, upload
       </div>
       <div className="relative mb-7 w-full max-w-[540px]">
         <div className="mx-auto flex items-center justify-center" style={{ height: 'clamp(130px,28vh,260px)' }}>
-          <div className="studio-frame relative h-full max-w-full border border-foreground/15 bg-card p-3 shadow-xl sm:p-4" style={{ aspectRatio: ratio }} aria-label={`${label} · ${canvasRatio === 'auto' ? layout('ratioAuto') : canvasRatio}`}>
+          <div className="studio-frame relative shrink-0 border border-foreground/15 bg-card p-3 shadow-xl sm:p-4" style={{ width: `min(100%, calc(clamp(130px, 28vh, 260px) * ${ratio}))`, aspectRatio: ratio }} aria-label={`${label} · ${canvasRatio === 'auto' ? layout('ratioAuto') : canvasRatio}`}>
             <div className={`grid size-full gap-2 ${frameGrid[layoutPreset]}`} aria-hidden="true">
               {Array.from({ length: cells }, (_, index) => (
                 <div key={index} className="studio-frame-cell relative grid min-h-0 min-w-0 place-items-center overflow-hidden bg-muted">

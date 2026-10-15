@@ -478,7 +478,7 @@ export function CharacterSettings({ idPrefix = 'character' }: { idPrefix?: strin
                 <canvas
                   ref={canvasRef}
                   aria-label={t('characterEditorLabel')}
-                  className="mx-auto block max-h-[360px] w-full max-w-full cursor-crosshair touch-none object-contain"
+                  className="mx-auto block h-auto w-auto max-h-[360px] max-w-full cursor-crosshair touch-none"
                   onPointerDown={handlePointerDown}
                   onPointerMove={handlePointerMove}
                   onPointerUp={handlePointerUp}
