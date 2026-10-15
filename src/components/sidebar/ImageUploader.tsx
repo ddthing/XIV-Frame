@@ -114,6 +114,7 @@ export function ImageUploader({ idPrefix = 'image' }: { idPrefix?: string }) {
       const file = (event.target as HTMLInputElement).files?.[0]
       if (!file) return
       const requestId = beginUpload(index)
+      const sourceImages = useStore.getState().images
 
       void prepareImageForCanvas(file)
         .then((url) => {
@@ -121,10 +122,14 @@ export function ImageUploader({ idPrefix = 'image' }: { idPrefix?: string }) {
             revokeObjectUrl(url)
             return
           }
+          if (useStore.getState().images !== sourceImages) {
+            revokeObjectUrl(url)
+            uploadRequests.current.delete(index)
+            setUploadError(t('uploadCanceled'))
+            return
+          }
 
           setImageAt(index, url)
-          setImageScale(index, 1)
-          setImagePosition(index, { x: 0, y: 0 })
           setSelectedIndex(index)
           setUploadError(null)
           uploadRequests.current.delete(index)
@@ -324,7 +329,7 @@ export function ImageUploader({ idPrefix = 'image' }: { idPrefix?: string }) {
                       </Button>
                     </div>
                   </div>
-                  <button type="button" onClick={() => { setImageScale(activeIndex, 1); setImagePosition(activeIndex, { x: 0, y: 0 }) }} className="inline-flex min-h-10 items-center gap-1.5 rounded-md px-2 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60">
+                  <button type="button" onClick={() => { useStore.getState().resetImageTransform(activeIndex) }} className="inline-flex min-h-10 items-center gap-1.5 rounded-md px-2 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60">
                     <RefreshCw className="size-3.5" /> {t('reset')}
                   </button>
                 </div>

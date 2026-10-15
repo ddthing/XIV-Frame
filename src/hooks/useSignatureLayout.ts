@@ -24,16 +24,30 @@ interface UseSignatureLayoutProps {
 }
 
 export function useSignatureLayout(props: UseSignatureLayoutProps) {
-  const [fontLoaded, setFontLoaded] = useState(false)
+  const [fontRevision, setFontRevision] = useState(0)
   const groupRef = useRef<Konva.Group | null>(null)
   const upperRef = useRef<Konva.Text | null>(null)
   const lowerRef = useRef<Konva.Text | null>(null)
 
   useEffect(() => {
-    document.fonts.load(`10px "${props.fontFamily}"`).then(() => {
-      setFontLoaded(true)
-    })
-  }, [props.fontFamily])
+    let active = true
+    const refreshMetrics = () => {
+      if (!active) return
+      // Konva caches text widths before a web font arrives. Its public change
+      // event refreshes those metrics even when the font name stays unchanged.
+      upperRef.current?.fire('fontFamilyChange')
+      lowerRef.current?.fire('fontFamilyChange')
+      setFontRevision(revision => revision + 1)
+      groupRef.current?.getLayer()?.batchDraw()
+    }
+
+    void Promise.all([
+      document.fonts.load(`${props.upperItalic ? 'italic ' : ''}${props.upperBold ? '700' : '400'} 40px "${props.fontFamily}"`, props.characterName || 'Aa'),
+      document.fonts.load(`${props.lowerItalic ? 'italic ' : ''}${props.lowerBold ? '700' : '400'} 24px "${props.fontFamily}"`, props.serverName || 'Aa'),
+    ]).then(refreshMetrics, refreshMetrics)
+
+    return () => { active = false }
+  }, [props.fontFamily, props.characterName, props.serverName, props.upperItalic, props.upperBold, props.lowerItalic, props.lowerBold])
 
   useEffect(() => {
     if (groupRef.current) {
@@ -76,7 +90,7 @@ export function useSignatureLayout(props: UseSignatureLayoutProps) {
     props.characterName, props.serverName, 
     props.upperFontSize, props.lowerFontSize, 
     props.signaturePosition, props.signatureAlign, 
-    fontLoaded, props.fontFamily,
+    fontRevision, props.fontFamily,
     props.upperLetterSpacing, props.upperBold, props.upperItalic,
     props.lowerLetterSpacing, props.lowerBold, props.lowerItalic,
     props.signatureSize,

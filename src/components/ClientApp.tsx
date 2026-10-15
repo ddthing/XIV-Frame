@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { EditorNavigation, type EditorTab } from '@/components/sidebar/EditorNavigation'
@@ -9,6 +9,7 @@ import { SettingsPanel } from '@/components/sidebar/SettingsPanel'
 import { PreviewCanvas } from '@/components/canvas/PreviewCanvas'
 import { DesktopToolbar } from '@/components/canvas/DesktopToolbar'
 import { MobileLayout } from '@/components/mobile/MobileLayout'
+import { useEditorShortcuts } from '@/hooks/useEditorShortcuts'
 
 import type Konva from 'konva'
 
@@ -21,6 +22,8 @@ export function ClientApp({ currentLocale }: { currentLocale: string }) {
   const [isNavigatorCollapsed, setIsNavigatorCollapsed] = useState(false)
   const [isHelpOpen, setIsHelpOpen] = useState(false)
   const [isFocusMode, setIsFocusMode] = useState(false)
+  const toggleFocus = useCallback(() => setIsFocusMode(value => !value), [])
+  useEditorShortcuts(toggleFocus)
 
   useEffect(() => {
     // Check if the user previously selected a different language
@@ -97,7 +100,7 @@ export function ClientApp({ currentLocale }: { currentLocale: string }) {
 
         <div className="hidden min-h-0 flex-1 flex-col md:flex">
           <DesktopToolbar stageRef={desktopStageRef} />
-          <div className={`grid min-h-0 flex-1 border-b border-border ${isFocusMode ? 'md:grid-cols-[minmax(0,1fr)]' : isNavigatorCollapsed ? 'md:grid-cols-[64px_minmax(0,1fr)]' : 'md:grid-cols-[64px_320px_minmax(0,1fr)]'} ${isFocusMode ? 'xl:grid-cols-[minmax(0,1fr)]' : isNavigatorCollapsed ? 'xl:grid-cols-[64px_minmax(0,1fr)]' : 'xl:grid-cols-[64px_390px_minmax(0,1fr)]'}`}>
+          <div className={`grid min-h-0 flex-1 border-b border-border ${isFocusMode ? 'md:grid-cols-[minmax(0,1fr)]' : isNavigatorCollapsed ? 'md:grid-cols-[64px_minmax(0,1fr)]' : 'md:grid-cols-[64px_304px_minmax(0,1fr)]'} ${isFocusMode ? 'xl:grid-cols-[minmax(0,1fr)]' : isNavigatorCollapsed ? 'xl:grid-cols-[64px_minmax(0,1fr)]' : 'xl:grid-cols-[64px_352px_minmax(0,1fr)]'}`}>
             {!isFocusMode && <EditorNavigation
               activeTab={activeTab}
               isHelpOpen={isHelpOpen}
@@ -121,7 +124,7 @@ export function ClientApp({ currentLocale }: { currentLocale: string }) {
               <PreviewCanvas
                 stageRef={desktopStageRef}
                 isFocusMode={isFocusMode}
-                onToggleFocus={() => setIsFocusMode(focusMode => !focusMode)}
+                onToggleFocus={toggleFocus}
               />
             </main>
           </div>

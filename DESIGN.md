@@ -72,7 +72,7 @@ The primary path is deliberately linear:
    image's size and position. Lock the image position when the framing is set.
 3. **시그니처** — add optional character/server text, logo, alignment, and
    supporting details after the visual composition is stable.
-4. **저장** — review the preview, then export the composed result as PNG.
+4. **저장** — review dimensions and format, then export PNG/JPEG or save an editable project.
 
 Recommendation is a shortcut inside the layout decision, not a separate
 workflow. When the image count suggests a likely choice, show a quiet
@@ -81,7 +81,7 @@ silently change the user's selection when the number of photos changes.
 
 Desktop uses a persistent 64px step rail for global movement between the
 three editor steps. The selected step opens the existing detail controls in an
-adjacent 320px–390px panel; that panel can collapse so the preview takes the
+adjacent 304px–352px panel; that panel can collapse so the preview takes the
 remaining width. There is no separate right inspector and no repeated primary
 workflow tab row. The rail's `안내` item opens the same panel with the guide,
 FAQ, service information, legal pages, contact link, and donation link.
@@ -235,3 +235,33 @@ KWCAG 2.1 and 2.2:
   person?
 - Are old neon, warm, sticky-note, or unrelated lookbook rules absent from the
   editor and documentation?
+
+## Studio workflow additions
+
+- Three compact presets apply layout, ratio, spacing, and finish together in
+  one reversible edit. They preserve photographs and signatures. The original
+  layout choices remain visible below them, with a six-option ratio grid.
+- The desktop inspector is 304px–352px wide. A small numbered section marker,
+  compact layout thumbnails, and a persistent next-step action keep controls
+  scannable. The canvas dock also exposes keyboard shortcut help and photo count.
+- The empty frame previews the chosen ratio and structure. Its add-photo button
+  opens a multi-file picker directly; drop and picker additions form one edit.
+- Header actions include undo/redo, project open/save, reset, language, and
+  export. Mobile shares history controls and includes project actions in its
+  save sheet. All new labels have Korean, English, and Japanese equivalents.
+- History retains up to 50 composition snapshots in memory. Consecutive changes
+  to the same continuous control within 600ms are grouped. View zoom, loading,
+  and locks are excluded. Blob URLs remain alive while any reachable snapshot
+  needs them. History and photos are never written to localStorage.
+- `.xivframe` files bundle editable settings and embedded raster assets. Import
+  validates shape, values, size, and decodability before one atomic edit. Remote
+  asset URLs are rejected. If the composition changes during preparation, the
+  import is cancelled rather than replacing newer work.
+- Fixed ratios describe the final frame including its border. Export offers
+  PNG/JPEG, a 2048px or 4096px long edge, or bounded working dimensions, plus a
+  filename. JPEG flattens transparency to white. The displayed pixel dimensions
+  match the download; view zoom and pan never affect output.
+- Grain is visible in both preview and export. Font changes refresh measured
+  text metrics. Export waits for assets, verifies the exact visible stage, and
+  cancels if the composition changes during preparation.
+

@@ -1,8 +1,7 @@
 'use client'
 
-import { Loader2, Upload } from 'lucide-react'
+import { ArrowRight, Loader2, Plus, ShieldCheck } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-
 import { Button } from '@/components/ui/button'
 import type { CanvasRatio, LayoutPreset } from '@/store/useStore'
 
@@ -11,99 +10,58 @@ interface EmptyFrameStateProps {
   isUploading: boolean
   layoutPreset: LayoutPreset
   uploadError: string | null
+  onAddPhotos: () => void
 }
 
-const FRAME_CELLS: Record<LayoutPreset, number> = {
-  split: 2,
-  'vertical-split': 2,
-  grid: 4,
+const frameGrid: Record<LayoutPreset, string> = {
+  split: 'grid-cols-2', 'vertical-split': 'grid-rows-2', grid: 'grid-cols-2 grid-rows-2',
 }
 
-const FRAME_GRID: Record<LayoutPreset, string> = {
-  split: 'grid-cols-2',
-  'vertical-split': 'grid-rows-2',
-  grid: 'grid-cols-2 grid-rows-2',
-}
-
-export function EmptyFrameState({ canvasRatio, isUploading, layoutPreset, uploadError }: EmptyFrameStateProps) {
+export function EmptyFrameState({ canvasRatio, isUploading, layoutPreset, uploadError, onAddPhotos }: EmptyFrameStateProps) {
   const t = useTranslations('CanvasPreview')
-  const layoutT = useTranslations('LayoutSettings')
-  const imageT = useTranslations('ImageUploader')
-
-  const layoutLabel = layoutPreset === 'split'
-    ? layoutT('presetSplit')
-    : layoutPreset === 'vertical-split'
-      ? layoutT('presetVertical')
-      : layoutT('presetGrid')
-  const layoutDescription = layoutPreset === 'split'
-    ? layoutT('presetSplitDescription')
-    : layoutPreset === 'vertical-split'
-      ? layoutT('presetVerticalDescription')
-      : layoutT('presetGridDescription')
-  const ratioLabel = canvasRatio === 'auto' ? layoutT('ratioAuto') : canvasRatio
-  const aspectRatio = canvasRatio === '2:1' ? '2 / 1' : '16 / 9'
+  const studio = useTranslations('Studio')
+  const layout = useTranslations('LayoutSettings')
+  const label = layout(layoutPreset === 'split' ? 'presetSplit' : layoutPreset === 'grid' ? 'presetGrid' : 'presetVertical')
+  const [rw, rh] = (canvasRatio === 'auto' ? '16:9' : canvasRatio).split(':').map(Number)
+  const ratio = rw / rh
+  const cells = layoutPreset === 'grid' ? 4 : 2
 
   return (
-    <div className="pointer-events-auto absolute inset-0 z-10 flex items-center justify-center bg-background px-4 py-6 sm:px-8">
-      <div className="grid w-full max-w-5xl items-center gap-6 md:grid-cols-[minmax(0,1fr)_14rem] lg:gap-9 xl:grid-cols-[minmax(0,1fr)_16rem]">
-        <div className="min-w-0">
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <span className="editor-meta">{t('framePreview')}</span>
-            <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">{ratioLabel}</span>
-          </div>
-
-          <div
-            className="relative w-full overflow-hidden rounded-xl border border-line-strong bg-card p-2 shadow-xl sm:p-3"
-            style={{ aspectRatio }}
-            aria-hidden="true"
-          >
-            <div className={`grid size-full gap-2 ${FRAME_GRID[layoutPreset]}`}>
-              {Array.from({ length: FRAME_CELLS[layoutPreset] }, (_, index) => (
-                <span key={index} className="relative min-h-0 min-w-0 overflow-hidden rounded-md bg-muted/75">
-                  <span className="absolute left-3 top-3 font-mono text-[10px] font-semibold tabular-nums text-muted-foreground/70">
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
-                  <span className="absolute bottom-3 right-3 size-2 rounded-sm border border-foreground/15" />
-                </span>
+    <div className="studio-empty flex size-full min-h-0 flex-col items-center justify-center overflow-y-auto px-6 py-8 text-center">
+      <div className="mb-5 sm:mb-7">
+        <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-muted-foreground">XIV FRAME / YOUR CREATIVE WORKSPACE</p>
+        <h2 className="mt-3 text-[clamp(23px,2.4vw,36px)] font-semibold leading-[1.3] tracking-[-0.045em]">{studio('emptyTitle')}</h2>
+        <p className="mt-2 text-xs leading-5 text-muted-foreground sm:text-sm">{studio('emptyDescription')}</p>
+      </div>
+      <div className="relative mb-7 w-full max-w-[540px]">
+        <div className="mx-auto flex items-center justify-center" style={{ height: 'clamp(130px,28vh,260px)' }}>
+          <div className="studio-frame relative h-full max-w-full border border-foreground/15 bg-card p-3 shadow-xl sm:p-4" style={{ aspectRatio: ratio }} aria-label={`${label} · ${canvasRatio === 'auto' ? layout('ratioAuto') : canvasRatio}`}>
+            <div className={`grid size-full gap-2 ${frameGrid[layoutPreset]}`} aria-hidden="true">
+              {Array.from({ length: cells }, (_, index) => (
+                <div key={index} className="studio-frame-cell relative grid min-h-0 min-w-0 place-items-center overflow-hidden bg-muted">
+                  <span className="absolute left-2 top-2 font-mono text-[9px] text-muted-foreground/70">{String(index + 1).padStart(2, '0')}</span>
+                  <Plus className="size-5 stroke-[0.7] text-muted-foreground/40" />
+                  <span className="absolute bottom-2 right-2 size-2 border-b border-r border-muted-foreground/25" />
+                </div>
               ))}
             </div>
           </div>
         </div>
-
-        <div className="flex min-w-0 flex-col items-start">
-          <span className="editor-meta">{t('selectedLayout')}</span>
-          <h2 className="mt-2 font-display text-xl font-bold tracking-tight text-foreground sm:text-2xl">{layoutLabel}</h2>
-          <p className="mt-2 max-w-[28rem] text-sm leading-6 text-muted-foreground">{layoutDescription}</p>
-
-          <div className="mt-5 flex flex-wrap gap-2">
-            <Button
-              type="button"
-              className="h-10 rounded-md px-4 text-xs font-bold"
-              onClick={() => window.dispatchEvent(new CustomEvent('xiv-frame:open-image'))}
-              disabled={isUploading}
-            >
-              {isUploading ? <Loader2 aria-hidden="true" className="size-4 animate-spin motion-reduce:animate-none" /> : <Upload aria-hidden="true" className="size-4" />}
-              {isUploading ? imageT('uploading') : t('addPhotos')}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              className="h-10 rounded-md px-3 text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground"
-              onClick={() => window.dispatchEvent(new CustomEvent('xiv-frame:open-layout'))}
-              disabled={isUploading}
-            >
-              {t('changeLayout')}
-            </Button>
-          </div>
-
-          <span className="mt-4 font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground">{imageT('dropHint')}</span>
-          {uploadError && (
-            <p role="alert" className="mt-4 text-xs leading-5 text-destructive">
-              {uploadError}
-            </p>
-          )}
+        <div className="mt-4 flex items-center justify-center gap-3 font-mono text-[10px] text-muted-foreground">
+          <span>{label}</span><span className="h-3 w-px bg-border" /><span>{canvasRatio === 'auto' ? layout('ratioAuto') : canvasRatio}</span>
         </div>
       </div>
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        <Button type="button" onClick={onAddPhotos} disabled={isUploading} className="h-11 rounded-md px-5 text-xs font-semibold">
+          {isUploading ? <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <Plus className="size-4" aria-hidden="true" />}
+          {isUploading ? studio('preparing') : t('addPhotos')}
+          {!isUploading && <ArrowRight className="ml-3 size-3.5" aria-hidden="true" />}
+        </Button>
+        <Button variant="ghost" type="button" className="h-11 px-4 text-xs text-muted-foreground" onClick={() => window.dispatchEvent(new CustomEvent('xiv-frame:open-layout'))}>{t('changeLayout')}</Button>
+      </div>
+      <p className="mt-4 text-[11px] text-muted-foreground">{studio('dropHint')}</p>
+      <p className="mt-5 inline-flex items-center gap-1.5 text-[10px] text-muted-foreground"><ShieldCheck className="size-3" aria-hidden="true" />{studio('localOnly')}</p>
+      {uploadError && <p role="alert" className="mt-4 max-w-sm text-xs leading-5 text-destructive">{uploadError}</p>}
     </div>
   )
 }

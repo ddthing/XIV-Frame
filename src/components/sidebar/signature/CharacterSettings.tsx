@@ -60,9 +60,7 @@ function drawPixelsRegion(canvas: HTMLCanvasElement | null, pixels: PixelState, 
 export function CharacterSettings({ idPrefix = 'character' }: { idPrefix?: string }) {
   const {
     characterSourceUrl,
-    setCharacterSourceUrl,
     characterCutoutUrl,
-    setCharacterCutoutUrl,
     setCharacterPosition,
     characterScale,
     setCharacterScale,
@@ -74,9 +72,7 @@ export function CharacterSettings({ idPrefix = 'character' }: { idPrefix?: strin
     setCharacterShadow,
   } = useStore(useShallow((state) => ({
     characterSourceUrl: state.characterSourceUrl,
-    setCharacterSourceUrl: state.setCharacterSourceUrl,
     characterCutoutUrl: state.characterCutoutUrl,
-    setCharacterCutoutUrl: state.setCharacterCutoutUrl,
     setCharacterPosition: state.setCharacterPosition,
     characterScale: state.characterScale,
     setCharacterScale: state.setCharacterScale,
@@ -99,6 +95,8 @@ export function CharacterSettings({ idPrefix = 'character' }: { idPrefix?: strin
   const lastPointerRef = useRef<PointerPosition | null>(null)
   const fileRequestRef = useRef(0)
   const processingRequestRef = useRef(0)
+  const editorRequestRef = useRef(0)
+  const internalWriteRef = useRef(false)
   const sourcePreview = characterSourceUrl
   const [workingPixels, setWorkingPixels] = useState<PixelState | null>(null)
   const [editorOpen, setEditorOpen] = useState(false)
@@ -110,6 +108,19 @@ export function CharacterSettings({ idPrefix = 'character' }: { idPrefix?: strin
   const [undoCount, setUndoCount] = useState(0)
   const controlId = (name: string) => `${idPrefix}-${name}`
   const fileInputId = controlId('file-input')
+
+  const updateCharacterAssets = (patch: {
+    characterSourceUrl?: string | null
+    characterCutoutUrl?: string | null
+    characterPosition?: { x: number; y: number } | null
+  }) => {
+    internalWriteRef.current = true
+    try {
+      useStore.getState().applyEdit(patch)
+    } finally {
+      internalWriteRef.current = false
+    }
+  }
 
   const nudgeCharacter = (dx: number, dy: number) => {
     window.dispatchEvent(new CustomEvent('xiv-frame:nudge-character', { detail: { dx, dy } }))
@@ -123,11 +134,37 @@ export function CharacterSettings({ idPrefix = 'character' }: { idPrefix?: strin
   useEffect(() => () => {
     fileRequestRef.current += 1
     processingRequestRef.current += 1
+    editorRequestRef.current += 1
     if (paintFrameRef.current !== null) {
       window.cancelAnimationFrame(paintFrameRef.current)
       paintFrameRef.current = null
     }
   }, [])
+
+  useEffect(() => useStore.subscribe((next, previous) => {
+    if (internalWriteRef.current || (next.characterSourceUrl === previous.characterSourceUrl && next.characterCutoutUrl === previous.characterCutoutUrl)) return
+    // Undo, reset, and project import can replace assets while this panel stays
+    // mounted. Discard stale pixels and cancel results from the previous asset.
+    fileRequestRef.current += 1
+    processingRequestRef.current += 1
+    editorRequestRef.current += 1
+    sourceBlobRef.current = null
+    originalPixelsRef.current = null
+    workingPixelsRef.current = null
+    undoStackRef.current = []
+    paintingRef.current = false
+    lastPointerRef.current = null
+    if (paintFrameRef.current !== null) {
+      window.cancelAnimationFrame(paintFrameRef.current)
+      paintFrameRef.current = null
+    }
+    setWorkingPixels(null)
+    setEditorOpen(false)
+    setUndoCount(0)
+    setIsPreparing(false)
+    setProgress(0)
+    setError(null)
+  }), [])
 
   const syncWorkingPixels = (next: PixelState) => {
     workingPixelsRef.current = next
@@ -141,14 +178,17 @@ export function CharacterSettings({ idPrefix = 'character' }: { idPrefix?: strin
       return
     }
 
+    const requestId = ++editorRequestRef.current
     try {
       const pixels = await dataUrlToImageData(characterCutoutUrl)
+      if (requestId !== editorRequestRef.current) return
       const next = { data: pixels.data.slice(), width: pixels.width, height: pixels.height }
-      originalPixelsRef.current = next
+      originalPixelsRef.current = { ...next, data: next.data.slice() }
       undoStackRef.current = []
       syncWorkingPixels(next)
       setEditorOpen(true)
     } catch {
+      if (requestId !== editorRequestRef.current) return
       setError(t('characterEditorError'))
     }
   }
@@ -159,6 +199,7 @@ export function CharacterSettings({ idPrefix = 'character' }: { idPrefix?: strin
     if (!file) return
     const requestId = ++fileRequestRef.current
     processingRequestRef.current += 1
+    editorRequestRef.current += 1
 
     setError(null)
 
@@ -168,9 +209,7 @@ export function CharacterSettings({ idPrefix = 'character' }: { idPrefix?: strin
 
       sourceBlobRef.current = prepared.blob
       void warmBackgroundRemovalModel().catch(() => undefined)
-      setCharacterSourceUrl(prepared.dataUrl)
-      setCharacterCutoutUrl(null)
-      setCharacterPosition(null)
+      updateCharacterAssets({ characterSourceUrl: prepared.dataUrl, characterCutoutUrl: null, characterPosition: null })
       originalPixelsRef.current = null
       workingPixelsRef.current = null
       setWorkingPixels(null)
@@ -192,6 +231,7 @@ export function CharacterSettings({ idPrefix = 'character' }: { idPrefix?: strin
   const handleRemoveBackground = async () => {
     if (!sourcePreview || isPreparing) return
     const requestId = ++processingRequestRef.current
+    editorRequestRef.current += 1
     const sourceUrl = sourcePreview
     const sourceBlob = sourceBlobRef.current
 
@@ -215,8 +255,7 @@ export function CharacterSettings({ idPrefix = 'character' }: { idPrefix?: strin
       undoStackRef.current = []
       setUndoCount(0)
       syncWorkingPixels({ data: result.data.slice(), width: result.width, height: result.height })
-      setCharacterCutoutUrl(imageDataToDataUrl(result.data, result.width, result.height))
-      setCharacterPosition(null)
+      updateCharacterAssets({ characterCutoutUrl: imageDataToDataUrl(result.data, result.width, result.height), characterPosition: null })
       setEditorOpen(true)
     } catch {
       if (requestId !== processingRequestRef.current) return
@@ -231,7 +270,7 @@ export function CharacterSettings({ idPrefix = 'character' }: { idPrefix?: strin
 
   const saveWorkingPixels = (pixels: PixelState | null) => {
     if (!pixels) return
-    setCharacterCutoutUrl(imageDataToDataUrl(pixels.data, pixels.width, pixels.height))
+    updateCharacterAssets({ characterCutoutUrl: imageDataToDataUrl(pixels.data, pixels.width, pixels.height) })
   }
 
   const paintAt = (point: PointerPosition) => {
@@ -336,8 +375,8 @@ export function CharacterSettings({ idPrefix = 'character' }: { idPrefix?: strin
   const handleClear = () => {
     fileRequestRef.current += 1
     processingRequestRef.current += 1
-    setCharacterSourceUrl(null)
-    setCharacterCutoutUrl(null)
+    editorRequestRef.current += 1
+    updateCharacterAssets({ characterSourceUrl: null, characterCutoutUrl: null, characterPosition: null })
     sourceBlobRef.current = null
     originalPixelsRef.current = null
     workingPixelsRef.current = null
@@ -345,7 +384,12 @@ export function CharacterSettings({ idPrefix = 'character' }: { idPrefix?: strin
     paintingRef.current = false
     lastPointerRef.current = null
     setEditorOpen(false)
-    setCharacterPosition(null)
+    if (paintFrameRef.current !== null) {
+      window.cancelAnimationFrame(paintFrameRef.current)
+      paintFrameRef.current = null
+    }
+    setIsPreparing(false)
+    setProgress(0)
     undoStackRef.current = []
     setUndoCount(0)
   }

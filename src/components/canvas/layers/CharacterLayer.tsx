@@ -182,7 +182,7 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
     characterFlipX,
     characterShadow,
     setCharacterPosition,
-    setCharacterScale,
+    applyEdit,
     isExporting,
   } = useStore(useShallow((state) => ({
     characterCutoutUrl: state.characterCutoutUrl,
@@ -192,7 +192,7 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
     characterFlipX: state.characterFlipX,
     characterShadow: state.characterShadow,
     setCharacterPosition: state.setCharacterPosition,
-    setCharacterScale: state.setCharacterScale,
+    applyEdit: state.applyEdit,
     isExporting: state.isExporting,
   })))
 
@@ -277,11 +277,11 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
   const handleResizeEnd = () => {
     const preview = resizePreviewRef.current
     if (preview) {
-      setCharacterScale(preview.scale)
-      setCharacterPosition(preview.position)
+      applyEdit({ characterScale: preview.scale, characterPosition: preview.position })
     }
     resizePreviewRef.current = null
     setLiveScale(null)
+    setLivePosition(null)
     setIsResizing(false)
   }
 
@@ -319,7 +319,7 @@ function CharacterLayerComponent({ contentWidth, contentHeight }: { contentWidth
         }}
         onDragEnd={(event) => {
           const nextPosition = { x: event.target.x(), y: event.target.y() }
-          setCharacterPosition(nextPosition)
+          applyEdit({ characterPosition: nextPosition })
           setLivePosition(null)
           setIsDragging(false)
         }}

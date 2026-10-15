@@ -10,6 +10,7 @@ import { ExportSheet } from './ExportSheet'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { Logo } from '@/components/ui/Logo'
 import { EditorGuide } from '@/components/canvas/EditorGuide'
+import { HistoryControls } from '@/components/canvas/HistoryControls'
 import type Konva from 'konva'
 
 export type BottomSheetType = 'image' | 'signature' | 'layout' | 'export' | null
@@ -107,6 +108,7 @@ export function MobileLayout({ stageRef }: { stageRef: React.MutableRefObject<Ko
           <Logo size="sm" inverse />
         </div>
         <div className="ml-auto flex shrink-0 items-center gap-1">
+          <HistoryControls inverse />
           <EditorGuide idSuffix="mobile" />
           <LanguageSwitcher inverse compact />
         </div>

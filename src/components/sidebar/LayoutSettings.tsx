@@ -6,6 +6,7 @@ import { EditorFieldHeader, EditorRadio, EditorSection, editorSegmentedGroupClas
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { useStore, type BackgroundColor, type CanvasRatio, type LayoutPreset } from '@/store/useStore'
+import { StudioPresets } from './StudioPresets'
 
 export function LayoutSettings({ onContinue, idPrefix = 'layout', showContinue = true, stickyContinue = false, showRatio = true }: { onContinue?: () => void; idPrefix?: string; showContinue?: boolean; stickyContinue?: boolean; showRatio?: boolean }) {
   const {
@@ -89,12 +90,13 @@ export function LayoutSettings({ onContinue, idPrefix = 'layout', showContinue =
 
   return (
     <div className="space-y-6">
+      <StudioPresets />
       <EditorSection title={t('compositionTitle')} description={t('compositionDescription')}>
         {showRatio && (
-          <div className="flex items-center justify-between gap-3">
+          <div className="space-y-2.5">
             <span className="text-xs font-semibold text-foreground">{t('ratio')}</span>
-            <div className={`flex items-center gap-0.5 ${editorSegmentedGroupClass}`} role="radiogroup" aria-label={t('ratio')}>
-              {(['auto', '16:9', '2:1'] as const satisfies CanvasRatio[]).map((ratio) => (
+            <div className={`grid grid-cols-3 items-center gap-0.5 ${editorSegmentedGroupClass}`} role="radiogroup" aria-label={t('ratio')}>
+              {(['auto', '16:9', '2:1', '1:1', '4:5', '9:16'] as const satisfies CanvasRatio[]).map((ratio) => (
                 <EditorRadio
                   key={ratio}
                   checked={canvasRatio === ratio}
@@ -110,7 +112,7 @@ export function LayoutSettings({ onContinue, idPrefix = 'layout', showContinue =
 
         <fieldset className="space-y-3">
           <legend className="sr-only">{t('layoutPreset')}</legend>
-          <div className="grid gap-1.5 rounded-xl bg-muted/35 p-1.5" role="radiogroup" aria-label={t('layoutPreset')}>
+          <div className="layout-options grid grid-cols-3 gap-2" role="radiogroup" aria-label={t('layoutPreset')}>
             {layoutOptions.map(({ preset, label, description, meta }) => {
               const selected = layoutPreset === preset
               const recommended = recommendedPreset === preset
@@ -121,27 +123,27 @@ export function LayoutSettings({ onContinue, idPrefix = 'layout', showContinue =
                   checked={selected}
                   aria-describedby={controlId(`layout-${preset}-description`)}
                   onClick={() => setLayoutPreset(preset)}
-                  className={`group grid min-h-[96px] grid-cols-[88px_minmax(0,1fr)] gap-3 rounded-md px-2.5 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 ${
+                  className={`group flex min-w-0 flex-col gap-2 rounded-lg border px-2 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 ${
                     selected
-                      ? 'bg-card text-foreground shadow-subtle'
-                      : 'hover:bg-muted/70'
+                      ? 'border-primary bg-muted text-foreground'
+                      : 'border-border bg-card hover:border-primary/40'
                   }`}
                 >
                   <LayoutThumbnail preset={preset} />
-                  <span className="flex min-w-0 flex-col justify-between gap-2">
+                  <span className="flex w-full min-w-0 flex-col justify-between gap-2">
                     <span className="flex items-start justify-between gap-2">
                       <span className="min-w-0">
-                        <span className="block text-sm font-semibold leading-5 text-foreground">{label}</span>
-                        <span className="mt-1 block font-mono text-[10px] font-medium uppercase tracking-[0.06em] text-muted-foreground">{meta}</span>
+                        <span className="block text-[11px] font-semibold leading-5 text-foreground">{label}</span>
+                        <span className="sr-only">{meta}</span>
                       </span>
                       {recommended && (
-                        <span className="shrink-0 rounded-full bg-background/70 px-2 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.06em] text-primary">
+                        <span className="sr-only">
                           {t('recommended')}
                         </span>
                       )}
                     </span>
                     <span id={controlId(`layout-${preset}-description`)} className="sr-only">{description}</span>
-                    <span className="mt-auto font-body text-[11px] font-semibold text-primary">
+                    <span className="sr-only">
                       {selected ? t('selectedLayout') : t('chooseLayout')}
                     </span>
                   </span>
