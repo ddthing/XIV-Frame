@@ -32,7 +32,7 @@ function initialState(patch = {}) {
 test('records composition changes and ignores zoom, loading, export, and lock state', () => {
   const history = createEditorHistory()
   const before = initialState()
-  const viewOnly = captureEditorSnapshot({ ...before, zoom: 200, isExporting: true, isCanvasLoading: true, isImageLocked: true })
+  const viewOnly = captureEditorSnapshot({ ...before, zoom: 200, showGuides: true, exportFormat: 'jpeg', exportSize: 2048, exportFilename: 'my-work', isExporting: true, isCanvasLoading: true, isImageLocked: true })
   assert.equal(history.record(before, viewOnly), false)
   assert.deepEqual(history.status(), { canUndo: false, canRedo: false })
   const after = { ...before, canvasRatio: '4:5', characterName: 'Warrior of Light' }

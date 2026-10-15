@@ -36,7 +36,7 @@ test('round-trips editable composition and embeds all assets while excluding act
     logoUrl: PNG, characterSourceUrl: PNG, characterCutoutUrl: PNG,
     imagePositions: [{ x: -48, y: 25 }], imageScales: [1.8], characterPosition: { x: 25, y: 10 },
     characterName: '빛의 전사', canvasRatio: '4:5', fontFamily: 'Ridibatang',
-    zoom: 175, isExporting: true, isImageLocked: true, resetAll() {},
+    zoom: 175, showGuides: true, exportFormat: 'jpeg', exportSize: 2048, exportFilename: 'my-work', isExporting: true, isImageLocked: true, resetAll() {},
   })
   assert.equal(saved.format, 'xiv-frame')
   const imported = validateProjectDocument(saved).composition
@@ -47,13 +47,22 @@ test('round-trips editable composition and embeds all assets while excluding act
   assert.equal(imported.characterCutoutUrl, PNG)
   assert.equal(imported.characterName, '빛의 전사')
   assert.equal(imported.canvasRatio, '4:5')
-  for (const key of ['zoom', 'isExporting', 'isImageLocked', 'resetAll']) assert.equal(Object.hasOwn(imported, key), false)
+  for (const key of ['zoom', 'showGuides', 'exportFormat', 'exportSize', 'exportFilename', 'isExporting', 'isImageLocked', 'resetAll']) assert.equal(Object.hasOwn(imported, key), false)
 })
 
 test('normalizes implicit photo transforms so fresh uploads can be saved', async () => {
   const saved = await document()
   assert.deepEqual(saved.composition.imagePositions, [{ x: 0, y: 0 }])
   assert.deepEqual(saved.composition.imageScales, [1])
+})
+
+test('whole-photo fit below 50 percent survives project save and restore while zero is rejected', async () => {
+  const saved = await document({ imageScales: [0.0625], imagePositions: [{x:350,y:0}], showGuides: true })
+  const composition = validateProjectDocument(saved).composition
+  assert.deepEqual(composition.imageScales,[0.0625])
+  assert.deepEqual(composition.imagePositions,[{x:350,y:0}])
+  assert.equal(Object.hasOwn(composition,'showGuides'),false)
+  assert.throws(()=>validateProjectDocument({...saved,composition:{...saved.composition,imageScales:[0]}}),ProjectFileError)
 })
 
 test('preserves the existing default bitmap font alias in previously saved settings', async () => {

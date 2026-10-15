@@ -68,7 +68,7 @@ const position = choice('top-left', 'top-center', 'top-right', 'middle-left', 'c
 // UI flags from untrusted JSON can never reach the store.
 const settingValidators: { [K in keyof ProjectSettings]: Validator<ProjectSettings[K]> } = {
   imagePositions: array(point),
-  imageScales: array(number(0.5, 3)),
+  imageScales: array(number(Number.EPSILON, 3)),
   layoutPreset: choice('split', 'vertical-split', 'grid'),
   canvasRatio: choice('auto', '16:9', '2:1', '1:1', '4:5', '9:16'),
   backgroundColor: choice('white', 'light-gray', 'transparent'),

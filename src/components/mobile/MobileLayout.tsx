@@ -64,8 +64,7 @@ export function MobileLayout({ stageRef }: { stageRef: React.MutableRefObject<Ko
 
   useEffect(() => {
     const openMobileSheet = (sheet: OpenBottomSheet) => {
-      // Desktop and mobile editors are both mounted for a stable responsive
-      // layout. Only the visible surface may respond to shared editor events.
+      // Ignore an event during the responsive surface handoff.
       if (!window.matchMedia('(max-width: 767px)').matches) return
       openSheet(sheet)
     }

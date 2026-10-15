@@ -34,9 +34,12 @@ export function ExportForm({ stageRef }: ExportFormProps) {
     isExporting: store.isExporting,
     isCanvasLoading: store.isCanvasLoading,
   })))
-  const [format, setFormat] = useState<ExportFormat>('png')
-  const [size, setSize] = useState<ExportSize>(4096)
-  const [filename, setFilename] = useState('xiv-frame')
+  const { format, size, filename, setExportPreferences } = useStore(useShallow(store => ({
+    format: store.exportFormat, size: store.exportSize, filename: store.exportFilename, setExportPreferences: store.setExportPreferences,
+  })))
+  const setFormat = (exportFormat: ExportFormat) => setExportPreferences({ exportFormat })
+  const setSize = (exportSize: ExportSize) => setExportPreferences({ exportSize })
+  const setFilename = (exportFilename: string) => setExportPreferences({ exportFilename })
   const [logicalSize, setLogicalSize] = useState<{ width: number; height: number } | null>(null)
   const [status, setStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const hasImages = state.images.some(Boolean)

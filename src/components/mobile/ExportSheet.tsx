@@ -7,6 +7,7 @@ import type Konva from 'konva'
 import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
+import { Switch } from '@/components/ui/switch'
 import { ExportForm } from '@/components/canvas/ExportDialog'
 import { ProjectActions } from '@/components/canvas/ProjectActions'
 import { useStore } from '@/store/useStore'
@@ -20,8 +21,9 @@ export function ExportSheet({ open, onOpenChange, stageRef }: {
 }) {
   const t = useTranslations('MobileLayout')
   const studio = useTranslations('Studio')
-  const { zoom, setZoom, resetAll, hasImages } = useStore(useShallow(state => ({
+  const { zoom, setZoom, resetAll, hasImages, showGuides, setShowGuides } = useStore(useShallow(state => ({
     zoom: state.zoom, setZoom: state.setZoom, resetAll: state.resetAll, hasImages: state.images.some(Boolean),
+    showGuides: state.showGuides, setShowGuides: state.setShowGuides,
   })))
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -29,6 +31,7 @@ export function ExportSheet({ open, onOpenChange, stageRef }: {
         <MobileSheetHeader open={open} onClose={() => onOpenChange(false)} eyebrow={t('exportEyebrow')} title={studio('export')} description={studio('exportDescription')} />
         <MobileSheetBody open={open} className="space-y-6 overflow-y-auto px-5 pb-[calc(env(safe-area-inset-bottom,1rem)+1.5rem)] pt-5">
           <ExportForm stageRef={stageRef} />
+          <label className="flex min-h-11 items-center justify-between gap-4 rounded-lg border border-border bg-card p-3"><span><span className="block text-xs font-semibold">{studio('guides')}</span><span className="mt-1 block text-[11px] text-muted-foreground">{studio('guidesHint')}</span></span><Switch checked={showGuides} onCheckedChange={setShowGuides} aria-label={studio('guides')} /></label>
           <div className="space-y-3 border-t border-border pt-5">
             <p className="text-xs font-semibold">{studio('projectFiles')}</p>
             <ProjectActions variant="light" />

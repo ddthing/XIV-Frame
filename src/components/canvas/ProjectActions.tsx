@@ -72,8 +72,7 @@ export function ProjectActions({ variant = 'dark', compact = false }: ProjectAct
 
   useEffect(() => {
     const handleSave = () => {
-      // Desktop and mobile surfaces can coexist in the DOM. Only the visible
-      // control handles the shared keyboard command.
+      // A closing mobile sheet must not handle the shared keyboard command.
       if (containerRef.current?.getClientRects().length) void saveProject()
     }
     window.addEventListener('xiv-frame:save-project', handleSave)

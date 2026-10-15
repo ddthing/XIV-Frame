@@ -12,6 +12,7 @@ import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { ImageUploadError, prepareImageForCanvas, revokeObjectUrl } from '@/lib/imageUpload'
 import { LazyCharacterSettings } from './LazySettings'
+import { PhotoTools } from './PhotoTools'
 
 type PendingUpload = { requestId: number; sourceUrl: string | undefined }
 
@@ -44,6 +45,7 @@ export function ImageUploader({ idPrefix = 'image' }: { idPrefix?: string }) {
   const t = useTranslations('ImageUploader')
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [uploadError, setUploadError] = useState<string | null>(null)
+  const [imageDimensions, setImageDimensions] = useState<Record<string, { width: number; height: number }>>({})
   const uploadRequests = useRef(new Map<number, PendingUpload>())
   const mountedRef = useRef(true)
 
@@ -105,10 +107,10 @@ export function ImageUploader({ idPrefix = 'image' }: { idPrefix?: string }) {
   const [scaleDraft, setScaleDraft] = useState<string | null>(null)
 
   const commitScale = () => {
-    const draft = scaleDraft ?? String(Math.round(activeScale * 100))
+    const draft = scaleDraft ?? String(Number((activeScale * 100).toFixed(2)))
     const value = Number(draft)
     const scale = draft.trim() && Number.isFinite(value)
-      ? Math.max(0.5, Math.min(3, value / 100))
+      ? Math.max(0.0001, Math.min(3, value / 100))
       : activeScale
     if (activeIndex >= 0) setImageScale(activeIndex, scale)
     setScaleDraft(null)
@@ -189,6 +191,13 @@ export function ImageUploader({ idPrefix = 'image' }: { idPrefix?: string }) {
     else handleFileUpload(index)
   }
 
+  const rememberDimensions = (source: string, image: HTMLImageElement) => {
+    const width = image.naturalWidth
+    const height = image.naturalHeight
+    setImageDimensions(current => current[source]?.width === width && current[source]?.height === height
+      ? current : { ...current, [source]: { width, height } })
+  }
+
   return (
     <div className="space-y-6">
       {uploadError && (
@@ -207,7 +216,7 @@ export function ImageUploader({ idPrefix = 'image' }: { idPrefix?: string }) {
           </div>
 
           <EditorSection title={t('uploadTitle')} description={t('uploadDescription')}>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="photo-library grid grid-cols-4 gap-2">
           {[0, 1, 2, 3].map((index) => {
             const image = images[index]
             if (!image && index !== nextUploadIndex) return null
@@ -216,7 +225,7 @@ export function ImageUploader({ idPrefix = 'image' }: { idPrefix?: string }) {
             return (
               <div
                 key={index}
-                className={`group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-xl border bg-card transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 ${
+                className={`group relative aspect-square cursor-pointer overflow-hidden rounded-md border bg-card transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 ${
                   selected
                     ? 'border-primary shadow-[inset_0_0_0_2px_var(--primary),var(--shadow-subtle)]'
                     : 'border-border hover:border-primary/30 hover:shadow-subtle'
@@ -232,25 +241,10 @@ export function ImageUploader({ idPrefix = 'image' }: { idPrefix?: string }) {
                       className="absolute inset-0 z-0 size-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring/70"
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={image} alt={t('imageLabel', { index: index + 1 })} className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" />
+                      <img src={image} alt={t('imageLabel', { index: index + 1 })} onLoad={event => rememberDimensions(image, event.currentTarget)} className="size-full object-cover" />
                       <span aria-hidden="true" className="pointer-events-none absolute inset-0 bg-primary/45 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
                     </button>
-                    {selected && <div className="absolute inset-x-2 bottom-2 z-10 flex min-w-0 items-center justify-center gap-1.5">
-                      {index > 0 && images[index - 1] && (
-                      <button type="button" aria-label={t('movePrevious')} onClick={(event) => handleMove(event, index, 'prev')} className="grid size-10 shrink-0 place-items-center rounded-md border border-primary-foreground/20 bg-background/95 text-foreground shadow-subtle transition-colors hover:bg-background">
-                          <ChevronLeft className="size-4" aria-hidden="true" />
-                        </button>
-                      )}
-                      {index < images.length - 1 && images[index + 1] && (
-                      <button type="button" aria-label={t('moveNext')} onClick={(event) => handleMove(event, index, 'next')} className="grid size-10 shrink-0 place-items-center rounded-md border border-primary-foreground/20 bg-background/95 text-foreground shadow-subtle transition-colors hover:bg-background">
-                          <ChevronRight className="size-4" aria-hidden="true" />
-                        </button>
-                      )}
-                    </div>}
-                    <span aria-hidden="true" className="pointer-events-none absolute left-2 top-2 grid size-6 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 font-mono text-[10px] font-bold tabular-nums text-foreground shadow-subtle">{String(index + 1).padStart(2, '0')}</span>
-                    {selected && <button type="button" aria-label={t('deleteImage')} onClick={(event) => handleRemove(event, index)} className="absolute right-2 top-2 grid size-10 place-items-center rounded-md border border-primary-foreground/20 bg-background/90 text-foreground shadow-subtle transition-colors hover:bg-destructive/10 hover:text-destructive">
-                      <X className="size-3.5" aria-hidden="true" />
-                    </button>}
+                    <span aria-hidden="true" className="pointer-events-none absolute bottom-1 left-1 grid size-5 place-items-center bg-background/90 font-mono text-[9px] font-bold tabular-nums text-foreground">{String(index + 1).padStart(2, '0')}</span>
                   </>
                 ) : (
                   <button
@@ -259,8 +253,8 @@ export function ImageUploader({ idPrefix = 'image' }: { idPrefix?: string }) {
                     onClick={() => handleSelect(index)}
                     className="flex size-full flex-col items-center justify-center gap-2 border border-dashed border-primary/20 text-muted-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring/70 group-hover:bg-surface-inset/60 group-hover:text-foreground"
                   >
-                    <span aria-hidden="true" className="grid size-9 place-items-center rounded-md bg-surface-inset text-foreground"><Upload className="size-4" /></span>
-                    <span className="text-[13px] font-semibold">{t('uploadImage')} {index + 1}</span>
+                    <Upload className="size-4" aria-hidden="true" />
+                    <span className="sr-only">{t('uploadImage')} {index + 1}</span>
                   </button>
                 )}
               </div>
@@ -269,10 +263,15 @@ export function ImageUploader({ idPrefix = 'image' }: { idPrefix?: string }) {
             </div>
 
             {imageCount > 0 && (
-              <div className="flex gap-2">
+              <div className="space-y-2">
+              <div className="flex items-center gap-1">
                 <Button variant="outline" size="sm" className="h-10 min-w-0 flex-1 rounded-md text-xs" onClick={() => handleFileUpload(activeIndex)}>
                   <RefreshCw className="size-3.5" aria-hidden="true" /> {t('change')}
                 </Button>
+                {activeIndex > 0 && <Button variant="outline" size="icon" className="size-10 shrink-0" aria-label={t('movePrevious')} onClick={event => handleMove(event, activeIndex, 'prev')}><ChevronLeft className="size-4" aria-hidden="true" /></Button>}
+                {activeIndex < images.length - 1 && <Button variant="outline" size="icon" className="size-10 shrink-0" aria-label={t('moveNext')} onClick={event => handleMove(event, activeIndex, 'next')}><ChevronRight className="size-4" aria-hidden="true" /></Button>}
+                <Button variant="outline" size="icon" className="size-10 shrink-0 hover:text-destructive" aria-label={t('deleteImage')} onClick={event => handleRemove(event, activeIndex)}><Trash2 className="size-3.5" aria-hidden="true" /></Button>
+              </div>
                 <Button variant="outline" size="sm" className="h-10 flex-1 rounded-md text-xs hover:border-destructive/30 hover:bg-destructive/10 hover:text-destructive" onClick={() => { if (!window.confirm(t('clearConfirm'))) return; invalidateAllUploads(); setImages([]); setSelectedIndex(0) }}>
                   <Trash2 className="size-3.5" aria-hidden="true" /> {t('clearAll')}
                 </Button>
@@ -284,12 +283,13 @@ export function ImageUploader({ idPrefix = 'image' }: { idPrefix?: string }) {
             <EditorSection title={t('selectedImage', { index: activeIndex + 1 })} description={t('selectedImageDescription')}>
               <div className="rounded-xl bg-muted/35 p-3 sm:p-4">
                 <div className="space-y-4">
-                  <EditorFieldHeader label={t('imageSize', { index: activeIndex + 1 })} value={`${Math.round(activeScale * 100)}%`} htmlFor={scaleInputId} />
+                  <PhotoTools index={activeIndex} dimensions={imageDimensions} />
+                  <EditorFieldHeader label={t('imageSize', { index: activeIndex + 1 })} value={`${Number((activeScale * 100).toFixed(2))}%`} htmlFor={scaleInputId} />
                   <div className="flex items-center gap-3">
                     <Slider
                       value={[activeScale]}
                       onValueChange={(values) => setImageScale(activeIndex, Array.isArray(values) ? values[0] : values as number)}
-                      min={0.5}
+                      min={0.01}
                       max={3}
                       step={0.01}
                       aria-label={t('imageSize', { index: activeIndex + 1 })}
@@ -301,15 +301,16 @@ export function ImageUploader({ idPrefix = 'image' }: { idPrefix?: string }) {
                         type="number"
                         inputMode="numeric"
                         className="h-10 pr-6 text-right text-base font-semibold tabular-nums md:text-xs [&::-webkit-inner-spin-button]:appearance-none"
-                        value={scaleDraft ?? String(Math.round(activeScale * 100))}
+                        value={scaleDraft ?? String(Number((activeScale * 100).toFixed(2)))}
                         onChange={(event) => {
                           setScaleDraft(event.target.value)
                           const value = Number(event.target.value)
-                          if (event.target.value.trim() && Number.isFinite(value) && value >= 50 && value <= 300) setImageScale(activeIndex, value / 100)
+                          if (event.target.value.trim() && Number.isFinite(value) && value >= 0.01 && value <= 300) setImageScale(activeIndex, value / 100)
                         }}
                         onBlur={commitScale}
                         onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur() }}
-                        min="50"
+                        min="0.01"
+                        step="0.01"
                         max="300"
                         aria-label={t('imageSize', { index: activeIndex + 1 })}
                       />

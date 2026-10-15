@@ -25,6 +25,7 @@ const mocks = {
   '@/components/ui/switch': { Switch: () => null },
   '@/lib/imageUpload': {},
   './LazySettings': { LazyCharacterSettings: () => null },
+  './PhotoTools': { PhotoTools: () => null },
 }
 const source = fs.readFileSync(new URL('../src/components/sidebar/ImageUploader.tsx', import.meta.url), 'utf8')
 const {outputText} = ts.transpileModule(source, {

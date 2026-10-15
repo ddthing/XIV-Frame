@@ -10,6 +10,7 @@ import { LogoLayer } from './layers/LogoLayer'
 import { CopyrightLayer } from './layers/CopyrightLayer'
 import { NoiseLayer } from './layers/NoiseLayer'
 import { getCanvasDimensions } from '@/lib/canvasGeometry'
+import { loadCanvasImages } from '@/lib/canvasImages'
 
 import type Konva from 'konva'
 
@@ -22,7 +23,7 @@ interface KonvaStageProps {
 export default function KonvaStage({ stageRef, onLoadError, onLoadStateChange }: KonvaStageProps) {
   const {
     images, layoutPreset, imageGap, imageTransition, blendWidth, canvasRatio,
-    borderWidth, backgroundColor, grainIntensity, setIsCanvasLoading
+    borderWidth, backgroundColor, grainIntensity, showGuides, setIsCanvasLoading
   } = useStore(useShallow(state => ({
     images: state.images,
     layoutPreset: state.layoutPreset,
@@ -33,10 +34,12 @@ export default function KonvaStage({ stageRef, onLoadError, onLoadStateChange }:
     borderWidth: state.borderWidth,
     backgroundColor: state.backgroundColor,
     grainIntensity: state.grainIntensity,
+    showGuides: state.showGuides,
     setIsCanvasLoading: state.setIsCanvasLoading,
   })))
   
   const containerRef = useRef<HTMLDivElement>(null)
+  const decodedImages = useRef(new Map<string, HTMLImageElement>())
   
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 })
   const [loadedImages, setLoadedImages] = useState<{ images: HTMLImageElement[]; sources: string }>({ images: [], sources: '' })
@@ -45,8 +48,7 @@ export default function KonvaStage({ stageRef, onLoadError, onLoadStateChange }:
 
   useEffect(() => {
     const container = containerRef.current
-    // Both responsive editors are mounted. Only the visible one owns the
-    // shared loading indicator; each stage also carries its own source revision.
+    // The active responsive editor owns loading and the export source revision.
     if (container && container.offsetWidth > 0 && container.offsetHeight > 0) {
       setIsCanvasLoading(!stageRef.current || loadedImages.sources !== requestedSources)
     }
@@ -54,28 +56,21 @@ export default function KonvaStage({ stageRef, onLoadError, onLoadStateChange }:
   
   useEffect(() => {
     let active = true
-    const imgInstances: HTMLImageElement[] = []
+    const validImages = images.filter((url): url is string => Boolean(url))
+    const batch = loadCanvasImages(validImages, decodedImages.current)
     
     const loadImages = async () => {
-      const validImages = images.filter((url): url is string => Boolean(url))
       onLoadStateChange?.(true)
-      const promises = validImages.map(url => {
-        return new Promise<HTMLImageElement>((resolve, reject) => {
-          const img = new window.Image()
-          imgInstances.push(img)
-          img.onload = () => resolve(img)
-          img.onerror = reject
-          img.src = url
-        })
-      })
       
       try {
-        const loaded = await Promise.all(promises)
+        const loaded = await batch.promise
         if (active) {
+          decodedImages.current = new Map(validImages.map((source, index) => [source, loaded[index]]))
           setLoadedImages({ images: loaded, sources: JSON.stringify(validImages) })
           onLoadStateChange?.(false)
         }
       } catch {
+        batch.cancel()
         if (active) {
           setLoadedImages({ images: [], sources: '' })
           onLoadStateChange?.(false)
@@ -86,11 +81,7 @@ export default function KonvaStage({ stageRef, onLoadError, onLoadStateChange }:
     loadImages()
     return () => { 
       active = false 
-      imgInstances.forEach(img => {
-        img.onload = null
-        img.onerror = null
-        img.src = ''
-      })
+      batch.cancel()
     }
   }, [images, onLoadError, onLoadStateChange])
 
@@ -143,7 +134,8 @@ export default function KonvaStage({ stageRef, onLoadError, onLoadStateChange }:
   if (!scale || scale <= 0 || !outerWidth || !outerHeight) return <div ref={containerRef} className="w-full h-full" />
 
   return (
-    <div ref={containerRef} className="w-full h-full flex items-center justify-center overflow-hidden">
+    <div ref={containerRef} className="relative w-full h-full flex items-center justify-center overflow-hidden">
+      {backgroundColor === 'transparent' && <div aria-hidden="true" className="canvas-transparency pointer-events-none absolute" style={{ width: outerWidth * scale, height: outerHeight * scale }} />}
       <Stage
         width={outerWidth * scale}
         height={outerHeight * scale}
@@ -152,7 +144,7 @@ export default function KonvaStage({ stageRef, onLoadError, onLoadStateChange }:
         exportImageSources={loadedImages.sources === requestedSources ? requestedSources : null}
         ref={stageRef}
       >
-        <Layer>
+        <Layer listening={false}>
           <BackgroundLayer 
             width={outerWidth} 
             height={outerHeight} 
@@ -192,12 +184,16 @@ export default function KonvaStage({ stageRef, onLoadError, onLoadStateChange }:
           </Layer>
         )}
 
-        <NoiseLayer 
+        {grainIntensity > 0 && <NoiseLayer
           width={outerWidth} 
           height={outerHeight} 
           intensity={grainIntensity} 
-        />
+        />}
       </Stage>
+      {showGuides && <svg data-canvas-guides="true" aria-hidden="true" className="pointer-events-none absolute" width={logicalWidth * scale} height={logicalHeight * scale} viewBox="0 0 3 3" preserveAspectRatio="none">
+        <path d="M1 0V3 M2 0V3 M0 1H3 M0 2H3" fill="none" stroke="black" strokeOpacity="0.4" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+        <path d="M1 0V3 M2 0V3 M0 1H3 M0 2H3" fill="none" stroke="white" strokeOpacity="0.8" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+      </svg>}
     </div>
   )
 }
