@@ -35,7 +35,7 @@ test('round-trips editable composition and embeds all assets while excluding act
   const saved = await document({
     logoUrl: PNG, characterSourceUrl: PNG, characterCutoutUrl: PNG,
     imagePositions: [{ x: -48, y: 25 }], imageScales: [1.8], characterPosition: { x: 25, y: 10 },
-    characterName: '빛의 전사', canvasRatio: '4:5', fontFamily: 'Ridibatang',
+    characterName: '빛의 전사', canvasRatio: '4:5', fontFamily: 'REATIC',
     zoom: 175, showGuides: true, exportFormat: 'jpeg', exportSize: 2048, exportFilename: 'my-work', isExporting: true, isImageLocked: true, resetAll() {},
   })
   assert.equal(saved.format, 'xiv-frame')
@@ -47,6 +47,7 @@ test('round-trips editable composition and embeds all assets while excluding act
   assert.equal(imported.characterCutoutUrl, PNG)
   assert.equal(imported.characterName, '빛의 전사')
   assert.equal(imported.canvasRatio, '4:5')
+  assert.equal(imported.fontFamily, 'REATIC')
   for (const key of ['zoom', 'showGuides', 'exportFormat', 'exportSize', 'exportFilename', 'isExporting', 'isImageLocked', 'resetAll']) assert.equal(Object.hasOwn(imported, key), false)
 })
 

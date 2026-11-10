@@ -144,6 +144,8 @@
     "fontSlowGothic": "スローゴシック",
     "fontRidibatang": "リディバタン",
     "fontMulmaru": "ムルマル",
+    "fontReatic": "REATIC",
+    "fontReaticInstall": "<download>公式サイト</download>から REATIC Regular と Bold をインストールし、ブラウザを開き直してください。読み込めない場合は代替フォントで表示されます。",
     "posTopLeft": "左上",
     "posTopCenter": "上部中央",
     "posTopRight": "右上",

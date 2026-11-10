@@ -41,10 +41,10 @@ export function useSignatureLayout(props: UseSignatureLayoutProps) {
       groupRef.current?.getLayer()?.batchDraw()
     }
 
-    void Promise.all([
+    void Promise.allSettled([
       document.fonts.load(`${props.upperItalic ? 'italic ' : ''}${props.upperBold ? '700' : '400'} 40px "${props.fontFamily}"`, props.characterName || 'Aa'),
       document.fonts.load(`${props.lowerItalic ? 'italic ' : ''}${props.lowerBold ? '700' : '400'} 24px "${props.fontFamily}"`, props.serverName || 'Aa'),
-    ]).then(refreshMetrics, refreshMetrics)
+    ]).then(refreshMetrics)
 
     return () => { active = false }
   }, [props.fontFamily, props.characterName, props.serverName, props.upperItalic, props.upperBold, props.lowerItalic, props.lowerBold])
