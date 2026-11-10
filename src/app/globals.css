@@ -89,6 +89,21 @@
     font-display: swap;
 }
 
+/* REATIC is loaded from the user's installation because its license restricts redistribution. */
+@font-face {
+    font-family: 'REATIC';
+    src: local('REATIC Regular'), local('REATIC-Regular'), local('리틱체 Regular');
+    font-weight: 400;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'REATIC';
+    src: local('REATIC Bold'), local('REATIC-Bold'), local('리틱체 Bold');
+    font-weight: 700;
+    font-display: swap;
+}
+
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 @import "tw-animate-css";

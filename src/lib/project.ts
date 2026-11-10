@@ -84,7 +84,7 @@ const settingValidators: { [K in keyof ProjectSettings]: Validator<ProjectSettin
   serverName: text(500),
   signaturePosition: position,
   signatureAlign: choice('left', 'center', 'right'),
-  fontFamily: choice('Pretendard', 'Terrarum Sans Bitmap', 'NexonMaplestory', 'TMoneyDungunbaram', 'OgRenaissanceSecret', 'Shouting', 'BookkMyungjo', 'x12y12pxMaruMinyaHangul', 'LotteriaChwapttaenggyeo', 'Bombaram', 'GoodNeighbor', 'SlowGothic', 'Ridibatang', 'Mulmaru'),
+  fontFamily: choice('Pretendard', 'Terrarum Sans Bitmap', 'NexonMaplestory', 'TMoneyDungunbaram', 'OgRenaissanceSecret', 'Shouting', 'BookkMyungjo', 'x12y12pxMaruMinyaHangul', 'LotteriaChwapttaenggyeo', 'Bombaram', 'GoodNeighbor', 'SlowGothic', 'Ridibatang', 'Mulmaru', 'REATIC'),
   signatureSize: number(50, 200),
   signatureColor: value => {
     if (typeof value !== 'string' || !/^#[a-f\d]{6}$/i.test(value)) invalid()

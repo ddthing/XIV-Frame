@@ -143,6 +143,8 @@
     "fontSlowGothic": "Slow Gothic",
     "fontRidibatang": "Ridi Batang",
     "fontMulmaru": "Mulmaru",
+    "fontReatic": "REATIC",
+    "fontReaticInstall": "Install REATIC Regular and Bold from the <download>official site</download>, then reopen your browser. The editor uses a fallback font when a face is unavailable.",
     "posTopLeft": "Top Left",
     "posTopCenter": "Top Center",
     "posTopRight": "Top Right",

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useStore } from '@/store/useStore'
 import { useShallow } from 'zustand/react/shallow'
 import { Label } from '@/components/ui/label'
@@ -9,6 +10,36 @@ import { EditorFieldHeader } from '@/components/ui/editor'
 import { PositionGrid } from '@/components/ui/PositionGrid'
 import { AlignGroup } from '@/components/ui/AlignGroup'
 import { DEFAULT_SIGNATURE_FONT, FONT_MAP, POSITION_OPTIONS } from '@/constants/signature'
+
+function ReaticFontHint() {
+  const t = useTranslations('SignatureSettings')
+  const [unavailable, setUnavailable] = useState(false)
+
+  useEffect(() => {
+    let active = true
+    void Promise.allSettled([
+      document.fonts.load('400 16px "REATIC"', '리틱체'),
+      document.fonts.load('700 16px "REATIC"', '리틱체'),
+    ]).then(results => {
+      if (active) setUnavailable(results.some(result => result.status === 'rejected' || result.value.length === 0))
+    })
+    return () => { active = false }
+  }, [])
+
+  if (!unavailable) return null
+
+  return (
+    <p role="status" className="font-body text-[11px] leading-4 text-muted-foreground">
+      {t.rich('fontReaticInstall', {
+        download: text => (
+          <a href="https://www.reaticindustry.com/reaticfont" target="_blank" rel="noopener noreferrer" className="underline">
+            {text}
+          </a>
+        ),
+      })}
+    </p>
+  )
+}
 
 export function TextSettingsGroup({ idPrefix = 'signature-text' }: { idPrefix?: string }) {
   const {
@@ -127,8 +158,10 @@ export function TextSettingsGroup({ idPrefix = 'signature-text' }: { idPrefix?: 
               <SelectItem value="SlowGothic" className="text-sm font-medium" style={{ fontFamily: 'SlowGothic' }}>{t('fontSlowGothic')}</SelectItem>
               <SelectItem value="Ridibatang" className="text-sm font-medium" style={{ fontFamily: 'Ridibatang' }}>{t('fontRidibatang')}</SelectItem>
               <SelectItem value="Mulmaru" className="text-sm font-medium" style={{ fontFamily: 'Mulmaru' }}>{t('fontMulmaru')}</SelectItem>
+              <SelectItem value="REATIC" className="text-sm font-medium" style={{ fontFamily: 'REATIC' }}>{t('fontReatic')}</SelectItem>
             </SelectContent>
           </Select>
+          {fontFamily === 'REATIC' && <ReaticFontHint />}
         </div>
 
         <div className="space-y-2">

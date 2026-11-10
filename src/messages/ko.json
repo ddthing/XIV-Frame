@@ -144,6 +144,8 @@
     "fontSlowGothic": "느림보고딕",
     "fontRidibatang": "리디바탕",
     "fontMulmaru": "물마루",
+    "fontReatic": "리틱체",
+    "fontReaticInstall": "<download>공식 페이지</download>에서 리틱체 Regular와 Bold를 설치하고 브라우저를 다시 열어 주세요. 불러올 수 없는 글꼴은 대체 글꼴로 표시됩니다.",
     "posTopLeft": "좌상단",
     "posTopCenter": "중앙상단",
     "posTopRight": "우상단",

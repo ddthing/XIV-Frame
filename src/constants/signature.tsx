@@ -15,7 +15,8 @@ export const FONT_MAP: Record<string, string> = {
   'GoodNeighbor': 'fontGoodNeighbor',
   'SlowGothic': 'fontSlowGothic',
   'Ridibatang': 'fontRidibatang',
-  'Mulmaru': 'fontMulmaru'
+  'Mulmaru': 'fontMulmaru',
+  'REATIC': 'fontReatic'
 }
 
 export const DEFAULT_SIGNATURE_FONT = 'Terrarum Sans Bitmap'
